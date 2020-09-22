@@ -3,19 +3,19 @@
 Che editor using intellij community edition
 
 
-# build image
+## build image
 ```bash
 $ docker build -t che-editor-intellij .
 ```
 
-# test image locally
+## test image locally
 ```bash
 $ docker run --rm -it -p 8080:8080 che-editor-intellij
 ```
 Connect from Chrome/Firefox to:
 http://localhost:8080/vnc.html?resize=remote&autoconnect=1
 
-# Test With Che
+## Test With Che
 http://che.openshift.io/f?url=https://gist.githubusercontent.com/benoitf/3c69b0290e6b6901dd20a505e1024267/raw/7f6523f7ec8a5bcbdbbc82eb4800fe565cb74c9f/gistfile1.txt
 
 current meta.yaml
