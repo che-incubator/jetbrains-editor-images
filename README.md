@@ -1,4 +1,4 @@
-#che-editor-intellij-community
+# che-editor-intellij-community
 
 POC to run Che with intellij community edition
 
