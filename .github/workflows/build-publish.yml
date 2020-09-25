@@ -45,5 +45,6 @@ jobs:
           echo "Building and pushing version ${IMAGE_VERSION} of image ${IMAGE_NAME}"
           docker buildx build --platform "${PLATFORMS}" -t "${IMAGE_NAME}:${IMAGE_VERSION}-${SHORT_SHA1}" \
             --push .
-          skopeo login --username ${{ secrets.QUAY_USERNAME }} --password ${{ secrets.QUAY_PASSWORD }} quay.io
-          skopeo copy docker://${IMAGE_NAME}:${IMAGE_VERSION}-${SHORT_SHA1} docker://${IMAGE_NAME}:latest
+          docker pull ${IMAGE_NAME}:${IMAGE_VERSION}-${SHORT_SHA1}
+          docker tag ${IMAGE_NAME}:${IMAGE_VERSION}-${SHORT_SHA1} ${IMAGE_NAME}:latest
+          docker push ${IMAGE_NAME}:latest
