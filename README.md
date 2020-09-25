@@ -16,7 +16,7 @@ Connect from Chrome/Firefox to:
 http://localhost:8080/vnc.html?resize=remote&autoconnect=1
 
 ## Test With Che
-http://che.openshift.io/f?url=https://raw.githubusercontent.com/che-incubator/che-editor-intellij-community/devfiles/master/workspace.yaml
+[![Contribute](https://www.eclipse.org/che/contribute.svg)](http://che.openshift.io/f?url=https://raw.githubusercontent.com/che-incubator/che-editor-intellij-community/devfiles/master/workspace.yaml)
 
 current meta.yaml
 ```yaml
