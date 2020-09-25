@@ -1,0 +1,47 @@
+#
+# Copyright (c) 2020 Red Hat, Inc.
+# This program and the accompanying materials are made
+# available under the terms of the Eclipse Public License 2.0
+# which is available at https://www.eclipse.org/legal/epl-2.0/
+#
+# SPDX-License-Identifier: EPL-2.0
+#
+
+on:
+  push:
+    paths-ignore:
+      - '**.md'
+    branches: [ master ]
+  
+jobs:
+  build:
+    env:
+      IMAGE_NAME: quay.io/che-incubator/che-editor-intellij-community
+    runs-on: ubuntu-latest
+    steps:
+      - name: Clone source code
+        uses: actions/checkout@v1
+        with:
+          fetch-depth: 1
+
+      - name: Docker login
+        uses: azure/docker-login@v1
+        with:
+          login-server: quay.io
+          username: ${{ secrets.QUAY_USERNAME }}
+          password: ${{ secrets.QUAY_PASSWORD }}
+
+      - name: Docker Buildx
+        uses: crazy-max/ghaction-docker-buildx@v3.3.0
+        with:
+          buildx-version: v0.4.2
+          qemu-version: 5.1.0-2
+
+      - name: Build and push image
+        run: |
+          IMAGE_VERSION=$(cat VERSION)
+          SHORT_SHA1=$(git rev-parse --short HEAD)
+          PLATFORMS=$(cat PLATFORMS)
+          echo "Building and pushing version ${IMAGE_VERSION} of image ${IMAGE_NAME}"
+          docker buildx build --platform "${PLATFORMS}" -t "${IMAGE_NAME}:${IMAGE_VERSION}-${SHORT_SHA1}" \
+            --push .
