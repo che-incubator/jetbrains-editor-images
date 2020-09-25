@@ -2,6 +2,6 @@ metadata:
   name: che-intellij-
 components:
   - type: cheEditor
-    reference: 'https://raw.githubusercontent.com/che-incubator/che-editor-intellij-community/devfiles/master/meta.yaml'
+    reference: 'https://raw.githubusercontent.com/che-incubator/che-editor-intellij-community/master/devfiles/meta.yaml'
     alias: theia-editor
 apiVersion: 1.0.0
