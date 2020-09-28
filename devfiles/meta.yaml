@@ -25,14 +25,8 @@ spec:
      image: "quay.io/che-incubator/che-editor-intellij-community:latest"
      mountSources: true
      volumes:
-         - mountPath: "/intellij-config"
-           name: intellij-config     
-     volumes:
-         - mountPath: "/home/user/.local"
-           name: intellij-local
-     volumes:
-         - mountPath: "/home/user/.java"
-           name: intellij-java
+         - mountPath: "/JetBrains/IdeaIC"
+           name: idea-configuration
      ports:
          - exposedPort: 8080
      memoryLimit: "2048M"
