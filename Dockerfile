@@ -52,14 +52,8 @@ RUN mkdir /${PRODUCT_NAME}-${PRODUCT_VERSION} && \
 # Copy fluxbox configuration
 COPY --chown=0:0 config/fluxbox /home/user/.fluxbox/init
 
-# Copy predefined configuration for IDE
-COPY --chown=0:0 config/etc/default/jetbrains/*.xml /etc/default/jetbrains/
-
-# Copy supervisord configuration
-COPY --chown=0:0 config/etc/supervisor /etc/supervisor
-
-# Copy tigervnc configuration
-COPY --chown=0:0 config/etc/tigervnc/vncserver-config-mandatory /etc/tigervnc/vncserver-config-mandatory
+# Copy predefined configs
+COPY --chown=0:0 config/etc /etc/
 
 # Copy sh scripts
 COPY --chown=0:0 scripts/*.sh /opt/
