@@ -7,32 +7,74 @@
 #
 
 FROM fedora:32
+
+# Product name:
+#   ideaIC    - IntelliJ Idea Community
+#   ideaIU    - IntelliJ Idea Ultimate
+#   WebStorm  - WebStorm
+ARG PRODUCT_NAME="ideaIC"
+
+# Product version
+ARG PRODUCT_VERSION="2020.2.3"
+
+# Product url constructs based on PRODUCT_NAME and PRODUCT_VERSION:
+#   https://download.jetbrains.com/idea/ideaIC-2020.2.3.tar.gz
+#   https://download.jetbrains.com/idea/ideaIU-2020.2.3.tar.gz
+#   https://download.jetbrains.com/webstorm/WebStorm-2020.2.3.tar.gz
+
+ARG BASE_MOUNT_FOLDER="/JetBrains"
+
 # which is used by novnc to find websockify
 RUN yum install -y tigervnc-server supervisor wget java-11-openjdk-devel novnc fluxbox which
 
-RUN mkdir /ideaIC-2020.2.2 && wget -qO- https://download.jetbrains.com/idea/ideaIC-2020.2.2.tar.gz | tar -zxv --strip-components=1 -C /ideaIC-2020.2.2 && \
-    mkdir -p /JetBrains/IdeaIC && \
+RUN mkdir /${PRODUCT_NAME}-${PRODUCT_VERSION} && \
+    case ${PRODUCT_NAME} in \
+        "ideaIC"|"ideaIU") \
+            wget -qO- https://download.jetbrains.com/idea/${PRODUCT_NAME}-${PRODUCT_VERSION}.tar.gz | tar -zxv --strip-components=1 -C /${PRODUCT_NAME}-${PRODUCT_VERSION} && \
+            ln -s /${PRODUCT_NAME}-${PRODUCT_VERSION}/bin/idea.sh /opt/run-ide.sh \
+            ;; \
+        "WebStorm") \
+            wget -qO- https://download.jetbrains.com/webstorm/${PRODUCT_NAME}-${PRODUCT_VERSION}.tar.gz | tar -zxv --strip-components=1 -C /${PRODUCT_NAME}-${PRODUCT_VERSION} && \
+            ln -s /${PRODUCT_NAME}-${PRODUCT_VERSION}/bin/webstorm.sh /opt/run-ide.sh \
+            ;; \
+    esac && \
+    mkdir -p ${BASE_MOUNT_FOLDER}/${PRODUCT_NAME} && \
     mkdir /etc/default/jetbrains && \
-    for f in "/JetBrains" "/ideaIC-2020.2.2" "/etc/passwd" "/etc/default/jetbrains"; do \
+    for f in "${BASE_MOUNT_FOLDER}" "/${PRODUCT_NAME}-${PRODUCT_VERSION}" "/etc/passwd" "/etc/default/jetbrains"; do \
       echo "Changing permissions on ${f}" && chgrp -R 0 ${f} && \
       chmod -R g+rwX ${f}; \
-    done
+    done && \
+    echo "idea.config.path=${BASE_MOUNT_FOLDER}/${PRODUCT_NAME}/config" > /${PRODUCT_NAME}-${PRODUCT_VERSION}/bin/idea.properties && \
+    echo "idea.system.path=${BASE_MOUNT_FOLDER}/${PRODUCT_NAME}/caches" >> /${PRODUCT_NAME}-${PRODUCT_VERSION}/bin/idea.properties && \
+    echo "idea.plugins.path=${BASE_MOUNT_FOLDER}/${PRODUCT_NAME}/plugins" >> /${PRODUCT_NAME}-${PRODUCT_VERSION}/bin/idea.properties && \
+    echo "idea.log.path=${BASE_MOUNT_FOLDER}/${PRODUCT_NAME}/logs" >> /${PRODUCT_NAME}-${PRODUCT_VERSION}/bin/idea.properties
 
-COPY --chown=0:0 etc/entrypoint.sh /entrypoint.sh
-COPY --chown=0:0 etc/prevent-idle-timeout.sh /
-COPY --chown=0:0 etc/preliminary-configuration.sh /
-COPY --chown=0:0 etc/default/*.xml /etc/default/jetbrains/
-COPY --chown=0:0 etc/supervisord.conf /etc/supervisord.conf
-# disable toolbar + use another theme
-COPY --chown=0:0 etc/fluxbox /home/user/.fluxbox/init
-# no security/ custom geometry
-COPY etc/tigervnc-config /etc/tigervnc/vncserver-config-mandatory
-# Set permissions on /etc/passwd and /home to allow arbitrary users to write
-COPY idea.properties /JetBrains/idea.properties
-RUN mkdir -p /home/user && chgrp -R 0 /home && chmod -R g=u /etc/passwd /etc/group /home && chmod +x /entrypoint.sh && chmod +x /prevent-idle-timeout.sh && chmod +x /preliminary-configuration.sh
+# Copy fluxbox configuration
+COPY --chown=0:0 config/fluxbox /home/user/.fluxbox/init
+
+# Copy predefined configuration for IDE
+COPY --chown=0:0 config/etc/default/jetbrains/*.xml /etc/default/jetbrains/
+
+# Copy supervisord configuration
+COPY --chown=0:0 config/etc/supervisor /etc/supervisor
+
+# Copy tigervnc configuration
+COPY --chown=0:0 config/etc/tigervnc/vncserver-config-mandatory /etc/tigervnc/vncserver-config-mandatory
+
+# Copy sh scripts
+COPY --chown=0:0 scripts/*.sh /opt/
+
+RUN mkdir -p /home/user && \
+    chgrp -R 0 /home && \
+    chmod -R g=u /etc/passwd /etc/group /home && \
+    chmod +x /opt/*.sh
+
 USER 10001
+
 ENV HOME=/home/user
-ENV IDEA_PROPERTIES=/JetBrains/idea.properties
+ENV JETBRAINS_PRODUCT=${PRODUCT_NAME}
+ENV JETBRAINS_PRODUCT_VERSION=${PRODUCT_VERSION}
+ENV JETBRAINS_BASE_MOUNT_FOLDER=${BASE_MOUNT_FOLDER}
 WORKDIR /projects
-ENTRYPOINT [ "/entrypoint.sh" ]
+ENTRYPOINT [ "/opt/entrypoint.sh" ]
 CMD ["tail", "-f", "/dev/null"]

@@ -1,7 +1,7 @@
 apiVersion: v2
-publisher: fbenoit
-name: intellij-NOVNC
-version: 2020.2.2
+publisher: eclipse
+name: ideaIC-NOVNC
+version: 2020.2.3
 type: Che Editor
 displayName:  IntelliJ IDEA Community Edition
 title:  IntelliJ IDEA Community Edition (in browser using noVNC) as editor for Eclipse Che
@@ -12,8 +12,7 @@ repository: https://github.com/che-incubator/che-editor-intellij-community
 firstPublicationDate: "2020-09-25"
 spec:
   endpoints:
-  # hack (use dirigible endpoint name as it is part of liveness probes)
-   -  name: "dirigible"
+   -  name: "intellij"
       public: true
       targetPort: 8080
       attributes:
@@ -21,7 +20,7 @@ spec:
         type: ide
         path: /vnc.html?resize=remote&autoconnect=true&reconnect=true
   containers:
-   - name: intellij-novnc
+   - name: ideaic-novnc
      image: "quay.io/che-incubator/che-editor-intellij-community:latest"
      mountSources: true
      volumes:
