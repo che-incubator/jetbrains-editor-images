@@ -8,27 +8,30 @@
 # SPDX-License-Identifier: EPL-2.0
 #
 
-# Ensure that main environment variable are configured
-if [ -z "${CHE_API_INTERNAL}" ]; then
-    echo "CHE_API_INTERNAL is not configured in environment."
-    exit 1
-fi
-if [ -z "${CHE_MACHINE_TOKEN}" ]; then
-    echo "CHE_MACHINE_TOKEN is not configured in environment."
-    exit 1
-fi
-if [ -z "${CHE_WORKSPACE_ID}" ]; then
-    echo "CHE_WORKSPACE_ID is not configured in environment."
+CA_CERT="/tmp/che/secret/ca.crt"
+
+
+if [ -z "${CHE_API_INTERNAL}" ] || [ -z "${CHE_WORKSPACE_ID}" ]; then
+    echo "CHE_API_INTERNAL or CHE_WORKSPACE_ID is not configured in environment."
     exit 1
 fi
 
-# Todo(vzhukovs): check for client certificates that might be included into request in case if script runs on minikube with self-signed certificates
+CURL_OPTS=
 
-# Start making requests to avoid idling, make a request to activity tracker each minute
+if [ -e $CA_CERT ]; then
+    CURL_OPTS="$CURL_OPTS --cacert /tmp/che/secret/ca.crt"
+fi
+
+if [ -n "$CHE_MACHINE_TOKEN" ]; then
+    CURL_OPTS="$CURL_OPTS -H \"Authorization: Bearer ${CHE_MACHINE_TOKEN}\""
+fi
+
+REQUEST_URL="${CHE_API_INTERNAL}/activity/${CHE_WORKSPACE_ID}"
+
 while true; do
-    curl -X PUT \
-    -H "Authorization: Bearer ${CHE_MACHINE_TOKEN}" \
-    "${CHE_API_INTERNAL}/activity/${CHE_WORKSPACE_ID}"
+    echo "$(date) - Perform request: 'curl -X PUT $CURL_OPTS $REQUEST_URL'."
+    eval curl -X PUT "${CURL_OPTS}" "${REQUEST_URL}"
+    echo "$(date) - Sleep for 1 minute."
 
-    sleep 1m
+    sleep 60
 done
