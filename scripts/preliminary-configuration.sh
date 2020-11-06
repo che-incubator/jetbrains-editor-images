@@ -13,4 +13,5 @@ if [ ! -e ${JETBRAINS_BASE_MOUNT_FOLDER}/${JETBRAINS_PRODUCT}/config/options ]; 
     echo "Provide preliminary configuration for JetBrains product."
     cp /etc/default/jetbrains/other.xml ${JETBRAINS_BASE_MOUNT_FOLDER}/${JETBRAINS_PRODUCT}/config/options/other.xml
     cp /etc/default/jetbrains/ide.general.xml ${JETBRAINS_BASE_MOUNT_FOLDER}/${JETBRAINS_PRODUCT}/config/options/ide.general.xml
+    cp /etc/default/jetbrains/updates.xml ${JETBRAINS_BASE_MOUNT_FOLDER}/${JETBRAINS_PRODUCT}/config/options/updates.xml
 fi
