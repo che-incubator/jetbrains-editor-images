@@ -11,3 +11,5 @@ session.screen0.strftimeFormat: %d %b, %a %02k:%M:%S
 session.screen0.toolbar.tools: prevworkspace, workspacename, nextworkspace, clock, prevwindow, nextwindow, iconbar, systemtray
 ! disable toolbar
 session.screen0.toolbar.visible:	false
+session.screen0.titlebar.left:
+session.screen0.titlebar.right: Maximize Close
