@@ -25,7 +25,7 @@ ARG PRODUCT_VERSION="2020.2.3"
 ARG BASE_MOUNT_FOLDER="/JetBrains"
 
 # which is used by novnc to find websockify
-RUN yum install -y tigervnc-server supervisor wget java-11-openjdk-devel novnc fluxbox git which
+RUN yum install -y tigervnc-server supervisor wget java-11-openjdk-devel novnc fluxbox git which nss libXScrnSaver mesa-libgbm
 
 RUN mkdir /${PRODUCT_NAME}-${PRODUCT_VERSION} && \
     case ${PRODUCT_NAME} in \
