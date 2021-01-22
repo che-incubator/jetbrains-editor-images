@@ -26,7 +26,6 @@ ARG BASE_MOUNT_FOLDER="/JetBrains"
 
 #Set JAVA_HOME
 ENV JAVA_HOME /usr/lib/jvm/java-11-openjdk/
-RUN export JAVA_HOME
 
 # which is used by novnc to find websockify
 RUN yum install -y tigervnc-server supervisor wget java-11-openjdk-devel novnc fluxbox git which nss libXScrnSaver mesa-libgbm
