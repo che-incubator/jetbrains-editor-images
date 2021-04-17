@@ -1,15 +1,15 @@
 apiVersion: v2
 publisher: eclipse
-name: projector-idea-c
-version: latest
+name: che-pycharm
+version: 2020.3
 type: Che Editor
-displayName:  IntelliJ IDEA Community
-title:  IntelliJ IDEA Community as Editor for Eclipse Che
-description:  IntelliJ IDEA Community running using Projector
-icon: https://resources.jetbrains.com/storage/products/intellij-idea/img/meta/intellij-idea_logo_300x300.png
+displayName:  PyCharm Community
+title:  PyCharm Community as Editor for Eclipse Che
+description:  PyCharm Community running using Projector
+icon: https://resources.jetbrains.com/storage/products/pycharm/img/meta/pycharm_logo_300x300.png
 category: Editor
 repository: https://github.com/che-incubator/jetbrains-editor-images
-firstPublicationDate: "2021-04-10"
+firstPublicationDate: "2021-04-17"
 spec:
   endpoints:
    -  name: "intellij"
@@ -20,12 +20,12 @@ spec:
         type: ide
         path: /projector-client/index.html?backgroundColor=434343&wss
   containers:
-   - name: projector-idea-c
-     image: "quay.io/che-incubator/che-projector-idea-c:latest"
+   - name: che-pycharm
+     image: "quay.io/che-incubator/che-pycharm:2020.3"
      mountSources: true
      volumes:
          - mountPath: "/home/projector-user"
            name: projector-user
      ports:
          - exposedPort: 8887
-     memoryLimit: "4096M"
+     memoryLimit: "2048M"
