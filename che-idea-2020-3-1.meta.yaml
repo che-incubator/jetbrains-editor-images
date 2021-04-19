@@ -18,7 +18,7 @@ spec:
       attributes:
         protocol: http
         type: ide
-        path: /projector-client/index.html?backgroundColor=434343&wss
+        path: /?backgroundColor=434343&wss
   containers:
    - name: che-idea
      image: "quay.io/che-incubator/che-idea:2020.3.1"
