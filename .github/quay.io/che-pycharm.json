@@ -1,0 +1,44 @@
+[
+    {
+        "displayName": "PyCharm Community",
+        "imageName": "quay.io/che-incubator/che-pycharm",
+        "imageTag": "latest",
+        "downloadUrl": "https://download.jetbrains.com/python/pycharm-community-2020.3.5.tar.gz"
+    },
+    {
+        "displayName": "PyCharm Community",
+        "imageName": "quay.io/che-incubator/che-pycharm",
+        "imageTag": "2020.3.5",
+        "downloadUrl": "https://download.jetbrains.com/python/pycharm-community-2020.3.5.tar.gz"
+    },
+    {
+        "displayName": "PyCharm Community",
+        "imageName": "quay.io/che-incubator/che-pycharm",
+        "imageTag": "2020.3.4",
+        "downloadUrl": "https://download.jetbrains.com/python/pycharm-community-2020.3.4.tar.gz"
+    },
+    {
+        "displayName": "PyCharm Community",
+        "imageName": "quay.io/che-incubator/che-pycharm",
+        "imageTag": "2020.3.3",
+        "downloadUrl": "https://download.jetbrains.com/python/pycharm-community-2020.3.3.tar.gz"
+    },
+    {
+        "displayName": "PyCharm Community",
+        "imageName": "quay.io/che-incubator/che-pycharm",
+        "imageTag": "2020.3.2",
+        "downloadUrl": "https://download.jetbrains.com/python/pycharm-community-2020.3.2.tar.gz"
+    },
+    {
+        "displayName": "PyCharm Community",
+        "imageName": "quay.io/che-incubator/che-pycharm",
+        "imageTag": "2020.3.1",
+        "downloadUrl": "https://download.jetbrains.com/python/pycharm-community-2020.3.1.tar.gz"
+    },
+    {
+        "displayName": "PyCharm Community",
+        "imageName": "quay.io/che-incubator/che-pycharm",
+        "imageTag": "2020.3",
+        "downloadUrl": "https://download.jetbrains.com/python/pycharm-community-2020.3.tar.gz"
+    }
+]

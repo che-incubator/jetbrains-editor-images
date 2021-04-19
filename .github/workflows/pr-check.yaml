@@ -7,28 +7,46 @@
 # SPDX-License-Identifier: EPL-2.0
 #
 
-name: PR check
+name: PR
 
 on:
   pull_request:
     paths-ignore:
     - '**.md'
+    - '**/LICENSE'
+    - '**/.gitignore'
+    - '**/doc/**'
+    - '**/devfiles/**'
+    - '**/kubernetes/**'
+    - '/run-container*.sh'
 
 jobs:
-  build:
-    runs-on: ubuntu-latest
-
+  prepare:
+    name: Prepare Environment
+    runs-on: ubuntu-18.04
+    outputs:
+      matrix: ${{ steps.set-matrix.outputs.matrix }}
     steps:
-    - name: Docker Buildx
-      uses: crazy-max/ghaction-docker-buildx@v3.3.0
-      with:
-        buildx-version: v0.4.2
-        qemu-version: 5.1.0-2
-    - name: Clone source code
-      uses: actions/checkout@v1
-      with:
-        fetch-depth: 1
-    - name: Docker build
-      run: |
-        PLATFORMS=$(cat PLATFORMS)
-        docker buildx build --platform "${PLATFORMS}" .
+      - uses: actions/checkout@v2
+        with:
+          fetch-depth: 1
+      - id: set-matrix
+        run: |
+          echo "::set-output name=matrix::{\"include\":[$( .github/build-container-matrix.sh -m latest )]}"
+  build:
+    name: ${{ matrix.displayName }} (${{ matrix.imageTag }}) - Projector Docker Build
+    needs: prepare
+    runs-on: ubuntu-18.04
+    strategy:
+      matrix: ${{ fromJson(needs.prepare.outputs.matrix) }}
+    steps:
+      - name: Clone source code
+        uses: actions/checkout@v2
+        with:
+          fetch-depth: 1
+      - name: Clone projector sources
+        run: |
+          ./clone-projector.sh
+      - name: Docker image build
+        run: |
+          ./build-container.sh ${{ matrix.imageName }} ${{ matrix.downloadUrl }}

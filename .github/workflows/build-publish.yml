@@ -11,40 +11,48 @@ on:
   push:
     paths-ignore:
       - '**.md'
+      - '**/LICENSE'
+      - '**/.gitignore'
+      - '**/doc/**'
+      - '**/devfiles/**'
+      - '**/kubernetes/**'
+      - '/run-container*.sh'
     branches: [ master ]
   
 jobs:
-  build:
-    env:
-      IMAGE_NAME: quay.io/che-incubator/che-editor-intellij-community
-    runs-on: ubuntu-latest
+  prepare:
+    name: Prepare Environment
+    runs-on: ubuntu-18.04
+    outputs:
+      matrix: ${{ steps.set-matrix.outputs.matrix }}
     steps:
-      - name: Clone source code
-        uses: actions/checkout@v1
+      - uses: actions/checkout@v2
         with:
           fetch-depth: 1
-
+      - id: set-matrix
+        run: |
+          echo "::set-output name=matrix::{\"include\":[$( .github/build-container-matrix.sh -m all )]}"
+  build:
+    name: ${{ matrix.displayName }} (${{ matrix.imageTag }}) - Projector Docker Build and Publish to Quay.io
+    needs: prepare
+    runs-on: ubuntu-18.04
+    strategy:
+      matrix: ${{ fromJson(needs.prepare.outputs.matrix) }}
+    steps:
+      - name: Clone source code
+        uses: actions/checkout@v2
+        with:
+          fetch-depth: 1
       - name: Docker login
         uses: azure/docker-login@v1
         with:
           login-server: quay.io
           username: ${{ secrets.QUAY_USERNAME }}
           password: ${{ secrets.QUAY_PASSWORD }}
-
-      - name: Docker Buildx
-        uses: crazy-max/ghaction-docker-buildx@v3.3.0
-        with:
-          buildx-version: v0.4.2
-          qemu-version: 5.1.0-2
-
-      - name: Build and push image
+      - name: Clone projector sources
         run: |
-          IMAGE_VERSION=$(cat VERSION)
-          SHORT_SHA1=$(git rev-parse --short HEAD)
-          PLATFORMS=$(cat PLATFORMS)
-          echo "Building and pushing version ${IMAGE_VERSION} of image ${IMAGE_NAME}"
-          docker buildx build --platform "${PLATFORMS}" -t "${IMAGE_NAME}:${IMAGE_VERSION}-${SHORT_SHA1}" \
-            --push .
-          docker pull ${IMAGE_NAME}:${IMAGE_VERSION}-${SHORT_SHA1}
-          docker tag ${IMAGE_NAME}:${IMAGE_VERSION}-${SHORT_SHA1} ${IMAGE_NAME}:latest
-          docker push ${IMAGE_NAME}:latest
+          ./clone-projector.sh
+      - name: Docker image build and publish
+        run: |
+          ./build-container.sh ${{ matrix.imageName }}:${{ matrix.imageTag }} ${{ matrix.downloadUrl }}
+          docker push ${{ matrix.imageName }}:${{ matrix.imageTag }}

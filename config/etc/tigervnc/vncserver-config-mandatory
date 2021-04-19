@@ -1,4 +1,0 @@
-## Mandatory settings for VNC servers started by the vncserver service
-securitytypes=None
-depth=24
-geometry=1920x1080

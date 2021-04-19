@@ -1,4 +1,4 @@
-# Copyright (c) 2020 Red Hat, Inc.
+# Copyright (c) 2021 Red Hat, Inc.
 # This program and the accompanying materials are made
 # available under the terms of the Eclipse Public License 2.0
 # which is available at https://www.eclipse.org/legal/epl-2.0/
@@ -6,69 +6,101 @@
 # SPDX-License-Identifier: EPL-2.0
 #
 
-FROM fedora:32
+#
+# Copyright 2019-2020 JetBrains s.r.o.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+#
 
-# Product name:
-#   ideaIC    - IntelliJ Idea Community
-#   ideaIU    - IntelliJ Idea Ultimate
-#   WebStorm  - WebStorm
-ARG PRODUCT_NAME="ideaIC"
+# To build the cuurent Dockerfile there is the following flow:
+#   $ ./clone-projector.sh
+#       Clones the Projector Client and Projector Server sources.
+#   $ ./build-container.sh [containerName [ideDownloadUrl]] or ./build-container-dev.sh [containerName [ideDownloadUrl]]
+#       Perform build Docker container.
+#       build-container.sh takes Projector Client and Projector Server sources and run Gradle build inside Stage 1.
+#       build-container-dev.sh relies on built Projector Server on the host. Useful if doesn't require to build in Stage 1.
 
-# Product version
-ARG PRODUCT_VERSION="2020.2.3"
+# Stage 1. Prepare JetBrains IDE with Projector.
+#   1. Downloads JetBrains IDE packaging by given downloadUrl build argument.
+#   2. If buildGradle build argument is set to false, then consumes built Projector assembly from the host.
+#       2.1 Otherwise starts Gradle build of Projector Server and Projector Client.
+#   3. Copies static files to the Projector assembly (entrypoint, launcher, configuration).
+FROM registry.access.redhat.com/ubi8-minimal:8.3-298 as projectorAssembly
+ENV PROJECTOR_DIR /projector
+ENV JAVA_HOME /usr/lib/jvm/java-11
+ARG downloadUrl
+ARG buildGradle
+ADD projector-client $PROJECTOR_DIR/projector-client
+ADD projector-server $PROJECTOR_DIR/projector-server
+RUN microdnf install -y --nodocs findutils tar gzip unzip java-11-openjdk-devel
+WORKDIR $PROJECTOR_DIR/projector-server
+RUN if [ "$buildGradle" = "true" ]; then ./gradlew clean; else echo "Skipping gradle build"; fi \
+    && if [ "$buildGradle" = "true" ]; then ./gradlew --console=plain :projector-server:distZip; else echo "Skipping gradle build"; fi
+WORKDIR /downloads
+RUN curl -SL $downloadUrl | tar -xz \
+    && find . -maxdepth 1 -type d -name * -exec mv {} $PROJECTOR_DIR/ide \;
+WORKDIR $PROJECTOR_DIR
+RUN set -ex \
+    && cp projector-server/projector-server/build/distributions/projector-server-1.0-SNAPSHOT.zip . \
+    && unzip projector-server-1.0-SNAPSHOT.zip \
+    && rm projector-server-1.0-SNAPSHOT.zip \
+    && rm -rf projector-client \
+    && rm -rf projector-server \
+    && mv projector-server-1.0-SNAPSHOT ide/projector-server \
+    && chmod 644 ide/projector-server/lib/*
+ADD jetbrains-editor-images/static $PROJECTOR_DIR
+RUN set -ex \
+    && mv ide-projector-launcher.sh ide/bin \
+    && find . -exec chgrp 0 {} \; -exec chmod g+rwX {} \; \
+    && find . -name "*.sh" -exec chmod +x {} \; \
+    && mv projector-user/.config .default \
+    && rm -rf projector-user
 
-# Product url constructs based on PRODUCT_NAME and PRODUCT_VERSION:
-#   https://download.jetbrains.com/idea/ideaIC-2020.2.3.tar.gz
-#   https://download.jetbrains.com/idea/ideaIU-2020.2.3.tar.gz
-#   https://download.jetbrains.com/webstorm/WebStorm-2020.2.3.tar.gz
+# Stage 2. Build the main image with necessary environment for running Projector
+#   Doesn't require to be a desktop environment. Projector runs in headless mode.
+FROM registry.access.redhat.com/ubi8-minimal:8.3-298
+ARG downloadUrl
+ENV PROJECTOR_USER_NAME projector-user
+ENV PROJECTOR_DIR /projector
+ENV HOME /home/$PROJECTOR_USER_NAME
+ENV PROJECTOR_CONFIG_DIR $HOME/.config
+RUN set -ex \
+    && microdnf install -y --nodocs \
+    shadow-utils wget git nss procps findutils \
+    # Packages required by JetBrains products.
+    libsecret jq \
+    # Packages needed for AWT.
+    libXext libXrender libXtst libXi libX11-xcb mesa-libgbm libdrm freetype \
+    # Check whether download Url represents IntelliJ IDEA to install required dependencies.
+    && if [ "${downloadUrl#*idea}" != "$downloadUrl" ]; then microdnf install -y --nodocs java-11-openjdk-devel; else echo "Not IntelliJ Idea"; fi \
+    # Check whether download Url represents PyCharm to install required dependencies.
+    && if [ "${downloadUrl#*pycharm}" != "$downloadUrl" ]; then microdnf install -y --nodocs python2 python3 python3-pip python3-setuptools; else echo "Not Pycharm"; fi \
+    && adduser -r -u 1002 -G root -d $HOME -m -s /bin/sh $PROJECTOR_USER_NAME \
+    && echo "%wheel ALL=(ALL) NOPASSWD: ALL" >> /etc/sudoers \
+    && mkdir /projects \
+    && for f in "${HOME}" "/etc/passwd" "/etc/group /projects"; do\
+            chgrp -R 0 ${f} && \
+            chmod -R g+rwX ${f}; \
+       done \
+    && cat /etc/passwd | sed s#root:x.*#root:x:\${USER_ID}:\${GROUP_ID}::\${HOME}:/bin/bash#g > ${HOME}/passwd.template \
+    && cat /etc/group | sed s#root:x:0:#root:x:0:0,\${USER_ID}:#g > ${HOME}/group.template \
+    # Change permissions to allow editing of files for openshift user
+    && find $HOME -exec chgrp 0 {} \; -exec chmod g+rwX {} \;
 
-ARG BASE_MOUNT_FOLDER="/JetBrains"
+COPY --chown=$PROJECTOR_USER_NAME:root --from=projectorAssembly $PROJECTOR_DIR $PROJECTOR_DIR
 
-# which is used by novnc to find websockify
-RUN yum install -y tigervnc-server supervisor wget java-11-openjdk-devel novnc fluxbox git which nss libXScrnSaver mesa-libgbm
-
-RUN mkdir /${PRODUCT_NAME}-${PRODUCT_VERSION} && \
-    case ${PRODUCT_NAME} in \
-        "ideaIC"|"ideaIU") \
-            wget -qO- https://download.jetbrains.com/idea/${PRODUCT_NAME}-${PRODUCT_VERSION}.tar.gz | tar -zxv --strip-components=1 -C /${PRODUCT_NAME}-${PRODUCT_VERSION} && \
-            ln -s /${PRODUCT_NAME}-${PRODUCT_VERSION}/bin/idea.sh /opt/run-ide.sh \
-            ;; \
-        "WebStorm") \
-            wget -qO- https://download.jetbrains.com/webstorm/${PRODUCT_NAME}-${PRODUCT_VERSION}.tar.gz | tar -zxv --strip-components=1 -C /${PRODUCT_NAME}-${PRODUCT_VERSION} && \
-            ln -s /${PRODUCT_NAME}-${PRODUCT_VERSION}/bin/webstorm.sh /opt/run-ide.sh \
-            ;; \
-    esac && \
-    mkdir -p ${BASE_MOUNT_FOLDER}/${PRODUCT_NAME} && \
-    mkdir /etc/default/jetbrains && \
-    for f in "${BASE_MOUNT_FOLDER}" "/${PRODUCT_NAME}-${PRODUCT_VERSION}" "/etc/passwd" "/etc/default/jetbrains"; do \
-      echo "Changing permissions on ${f}" && chgrp -R 0 ${f} && \
-      chmod -R g+rwX ${f}; \
-    done && \
-    echo "idea.config.path=${BASE_MOUNT_FOLDER}/${PRODUCT_NAME}/config" > /${PRODUCT_NAME}-${PRODUCT_VERSION}/bin/idea.properties && \
-    echo "idea.system.path=${BASE_MOUNT_FOLDER}/${PRODUCT_NAME}/caches" >> /${PRODUCT_NAME}-${PRODUCT_VERSION}/bin/idea.properties && \
-    echo "idea.plugins.path=${BASE_MOUNT_FOLDER}/${PRODUCT_NAME}/plugins" >> /${PRODUCT_NAME}-${PRODUCT_VERSION}/bin/idea.properties && \
-    echo "idea.log.path=${BASE_MOUNT_FOLDER}/${PRODUCT_NAME}/logs" >> /${PRODUCT_NAME}-${PRODUCT_VERSION}/bin/idea.properties
-
-# Copy fluxbox configuration
-COPY --chown=0:0 config/fluxbox /home/user/.fluxbox/init
-
-# Copy predefined configs
-COPY --chown=0:0 config/etc /etc/
-
-# Copy sh scripts
-COPY --chown=0:0 scripts/*.sh /opt/
-
-RUN mkdir -p /home/user && \
-    chgrp -R 0 /home && \
-    chmod -R g=u /etc/passwd /etc/group /home && \
-    chmod +x /opt/*.sh
-
-USER 10001
-
-ENV HOME=/home/user
-ENV JETBRAINS_PRODUCT=${PRODUCT_NAME}
-ENV JETBRAINS_PRODUCT_VERSION=${PRODUCT_VERSION}
-ENV JETBRAINS_BASE_MOUNT_FOLDER=${BASE_MOUNT_FOLDER}
+ENV DEV_MODE=false
+USER $PROJECTOR_USER_NAME
 WORKDIR /projects
-ENTRYPOINT [ "/opt/entrypoint.sh" ]
+ENTRYPOINT [ "/bin/bash", "-c", "$PROJECTOR_DIR/entrypoint.sh" ]
 CMD ["tail", "-f", "/dev/null"]
