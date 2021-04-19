@@ -1,8 +1,5 @@
-.github
-doc
-devfiles
-kubernetes
-LICENSE
-PLATFORMS
-README.md
-VERSION
+**
+
+!/projector-client/**
+!/projector-server/**
+!/jetbrains-editor-images/static/**

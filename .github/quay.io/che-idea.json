@@ -1,0 +1,26 @@
+[
+    {
+        "displayName": "IntelliJ IDEA Community",
+        "imageName": "quay.io/che-incubator/che-idea",
+        "imageTag": "latest",
+        "downloadUrl": "https://download.jetbrains.com/idea/ideaIC-2020.3.3.tar.gz"
+    },
+    {
+        "displayName": "IntelliJ IDEA Community",
+        "imageName": "quay.io/che-incubator/che-idea",
+        "imageTag": "2020.3.3",
+        "downloadUrl": "https://download.jetbrains.com/idea/ideaIC-2020.3.3.tar.gz"
+    },
+    {
+        "displayName": "IntelliJ IDEA Community",
+        "imageName": "quay.io/che-incubator/che-idea",
+        "imageTag": "2020.3.2",
+        "downloadUrl": "https://download.jetbrains.com/idea/ideaIC-2020.3.2.tar.gz"
+    },
+    {
+        "displayName": "IntelliJ IDEA Community",
+        "imageName": "quay.io/che-incubator/che-idea",
+        "imageTag": "2020.3.1",
+        "downloadUrl": "https://download.jetbrains.com/idea/ideaIC-2020.3.1.tar.gz"
+    }
+]
