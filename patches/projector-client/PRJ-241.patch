@@ -1,0 +1,13 @@
+diff --git a/projector-client-common/src/jsMain/kotlin/org/jetbrains/projector/client/common/misc/ParamsProvider.kt b/projector-client-common/src/jsMain/kotlin/org/jetbrains/projector/client/common/misc/ParamsProvider.kt
+index 560ce9a..bbe78a6 100644
+--- a/projector-client-common/src/jsMain/kotlin/org/jetbrains/projector/client/common/misc/ParamsProvider.kt
++++ b/projector-client-common/src/jsMain/kotlin/org/jetbrains/projector/client/common/misc/ParamsProvider.kt
+@@ -31,7 +31,7 @@ actual object ParamsProvider {
+   private fun getCurrentHostname(): String = when (val hostname = window.location.hostname) {
+     "" -> "localhost"  // when you open a file in a browser (like "file://..."), the hostname is empty, so assume the localhost is preferred
+ 
+-    else -> hostname
++    else -> "$hostname${if (window.location.pathname != "/") window.location.pathname else ""}"
+   }
+ 
+   private fun getCurrentPort(): String {
