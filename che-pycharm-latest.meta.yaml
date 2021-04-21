@@ -3,29 +3,33 @@ publisher: eclipse
 name: che-pycharm
 version: latest
 type: Che Editor
-displayName:  PyCharm Community
-title:  PyCharm Community as Editor for Eclipse Che
-description:  PyCharm Community running using Projector
+displayName: PyCharm Community
+title: PyCharm Community as Editor for Eclipse Che
+description: PyCharm Community running using Projector
 icon: https://resources.jetbrains.com/storage/products/pycharm/img/meta/pycharm_logo_300x300.png
 category: Editor
 repository: https://github.com/che-incubator/jetbrains-editor-images
 firstPublicationDate: "2021-04-17"
 spec:
   endpoints:
-   -  name: "intellij"
+    - name: "intellij"
       public: true
       targetPort: 8887
       attributes:
         protocol: http
         type: ide
+        secure: true
+        cookiesAuthEnabled: true
         path: /?backgroundColor=434343&wss
   containers:
-   - name: che-pycharm
-     image: "quay.io/che-incubator/che-pycharm:latest"
-     mountSources: true
-     volumes:
-         - mountPath: "/home/projector-user"
-           name: projector-user
-     ports:
-         - exposedPort: 8887
-     memoryLimit: "2048M"
+    - name: che-pycharm
+      image: "quay.io/che-incubator/che-pycharm:latest"
+      mountSources: true
+      volumes:
+        - mountPath: "/home/projector-user"
+          name: projector-user
+      ports:
+        - exposedPort: 8887
+      memoryLimit: 4096M	
+      cpuLimit: 1500m	
+      cpuRequest: 600m
