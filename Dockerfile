@@ -102,5 +102,5 @@ COPY --chown=$PROJECTOR_USER_NAME:root --from=projectorAssembly $PROJECTOR_DIR $
 ENV DEV_MODE=false
 USER $PROJECTOR_USER_NAME
 WORKDIR /projects
-ENTRYPOINT [ "/bin/bash", "-c", "$PROJECTOR_DIR/entrypoint.sh" ]
-CMD ["tail", "-f", "/dev/null"]
+EXPOSE 8887
+CMD $PROJECTOR_DIR/entrypoint.sh
