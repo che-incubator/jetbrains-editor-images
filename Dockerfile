@@ -76,7 +76,7 @@ ENV HOME /home/$PROJECTOR_USER_NAME
 ENV PROJECTOR_CONFIG_DIR $HOME/.config
 RUN set -ex \
     && microdnf install -y --nodocs \
-    shadow-utils wget git nss procps findutils \
+    shadow-utils wget git nss procps findutils which socat \
     # Packages required by JetBrains products.
     libsecret jq \
     # Packages needed for AWT.
