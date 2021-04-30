@@ -1,0 +1,50 @@
+diff --git a/projector-client-web/src/main/kotlin/org/jetbrains/projector/client/web/window/Window.kt b/projector-client-web/src/main/kotlin/org/jetbrains/projector/client/web/window/Window.kt
+index 0bf358a..d5c630a 100644
+--- a/projector-client-web/src/main/kotlin/org/jetbrains/projector/client/web/window/Window.kt
++++ b/projector-client-web/src/main/kotlin/org/jetbrains/projector/client/web/window/Window.kt
+@@ -24,6 +24,7 @@
+ package org.jetbrains.projector.client.web.window
+ 
+ import kotlinx.browser.document
++import kotlinx.browser.window
+ import kotlinx.dom.addClass
+ import org.jetbrains.projector.client.common.DrawEvent
+ import org.jetbrains.projector.client.common.SingleRenderingSurfaceProcessor
+@@ -37,10 +38,12 @@ import org.jetbrains.projector.client.web.state.ClientAction
+ import org.jetbrains.projector.client.web.state.ClientStateMachine
+ import org.jetbrains.projector.client.web.state.LafListener
+ import org.jetbrains.projector.client.web.state.ProjectorUI
++import org.jetbrains.projector.common.protocol.data.CommonIntSize
+ import org.jetbrains.projector.common.protocol.data.CommonRectangle
+ import org.jetbrains.projector.common.protocol.data.CursorType
+ import org.jetbrains.projector.common.protocol.toClient.WindowData
+ import org.jetbrains.projector.common.protocol.toClient.WindowType
++import org.jetbrains.projector.common.protocol.toServer.ClientResizeEvent
+ import org.jetbrains.projector.common.protocol.toServer.ClientWindowCloseEvent
+ import org.jetbrains.projector.common.protocol.toServer.ClientWindowMoveEvent
+ import org.jetbrains.projector.common.protocol.toServer.ClientWindowResizeEvent
+@@ -118,6 +121,7 @@ class Window(windowData: WindowData, private val stateMachine: ClientStateMachin
+ 
+     if (windowData.windowType == WindowType.IDEA_WINDOW || windowData.windowType == WindowType.POPUP) {
+       canvas.style.border = "none"
++      setMaximized()
+     }
+     else if (windowData.windowType == WindowType.WINDOW) {
+       if (windowData.undecorated) {
+@@ -248,6 +252,16 @@ class Window(windowData: WindowData, private val stateMachine: ClientStateMachin
+     )
+   }
+ 
++  private fun setMaximized() {
++    val userScalingRatio = ParamsProvider.USER_SCALING_RATIO
++
++    stateMachine.fire(ClientAction.AddEvent(ClientResizeEvent(size = CommonIntSize(
++      width = (window.innerWidth / userScalingRatio).roundToInt(),
++      height = (window.innerHeight / userScalingRatio).roundToInt()
++    ))))
++    stateMachine.fire(ClientAction.WindowResize)
++  }
++
+   fun dispose() {
+     canvas.remove()
+     border.dispose()
