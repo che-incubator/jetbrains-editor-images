@@ -67,15 +67,11 @@ if [ ! -d "$PROJECTOR_CONFIG_DIR" ]; then
   cp -rp "$PROJECTOR_DIR"/.default "$PROJECTOR_CONFIG_DIR"
 fi
 
+# Setup necessary envrionment variables
+echo "export JAVA_HOME=/usr/lib/jvm/java-11" >> "${HOME}"/.bashrc
+
 # Detect IDE's product code
 productCode=$(jq -r .productCode < "$PROJECTOR_DIR"/ide/product-info.json)
-
-# Setup necessary envrionment variables
-case $productCode in
-  "IC" | "IU")
-      echo "export JAVA_HOME=/usr/lib/jvm/java-11" >> "${HOME}"/.bashrc
-    ;;
-esac
 
 # Offline activation key registration
 # Depending on the product code id taken from $PROJECTOR_DIR/ide/product-info.json looks for:
