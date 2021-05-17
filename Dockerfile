@@ -69,7 +69,6 @@ RUN set -ex \
 # Stage 2. Build the main image with necessary environment for running Projector
 #   Doesn't require to be a desktop environment. Projector runs in headless mode.
 FROM registry.access.redhat.com/ubi8-minimal:8.3-298
-ARG downloadUrl
 ENV PROJECTOR_USER_NAME projector-user
 ENV PROJECTOR_DIR /projector
 ENV HOME /home/$PROJECTOR_USER_NAME
@@ -78,13 +77,9 @@ RUN set -ex \
     && microdnf install -y --nodocs \
     shadow-utils wget git nss procps findutils which socat \
     # Packages required by JetBrains products.
-    libsecret jq \
+    libsecret jq java-11-openjdk-devel python2 python3 python3-pip python3-setuptools \
     # Packages needed for AWT.
     libXext libXrender libXtst libXi libX11-xcb mesa-libgbm libdrm freetype \
-    # Check whether download Url represents IntelliJ IDEA to install required dependencies.
-    && if [ "${downloadUrl#*idea}" != "$downloadUrl" ]; then microdnf install -y --nodocs java-11-openjdk-devel; else echo "Not IntelliJ Idea"; fi \
-    # Check whether download Url represents PyCharm to install required dependencies.
-    && if [ "${downloadUrl#*pycharm}" != "$downloadUrl" ]; then microdnf install -y --nodocs python2 python3 python3-pip python3-setuptools; else echo "Not Pycharm"; fi \
     && adduser -r -u 1002 -G root -d $HOME -m -s /bin/sh $PROJECTOR_USER_NAME \
     && echo "%wheel ALL=(ALL) NOPASSWD: ALL" >> /etc/sudoers \
     && mkdir /projects \
