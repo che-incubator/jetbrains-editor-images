@@ -1,0 +1,121 @@
+Index: gradle.properties
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/gradle.properties b/gradle.properties
+--- a/gradle.properties	(revision 555e38b5885df2598fcd2639c687124e60e3218e)
++++ b/gradle.properties	(date 1621419411887)
+@@ -31,6 +31,7 @@
+ javassistVersion=3.27.0-GA
+ javaWebSocketVersion=1.5.1
+ jqueryVersion=3.5.1
++jsoupVersion=1.13.1
+ kotlinVersion=1.4.20
+ kotlinExtensionsVersion=1.0.1-pre.129-kotlin-1.4.10
+ kotlinReactVersion=16.14.0-pre.125-kotlin-1.4.10
+Index: projector-server-core/build.gradle.kts
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/projector-server-core/build.gradle.kts b/projector-server-core/build.gradle.kts
+--- a/projector-server-core/build.gradle.kts	(revision 555e38b5885df2598fcd2639c687124e60e3218e)
++++ b/projector-server-core/build.gradle.kts	(date 1621419411879)
+@@ -47,6 +47,7 @@
+ val dnsjavaVersion: String by project
+ val javassistVersion: String by project
+ val javaWebSocketVersion: String by project
++val jsoupVersion: String by project
+ val kotlinVersion: String by project
+ val ktorVersion: String by project
+ val selenideVersion: String by project
+@@ -130,6 +131,7 @@
+   api("org.java-websocket:Java-WebSocket:$javaWebSocketVersion")
+   implementation("org.slf4j:slf4j-simple:$slf4jVersion")
+   implementation("dnsjava:dnsjava:$dnsjavaVersion")
++  implementation("org.jsoup:jsoup:$jsoupVersion")
+ 
+   // todo: remove these dependencies: they should be exported from projector-common but now it seems not working
+   testImplementation(kotlin("test", kotlinVersion))
+Index: projector-server-core/src/main/kotlin/org/jetbrains/projector/server/core/ij/md/LocalImagesInliner.kt
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/projector-server-core/src/main/kotlin/org/jetbrains/projector/server/core/ij/md/LocalImagesInliner.kt b/projector-server-core/src/main/kotlin/org/jetbrains/projector/server/core/ij/md/LocalImagesInliner.kt
+--- a/projector-server-core/src/main/kotlin/org/jetbrains/projector/server/core/ij/md/LocalImagesInliner.kt	(revision 555e38b5885df2598fcd2639c687124e60e3218e)
++++ b/projector-server-core/src/main/kotlin/org/jetbrains/projector/server/core/ij/md/LocalImagesInliner.kt	(date 1621419262759)
+@@ -23,60 +23,32 @@
+  */
+ package org.jetbrains.projector.server.core.ij.md
+ 
+-import java.io.ByteArrayInputStream
+-import java.io.StringWriter
++import org.jsoup.Jsoup
+ import java.net.URI
+ import java.nio.file.Files
+ import java.nio.file.Path
+ import java.util.*
+-import javax.xml.parsers.DocumentBuilderFactory
+-import javax.xml.transform.OutputKeys
+-import javax.xml.transform.TransformerFactory
+-import javax.xml.transform.dom.DOMSource
+-import javax.xml.transform.stream.StreamResult
+ 
+ internal object LocalImagesInliner {
+ 
+-  private val docFactory = DocumentBuilderFactory.newInstance()
+-  private val docBuilder = docFactory.newDocumentBuilder()
+-
+-  private val transformerFactory = TransformerFactory.newInstance()
+-  private val transformer = transformerFactory.newTransformer().apply {
+-    setOutputProperty(OutputKeys.INDENT, "no")  // this is mandatory because extra indents spoil blocks of code
+-    setOutputProperty(OutputKeys.METHOD, "xml")  // previous line won't work without this one
+-    setOutputProperty(OutputKeys.OMIT_XML_DECLARATION, "yes")  // previous line will add header so we have o disable it explicitly
+-  }
+-
+   fun inlineLocalImages(html: String): String {
+-    val input = ByteArrayInputStream(html.toByteArray())
+-
+-    val doc = docBuilder.parse(input)
+-    val images = doc.getElementsByTagName("img")
+-
+-    for (imageId in 0 until images.length) {
+-      val image = images.item(imageId)
+-
+-      val srcAttribute = image.attributes.getNamedItem("src") ?: continue
++    val doc = Jsoup.parse(html)
++    val images = doc.getElementsByTag("img")
+ 
+-      val src = srcAttribute.textContent
++    images.forEach {
++      val src = it.attr("src")
+ 
+-      if (!src.startsWith("file:")) {
+-        continue
+-      }
+-
+-      val extension = src.substringAfterLast('.', missingDelimiterValue = "")
+-      val path = Path.of(URI(src))
++      if (src.startsWith("file:")) {
++        val extension = src.substringAfterLast('.', missingDelimiterValue = "")
++        val path = Path.of(URI(src.substringBefore('?')))
+ 
+-      val inlinedImage = inlineImage(path, extension)
++        val inlinedImage = inlineImage(path, extension)
+ 
+-      srcAttribute.textContent = inlinedImage
++        it.attr("src", inlinedImage)
++      }
+     }
+-
+-    val source = DOMSource(doc)
+-    val stringWriter = StringWriter(html.length)
+-    transformer.transform(source, StreamResult(stringWriter))
+ 
+-    return stringWriter.toString()
++    return doc.toString()
+   }
+ 
+   private fun inlineImage(localPath: Path, extension: String): String {
