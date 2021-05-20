@@ -77,7 +77,7 @@ RUN set -ex \
     && microdnf install -y --nodocs \
     shadow-utils wget git nss procps findutils which socat \
     # Packages required by JetBrains products.
-    libsecret jq java-11-openjdk-devel python2 python3 python3-pip python3-setuptools \
+    libsecret jq java-11-openjdk-devel python2 python39 \
     # Packages needed for AWT.
     libXext libXrender libXtst libXi libX11-xcb mesa-libgbm libdrm freetype \
     && adduser -r -u 1002 -G root -d $HOME -m -s /bin/sh $PROJECTOR_USER_NAME \
