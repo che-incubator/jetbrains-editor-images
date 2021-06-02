@@ -33,7 +33,7 @@ base_dir=$(cd "$(dirname "$0")"; pwd)
 # Clone the Projector Client, stick to the particular version and apply necessary patches if needed
 git clone https://github.com/JetBrains/projector-client.git "$base_dir"/../projector-client
 cd "$base_dir"/../projector-client
-git checkout 555e38b5885df2598fcd2639c687124e60e3218e
+git checkout 57b1aba28f4ff7bf3953274b7866797085564c39
 
 if [ -d "$base_dir/patches/projector-client" ]; then
     echo "Applying patches for Projector Client"
@@ -46,7 +46,7 @@ cd "$base_dir"
 # Link with Projector Client
 git clone https://github.com/JetBrains/projector-server.git "$base_dir"/../projector-server
 cd "$base_dir"/../projector-server
-git checkout f8461f8aadefcdc2ebf3ceb97cf591df1e6d2f8f
+git checkout fb51272f5d18084502a6ff2d958b2d4bf1023b69
 echo "useLocalProjectorClient=true" > local.properties
 
 if [ -d "$base_dir/patches/projector-server" ]; then
