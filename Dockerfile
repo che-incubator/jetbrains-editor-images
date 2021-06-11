@@ -45,18 +45,21 @@ ADD projector-server $PROJECTOR_DIR/projector-server
 RUN microdnf install -y --nodocs findutils tar gzip unzip java-11-openjdk-devel
 WORKDIR $PROJECTOR_DIR/projector-server
 RUN if [ "$buildGradle" = "true" ]; then ./gradlew clean; else echo "Skipping gradle build"; fi \
-    && if [ "$buildGradle" = "true" ]; then ./gradlew --console=plain :projector-server:distZip; else echo "Skipping gradle build"; fi
+    && if [ "$buildGradle" = "true" ]; then ./gradlew --console=plain :projector-server:distZip; else echo "Skipping gradle build"; fi \
+    && cd projector-server/build/distributions \
+    && find . -maxdepth 1 -type f -name projector-server-*.zip -exec mv {} projector-server.zip \;
 WORKDIR /downloads
 RUN curl -SL $downloadUrl | tar -xz \
     && find . -maxdepth 1 -type d -name * -exec mv {} $PROJECTOR_DIR/ide \;
 WORKDIR $PROJECTOR_DIR
 RUN set -ex \
-    && cp projector-server/projector-server/build/distributions/projector-server-1.0-SNAPSHOT.zip . \
-    && unzip projector-server-1.0-SNAPSHOT.zip \
-    && rm projector-server-1.0-SNAPSHOT.zip \
+    && cp projector-server/projector-server/build/distributions/projector-server.zip . \
     && rm -rf projector-client \
     && rm -rf projector-server \
-    && mv projector-server-1.0-SNAPSHOT ide/projector-server \
+    && unzip projector-server.zip \
+    && rm projector-server.zip \
+    && find . -maxdepth 1 -type d -name projector-server-* -exec mv {} projector-server \; \
+    && mv projector-server ide/projector-server \
     && chmod 644 ide/projector-server/lib/*
 ADD jetbrains-editor-images/static $PROJECTOR_DIR
 RUN set -ex \
