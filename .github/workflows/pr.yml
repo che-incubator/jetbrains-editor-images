@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2020 Red Hat, Inc.
+# Copyright (c) 2021 Red Hat, Inc.
 # This program and the accompanying materials are made
 # available under the terms of the Eclipse Public License 2.0
 # which is available at https://www.eclipse.org/legal/epl-2.0/
@@ -12,18 +12,17 @@ name: PR
 on:
   pull_request:
     paths-ignore:
-    - '**.md'
-    - '**/LICENSE'
-    - '**/.gitignore'
-    - '**/doc/**'
-    - '**/devfiles/**'
-    - '**/kubernetes/**'
-    - '/run-container*.sh'
+      - '**.md'
+      - 'LICENSE'
+      - '.gitignore'
+      - 'doc/**'
+      - 'devfiles/**'
+      - 'kubernetes/**'
 
 jobs:
-  prepare:
+  prepare_environment:
     name: Prepare Environment
-    runs-on: ubuntu-18.04
+    runs-on: ubuntu-latest
     outputs:
       matrix: ${{ steps.set-matrix.outputs.matrix }}
     steps:
@@ -34,19 +33,20 @@ jobs:
         run: |
           echo "::set-output name=matrix::{\"include\":[$( .github/build-container-matrix.sh -m latest )]}"
   build:
-    name: ${{ matrix.displayName }} (${{ matrix.imageTag }}) - Projector Docker Build
-    needs: prepare
-    runs-on: ubuntu-18.04
+    name: ${{ matrix.productCode }} (${{ matrix.version }}) - Projector Docker Build
+    needs: prepare_environment
+    runs-on: ubuntu-latest
     strategy:
-      matrix: ${{ fromJson(needs.prepare.outputs.matrix) }}
+      matrix: ${{ fromJson(needs.prepare_environment.outputs.matrix) }}
     steps:
       - name: Clone source code
         uses: actions/checkout@v2
         with:
           fetch-depth: 1
-      - name: Clone projector sources
-        run: |
-          ./clone-projector.sh
       - name: Docker image build
         run: |
-          ./build-container.sh ${{ matrix.imageName }} ${{ matrix.downloadUrl }}
+          ./projector.sh build \
+              --tag ${{ secrets.QUAY_REPOSITORY }}/${{ matrix.dockerImage }}:${{ matrix.version }} \
+              --url ${{ matrix.downloadUrl }} \
+              --progress plain \
+              --log-level debug

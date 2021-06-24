@@ -56,7 +56,7 @@ preventWorkspaceFromShutdown() {
   done
 }
 
-if [ "$DEV_MODE" = "false" ]; then
+if [ -n "$CHE_WORKSPACE_ID" ]; then
   echo "Prevent workspace from unexpected shutdown"
   preventWorkspaceFromShutdown &
 fi

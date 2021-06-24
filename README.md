@@ -80,11 +80,11 @@ $ docker pull quay.io/che-incubator/che-pycharm
 Then it is enough to run the particular container, passing the run options, as shown below:
 
 ```sh
-$ docker run --env DEV_MODE=true --rm -p 8887:8887 -it quay.io/che-incubator/che-idea
-$ docker run --env DEV_MODE=true --rm -p 8887:8887 -it quay.io/che-incubator/che-pycharm
+$ docker run --env --rm -p 8887:8887 -it quay.io/che-incubator/che-idea
+$ docker run --env --rm -p 8887:8887 -it quay.io/che-incubator/che-pycharm
 ```
 
-This will run Projector Server with the particular JetBrains IDE locally on your host.
+This will run the latest supported JetBrains IDE locally on your host.
 
 Then navigate to [http://localhost:8887](http://localhost:8887), to access the JetBrains IDE.
 
@@ -98,48 +98,146 @@ Clone current repository and perform the following steps:
 
 ```sh
 $ git clone https://github.com/che-incubator/jetbrains-editor-images && cd jetbrains-editor-images
-$ ./clone-projector.sh
-$ ./build-container.sh
-$ ./run-container.sh
+$ ./projector.sh build
+$ ./projector.sh run CONTAINER
 ```
 
-The following sequence will clone **Projector Client** and **Projector Server**, build the default image with **IntelliJ IDEA Community** and run it.
+The following sequence prompt user to choose the **IDE packaging** to build. Then automatically performs clonning **Projector Client** and **Projector Server** sources, build them and build Docker image. The build image name will be printed in the end of build process, which can be run pass to `run` command to start the container locally.
 
 After that, navigate to [http://localhost:8887](http://localhost:8887), to access the JetBrains IDE.
+
+More information is available in [Developer Guide](doc/Developer-Guide.md).
 
 
 
 ## Scripts reference
 
-### `clone-projector.sh`
+### `projector.sh`
 
-Clones the Projector Client and Projector Server into the following location:
+The main entrypoint to build and run of IntelliJ-based IDEs to run in Eclipse Che environment.
 
-- `../projector-client`
+Calling the
 
-- `../projector-server`
+```sh
+$ ./projector.sh
+```
 
-Links Projector Client with Projector Server by adding property `useLocalProjectorClient=true` to `projector-server/local.properties`.
+ without any parameters and commands will print the help information section:
 
-### `build-container.sh [containerName [downloadUrl]]`
+```sh
+Usage: ./projector.sh COMMAND [OPTIONS]
 
-Compiles the Projector inside Docker and builds a Docker container locally.
+Projector-based container manager
 
-### `build-container-dev.sh [containerName [downloadUrl]]`
+Options:
+  -h, --help              Display help information
+  -v, --version           Display version information
+  -l, --log-level string  Set the logging level ("debug"|"info"|"warn"|"error"|"fatal") (default "info")
 
-Compiles the Projector on user host machine and builds a Docker container locally. **Requires configured JDK 11**.
+Commands:
+  build   Build an image for the particular IntelliJ-based IDE package
+  run     Start a container with IntelliJ-based IDE
 
-### `run-container.sh [containerName]`
+Run './projector.sh COMMAND --help' for more information on a command.
+To get more help with the './projector.sh' check out guides at https://github.com/che-incubator/jetbrains-editor-images/tree/master/doc
+```
 
-Runs the Docker container.
 
-Starts the Projector server and hosts web client files on port 8887.
 
-### `run-container-mounted.sh [containerName]`
+#### `projector.sh build`
 
-Runs the Docker container and mounts `~/projector-user` hosts directory as home directory, and `~/projector-projects` as projector directory in the container, so settings and projects can be stored between container restarts.
+Performs build an image for particular IntelliJ-based IDE package.
 
-Starts the Projector server and hosts web client files on port 8887.
+Calling the
+
+```sh
+$ ./projector.sh build --help
+```
+
+will print the help information section:
+
+```sh
+Usage: ./projector.sh build [OPTIONS]
+
+Build an image for the particular IntelliJ-based IDE package
+
+Note, that if '--tag' or '--url' option is missed, then interactive wizard will be invoked to choose
+the predefined IDE packaging from the default configuration.
+
+Options:
+  -t, --tag string              Name and optionally a tag in the 'name:tag' format for the result image
+  -u, --url string              Downloadable URL of IntelliJ-based IDE package
+      --no-projector-build      Skip build of Projector Client and Projector Server inside the container
+      --run-on-build            Run the container immediately after build
+      --save-on-build           Save the image to a tar archive after build. Basename of --url.
+      --mount-volumes [string]  Mount volumes to the container which was started using '--run-on-build' option
+                                Volumes should be separated by comma, e.g. "/l/path_1:/r/path_1,/l/path_2:/r/path_2".
+                                If option value is omitted, then default value is loaded.
+                                Default value: $HOME/projector-user:/home/projector-user,$HOME/projector-projects:/projects
+  -p, --progress string         Set type of progress output ("auto"|"plain") (default "auto")
+      --config string           Specify the configuration file for predefined IDE package list (default "compatible-ide.json")
+      --projector-only          Clone and build Projector only ignoring other options. Used when need to fetch Projector
+                                sources only and assembly the binaries.
+```
+
+
+
+#### `projector.sh run`
+
+Starts the container with IntelliJ-based IDE locally.
+
+Calling the
+
+```sh
+$ ./projector.sh run --help
+```
+
+will print the help information section:
+
+```sh
+Usage: ./projector.sh run CONTAINER [OPTIONS]
+
+Start a container with IntelliJ-based IDE
+
+Options:
+      --mount-volumes [string]  Mount volumes to the container which was started using '--run-on-build' option.
+                                Volumes should be separated by comma, e.g. "/l/path_1:/r/path_1,/l/path_2:/r/path_2".
+                                If option value is omitted, then default value is loaded.
+                                Default value: $HOME/projector-user:/home/projector-user,$HOME/projector-projects:/projects
+```
+
+
+
+### `make-release.sh`
+
+Performes the release process for editor images. Steps performed in this shell script:
+
+- Fetch configuration about all supported IDEs
+- Perform build the docker images locally and checks whether there are an errors during build
+- Creates tag and pushes to the remote
+
+Calling the
+
+```sh
+$ ./make-release.sh --help
+```
+
+will print the help information section:
+
+```sh
+Usage: ./make-release.sh [OPTIONS]
+
+Performs the release of editor images.
+
+Options:
+  -h, --help              Display help information
+  -v, --version           Display version information
+  -t, --tag string        Release tag name (e.g. "YYYYMMDD.hashId")
+  -l, --log-level string  Set the logging level ("debug"|"info"|"warn"|"error"|"fatal") (default "info")
+      --skip-checks       Skip pre-release checks. WARNING! Use this option if you know what you do!
+```
+
+More information is available in [Developer Guide](doc/Developer-Guide.md).
 
 
 

@@ -8,48 +8,94 @@ Current document contains tip to help and understand the first steps that needed
 
 In order to build locally Docker container, make sure, that **Docker version is 18.09** or higher, since the build scripts use [Docker BuildKit](https://docs.docker.com/develop/develop-images/build_enhancements/).
 
+> For macOS users, it is needed to ensure that `gnu-getopt` is installed in the system.
 
 
-## Build JetBrains IDE in Docker using distribution
 
-In order to build the Docker image with custom JetBrains IDE distribution, there is an optional `ideDownloadUrl` parameter, which you can pass to `build-container.sh` or `build-continer-dev.sh` scripts. This download URL should point to `tar.gz` packaging. For example, navigate to [download page](https://www.jetbrains.com/idea/download/#section=linux), click "Other versions" and copy the link for the IDE packaging. Please ensure that you select `tar.gz` **with JBR**, not without.
+## Build JetBrains IDE in Docker using custom distribution
 
-Below you can find a few examples how to build different JetBrains IDEs using `ideDownloadUrl` parameter:
+In order to build the Docker image with the custom JetBrains IDE distribution, there is an ability to pass particular distribution through the `--tag` and `--url` parameters to `./projector.sh build`.
+
+The complete command looks:
+
+```sh
+./projector build --tag name:tag --url downloadUrl
+```
+
+This command will perform the build of `name:tag` image with the given IDE distribution provided by `downloadUrl`. This download URL should point to `tar.gz` packaging. For example, navigate to [download page](https://www.jetbrains.com/idea/download/#section=linux), click "Other versions" and copy the link for the IDE packaging. Please ensure that you select `tar.gz` **with JBR**, not without.
+
+Then, it is only need to call `./projector.sh run` command to run the container locally:
+
+```sh
+./projector.sh run name:tag
+```
+
+After that, navigate to [http://localhost:8887](http://localhost:8887), to access the JetBrains IDE.
+
+
+
+##### Example of usage
+
+Below you can find a few examples how to build different JetBrains IDEs using `--url` parameter:
 
 - Build the Docker image with **WebStorm 2020.3.3**
 
   ```sh
   $ git clone https://github.com/che-incubator/jetbrains-editor-images && cd jetbrains-editor-images
-  $ ./clone-projector.sh
-  $ ./build-container.sh che-webstorm https://download.jetbrains.com/webstorm/WebStorm-2020.3.3.tar.gz
-  $ ./run-container.sh che-webstorm
+  $ ./projector.sh build --tag che-webstorm:latest --url https://download.jetbrains.com/webstorm/WebStorm-2020.3.3.tar.gz
+  $ ./projector.sh run che-webstorm:latest
   ```
 
 - Build the Docker image with **PyCharm Community 2020.3.5**
 
   ```sh
   $ git clone https://github.com/che-incubator/jetbrains-editor-images && cd jetbrains-editor-images
-  $ ./clone-projector.sh
-  $ ./build-container.sh che-pycharm https://download.jetbrains.com/python/pycharm-community-2020.3.5.tar.gz
-  $ ./run-container.sh che-pycharm
+  $ ./projector.sh build --tag che-pycharm:latest --url https://download.jetbrains.com/python/pycharm-community-2020.3.5.tar.gz
+  $ ./projector.sh run che-pycharm:latest
   ```
 
 - Build the Docker image with **IntelliJ IDEA Ultimate 2020.2.2**
 
   ```sh
   $ git clone https://github.com/che-incubator/jetbrains-editor-images && cd jetbrains-editor-images
-  $ ./clone-projector.sh
-  $ ./build-container.sh che-idea-ultimate https://download.jetbrains.com/idea/ideaIU-2020.2.2.tar.gz
-  $ ./run-container.sh che-idea-ultimate
+  $ ./projector.sh build --tag che-idea-ultimate:latest --url https://download.jetbrains.com/idea/ideaIU-2020.2.2.tar.gz
+  $ ./projector.sh run che-idea-ultimate:latest
   ```
 
 After performing any build scenario, which provided above, navigate to [http://localhost:8887](http://localhost:8887), to access the JetBrains IDE.
 
 
 
-## Use Docker image with JetBrains IDE in Eclipse Che
+## Build JetBrains IDE in Docker based on the predefined configuration
 
-When `build-container.sh` or `build-container-dev.sh` script is called without any parameters, it creates the Docker image with **IntelliJ IDEA Community** by default. The resulting Docker image will be named with the name provided by default in [default-che-container.json](../default-che-container.json). In case, if the `containerName` parameter is passed, the resulting Docker image will be named with the name passed in the current parameter.
+It is also available to select predefined IDE distribution from the wizard during image build. When `--tag` or `--url` parameters are ommitted, then select wizard is called. Predefined configurations, that are currently supported are provided in [compatible-ide.json](../compatible-ide.json).
+
+The complete command looks:
+
+```sh
+./projector.sh build
+```
+
+This command will prompt user to select the IDE packaging to build:
+
+```sh
+[info] Select the IDE package to build (default is 'IntelliJ IDEA Community'):
+       1) IntelliJ IDEA Community
+       2) PyCharm Community
+```
+
+Then prompt to choose IDE packaging version to build (in case of selecting default choice):
+
+```sh
+[info] Select the IDE package version to build (default is '2020.3.3'):
+       1) 2020.3.3
+       2) 2020.3.2
+       3) 2020.3.1
+```
+
+
+
+## Use Docker image with JetBrains IDE in Eclipse Che
 
 The next step will be tag the resulting image by adding your namespace using the following command pattern:
 

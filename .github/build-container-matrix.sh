@@ -12,7 +12,6 @@
 set -e
 
 CONTAINER_MATRIX="all"
-CONTAINER_MATRIX_CONFIG_DIR="quay.io"
 
 while getopts ":m:" opt; do
   case $opt in
@@ -27,18 +26,14 @@ done
 
 base_dir=$(cd "$(dirname "$0")"; pwd)
 
-if [ ! -d "$base_dir/$CONTAINER_MATRIX_CONFIG_DIR" ]; then
-    exit 2
-fi
-
 SEARCH_FILTER=""
 
 if [ "$CONTAINER_MATRIX" = "all" ]; then
-  SEARCH_FILTER=".[]"
+  SEARCH_FILTER=".[] | {displayName, dockerImage, productCode} + (.productVersion[])"
 elif [ "$CONTAINER_MATRIX" = "latest" ]; then
-  SEARCH_FILTER=".[] | select(.imageTag == \"latest\")"
+  SEARCH_FILTER=".[] | {displayName, dockerImage, productCode} + (.productVersion[]) | select(.latest == true)"
 else
   exit 3
 fi
 
-find "$base_dir/$CONTAINER_MATRIX_CONFIG_DIR" -name "*.json" -print0 -type f | xargs -0 cat | jq -c -r "$SEARCH_FILTER" | paste -sd "," -
+jq -c -r "$SEARCH_FILTER" < "$base_dir"/../compatible-ide.json | paste -sd "," -
