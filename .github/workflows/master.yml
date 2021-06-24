@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2020 Red Hat, Inc.
+# Copyright (c) 2021 Red Hat, Inc.
 # This program and the accompanying materials are made
 # available under the terms of the Eclipse Public License 2.0
 # which is available at https://www.eclipse.org/legal/epl-2.0/
@@ -7,22 +7,23 @@
 # SPDX-License-Identifier: EPL-2.0
 #
 
+name: Publish Next
+
 on:
   push:
     paths-ignore:
       - '**.md'
-      - '**/LICENSE'
-      - '**/.gitignore'
-      - '**/doc/**'
-      - '**/devfiles/**'
-      - '**/kubernetes/**'
-      - '/run-container*.sh'
+      - 'LICENSE'
+      - '.gitignore'
+      - 'doc/**'
+      - 'devfiles/**'
+      - 'kubernetes/**'
     branches: [ master ]
-  
+
 jobs:
-  prepare:
+  prepare_environment:
     name: Prepare Environment
-    runs-on: ubuntu-18.04
+    runs-on: ubuntu-latest
     outputs:
       matrix: ${{ steps.set-matrix.outputs.matrix }}
     steps:
@@ -33,26 +34,27 @@ jobs:
         run: |
           echo "::set-output name=matrix::{\"include\":[$( .github/build-container-matrix.sh -m all )]}"
   build:
-    name: ${{ matrix.displayName }} (${{ matrix.imageTag }}) - Projector Docker Build and Publish to Quay.io
-    needs: prepare
-    runs-on: ubuntu-18.04
+    name: ${{ matrix.productCode }} (${{ matrix.version }}) - Publish Next to Quay.io
+    needs: prepare_environment
+    runs-on: ubuntu-latest
     strategy:
-      matrix: ${{ fromJson(needs.prepare.outputs.matrix) }}
+      matrix: ${{ fromJson(needs.prepare_environment.outputs.matrix) }}
     steps:
       - name: Clone source code
         uses: actions/checkout@v2
         with:
           fetch-depth: 1
       - name: Docker login
-        uses: azure/docker-login@v1
+        uses: docker/login-action@v1
         with:
-          login-server: quay.io
+          registry: quay.io
           username: ${{ secrets.QUAY_USERNAME }}
           password: ${{ secrets.QUAY_PASSWORD }}
-      - name: Clone projector sources
-        run: |
-          ./clone-projector.sh
       - name: Docker image build and publish
         run: |
-          ./build-container.sh ${{ matrix.imageName }}:${{ matrix.imageTag }} ${{ matrix.downloadUrl }}
-          docker push ${{ matrix.imageName }}:${{ matrix.imageTag }}
+          ./projector.sh build \
+              --tag ${{ secrets.QUAY_REPOSITORY }}/${{ matrix.dockerImage }}:${{ matrix.version }}-next \
+              --url ${{ matrix.downloadUrl }} \
+              --progress plain \
+              --log-level debug
+          docker push ${{ secrets.QUAY_REPOSITORY }}/${{ matrix.dockerImage }}:${{ matrix.version }}-next

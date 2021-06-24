@@ -23,12 +23,7 @@
 #
 
 # To build the cuurent Dockerfile there is the following flow:
-#   $ ./clone-projector.sh
-#       Clones the Projector Client and Projector Server sources.
-#   $ ./build-container.sh [containerName [ideDownloadUrl]] or ./build-container-dev.sh [containerName [ideDownloadUrl]]
-#       Perform build Docker container.
-#       build-container.sh takes Projector Client and Projector Server sources and run Gradle build inside Stage 1.
-#       build-container-dev.sh relies on built Projector Server on the host. Useful if doesn't require to build in Stage 1.
+#   $ ./projector.sh build [OPTIONS]
 
 # Stage 1. Prepare JetBrains IDE with Projector.
 #   1. Downloads JetBrains IDE packaging by given downloadUrl build argument.
@@ -38,18 +33,19 @@
 FROM registry.access.redhat.com/ubi8-minimal:8.3-298 as projectorAssembly
 ENV PROJECTOR_DIR /projector
 ENV JAVA_HOME /usr/lib/jvm/java-11
-ARG downloadUrl
-ARG buildGradle
+ARG idePackagingUrl
+ARG skipProjectorBuild
+ARG dockerfileBaseDir
 ADD projector-client $PROJECTOR_DIR/projector-client
 ADD projector-server $PROJECTOR_DIR/projector-server
 RUN microdnf install -y --nodocs findutils tar gzip unzip java-11-openjdk-devel
 WORKDIR $PROJECTOR_DIR/projector-server
-RUN if [ "$buildGradle" = "true" ]; then ./gradlew clean; else echo "Skipping gradle build"; fi \
-    && if [ "$buildGradle" = "true" ]; then ./gradlew --console=plain :projector-server:distZip; else echo "Skipping gradle build"; fi \
+RUN if [ "$skipProjectorBuild" != "true" ]; then ./gradlew clean; else echo "Skipping Projector build"; fi \
+    && if [ "$skipProjectorBuild" != "true" ]; then ./gradlew --console=plain :projector-server:distZip; else echo "Skipping Projector build"; fi \
     && cd projector-server/build/distributions \
     && find . -maxdepth 1 -type f -name projector-server-*.zip -exec mv {} projector-server.zip \;
 WORKDIR /downloads
-RUN curl -SL $downloadUrl | tar -xz \
+RUN curl -SL $idePackagingUrl | tar -xz \
     && find . -maxdepth 1 -type d -name * -exec mv {} $PROJECTOR_DIR/ide \;
 WORKDIR $PROJECTOR_DIR
 RUN set -ex \
@@ -61,7 +57,7 @@ RUN set -ex \
     && find . -maxdepth 1 -type d -name projector-server-* -exec mv {} projector-server \; \
     && mv projector-server ide/projector-server \
     && chmod 644 ide/projector-server/lib/*
-ADD jetbrains-editor-images/static $PROJECTOR_DIR
+ADD $dockerfileBaseDir/static $PROJECTOR_DIR
 RUN set -ex \
     && mv ide-projector-launcher.sh ide/bin \
     && find . -exec chgrp 0 {} \; -exec chmod g+rwX {} \; \
@@ -97,7 +93,6 @@ RUN set -ex \
 
 COPY --chown=$PROJECTOR_USER_NAME:root --from=projectorAssembly $PROJECTOR_DIR $PROJECTOR_DIR
 
-ENV DEV_MODE=false
 USER $PROJECTOR_USER_NAME
 WORKDIR /projects
 EXPOSE 8887
