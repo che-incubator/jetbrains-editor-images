@@ -36,7 +36,7 @@ PROJECTOR_SERVER_GIT=https://github.com/JetBrains/projector-server.git
 PROJECTOR_CLIENT_SHA1=57b1aba28f4ff7bf3953274b7866797085564c39
 PROJECTOR_SERVER_SHA1=fb51272f5d18084502a6ff2d958b2d4bf1023b69
 
-DOC_URL=https://github.com/che-incubator/jetbrains-editor-images/tree/master/doc
+DOC_URL=https://github.com/che-incubator/jetbrains-editor-images/tree/main/doc
 
 # Logging configuration
 # https://en.wikipedia.org/wiki/Syslog#Severity_level
