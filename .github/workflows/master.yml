@@ -18,7 +18,7 @@ on:
       - 'doc/**'
       - 'devfiles/**'
       - 'kubernetes/**'
-    branches: [ master ]
+    branches: [ main ]
 
 jobs:
   prepare_environment:

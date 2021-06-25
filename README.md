@@ -15,7 +15,7 @@ In order to run JetBrains IDE in Eclipse Che infrastructure, current repository 
 - Che Factory pattern:
 
   ```
-  https://<your-che-host>/f?url=https://github.com/che-incubator/jetbrains-editor-images/raw/master/devfiles/che-idea.yaml
+  https://<your-che-host>/f?url=https://github.com/che-incubator/jetbrains-editor-images/raw/main/devfiles/che-idea.yaml
   ```
 
 - Create the Workspace from [chectl](https://github.com/che-incubator/chectl/) (Requires clone the current repository):
@@ -42,7 +42,7 @@ In order to run JetBrains IDE in Eclipse Che infrastructure, current repository 
 - Che Factory pattern:
 
   ```
-  https://<your-che-host>/f?url=https://github.com/che-incubator/jetbrains-editor-images/raw/master/devfiles/che-pycharm.yaml
+  https://<your-che-host>/f?url=https://github.com/che-incubator/jetbrains-editor-images/raw/main/devfiles/che-pycharm.yaml
   ```
 
 - Create the Workspace from [chectl](https://github.com/che-incubator/chectl/) (Requires clone the current repository):
@@ -139,7 +139,7 @@ Commands:
   run     Start a container with IntelliJ-based IDE
 
 Run './projector.sh COMMAND --help' for more information on a command.
-To get more help with the './projector.sh' check out guides at https://github.com/che-incubator/jetbrains-editor-images/tree/master/doc
+To get more help with the './projector.sh' check out guides at https://github.com/che-incubator/jetbrains-editor-images/tree/main/doc
 ```
 
 

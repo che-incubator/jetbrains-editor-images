@@ -16,7 +16,7 @@ Open [OpenShift Workspaces](https://workspaces.openshift.com/), make sure you ar
 
 ![CodeReady Workspaces - Dashboard](https://raw.githubusercontent.com/che-incubator/jetbrains-editor-images/media/images/crw-dashboard.jpg)
 
-Grab particular Devfile [from the repository](https://github.com/che-incubator/jetbrains-editor-images/tree/master/devfiles) and paste the URL for Devfile as Devfile template and create the Workspace.
+Grab particular Devfile [from the repository](https://github.com/che-incubator/jetbrains-editor-images/tree/main/devfiles) and paste the URL for Devfile as Devfile template and create the Workspace.
 
 ![CodeReady Workspaces - New Workspace](https://raw.githubusercontent.com/che-incubator/jetbrains-editor-images/media/images/crw-create-workspace.jpg)
 
