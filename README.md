@@ -15,14 +15,14 @@ In order to run JetBrains IDE in Eclipse Che infrastructure, current repository 
 - Che Factory pattern:
 
   ```
-  https://<your-che-host>/f?url=https://github.com/che-incubator/jetbrains-editor-images/raw/main/devfiles/che-idea.yaml
+  https://<your-che-host>/f?url=https://github.com/che-incubator/jetbrains-editor-images/raw/main/devfiles/latest/che-idea/latest.yaml
   ```
 
 - Create the Workspace from [chectl](https://github.com/che-incubator/chectl/) (Requires clone the current repository):
 
   ```sh
   $ git clone https://github.com/che-incubator/jetbrains-editor-images && cd jetbrains-editor-images
-  $ chectl workspace:create -f devfiles/che-idea.yaml
+  $ chectl workspace:create -f devfiles/latest/che-idea/latest.yaml
   ```
 
 - Create the Workspace from the following workspace configuration:
@@ -32,7 +32,7 @@ In order to run JetBrains IDE in Eclipse Che infrastructure, current repository 
     name: che-idea
   components:
     - type: cheEditor
-      reference: 'https://raw.githubusercontent.com/che-incubator/jetbrains-editor-images/meta/che-idea-latest.meta.yaml'
+      reference: 'https://raw.githubusercontent.com/che-incubator/jetbrains-editor-images/meta/che-idea/latest.meta.yaml'
       alias: che-idea
   apiVersion: 1.0.0
   ```
@@ -42,14 +42,14 @@ In order to run JetBrains IDE in Eclipse Che infrastructure, current repository 
 - Che Factory pattern:
 
   ```
-  https://<your-che-host>/f?url=https://github.com/che-incubator/jetbrains-editor-images/raw/main/devfiles/che-pycharm.yaml
+  https://<your-che-host>/f?url=https://github.com/che-incubator/jetbrains-editor-images/raw/main/devfiles/latest/che-pycharm/latest.yaml
   ```
 
 - Create the Workspace from [chectl](https://github.com/che-incubator/chectl/) (Requires clone the current repository):
 
   ```sh
   $ git clone https://github.com/che-incubator/jetbrains-editor-images && cd jetbrains-editor-images
-  $ chectl workspace:create -f devfiles/che-pycharm.yaml
+  $ chectl workspace:create -f devfiles/latest/che-pycharm/latest.yaml
   ```
 
 - Create the Workspace from the following workspace configuration:
@@ -59,7 +59,7 @@ In order to run JetBrains IDE in Eclipse Che infrastructure, current repository 
     name: che-pycharm
   components:
     - type: cheEditor
-      reference: 'https://raw.githubusercontent.com/che-incubator/jetbrains-editor-images/meta/che-pycharm-latest.meta.yaml'
+      reference: 'https://raw.githubusercontent.com/che-incubator/jetbrains-editor-images/meta/che-pycharm/latest.meta.yaml'
       alias: che-pycharm
   apiVersion: 1.0.0
   ```
