@@ -1,7 +1,7 @@
 # Changelog
 This document reflects the project's changes made after each release cycle
 
-## [YYYYMMDD] Unreleased
+## [20210629]
 
 ### News
 
@@ -11,6 +11,7 @@ This document reflects the project's changes made after each release cycle
 
 - Build Docker images using Projector ([#21](https://github.com/che-incubator/jetbrains-editor-images/pull/21))
 - Add guide which describes how to connect to workspace from projector launcher ([#31](https://github.com/che-incubator/jetbrains-editor-images/pull/31))
+- Align devfiles to new release scheme ([#34](https://github.com/che-incubator/jetbrains-editor-images/pull/34))
 
 ### Changed
 
