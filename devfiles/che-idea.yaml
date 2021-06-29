@@ -1,7 +1,0 @@
-metadata:
-  name: che-idea
-components:
-  - type: cheEditor
-    reference: 'https://raw.githubusercontent.com/che-incubator/jetbrains-editor-images/meta/che-idea-latest.meta.yaml'
-    alias: che-idea
-apiVersion: 1.0.0

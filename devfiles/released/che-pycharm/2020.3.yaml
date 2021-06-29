@@ -1,0 +1,7 @@
+metadata:
+  name: che-pycharm
+components:
+  - type: cheEditor
+    reference: 'https://raw.githubusercontent.com/che-incubator/jetbrains-editor-images/meta/che-pycharm/2020.3.meta.yaml'
+    alias: che-pycharm
+apiVersion: 1.0.0
