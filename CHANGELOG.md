@@ -5,7 +5,7 @@ This document reflects the project's changes made after each release cycle
 
 ### News
 
-- TBD
+- Removed auxiliary patch to support single host environment
 
 ### Added
 
@@ -13,7 +13,7 @@ This document reflects the project's changes made after each release cycle
 
 ### Changed
 
-- TBD
+- Bump Projector Client and Projector Server SHA1 revisions to fetch the latest upstream changes ([#37](https://github.com/che-incubator/jetbrains-editor-images/pull/37))
 
 ### Fixed
 
