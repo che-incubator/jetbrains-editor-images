@@ -14,6 +14,7 @@ This document reflects the project's changes made after each release cycle
 ### Changed
 
 - Bump Projector Client and Projector Server SHA1 revisions to fetch the latest upstream changes ([#37](https://github.com/che-incubator/jetbrains-editor-images/pull/37))
+- Update ubi image version from 8.3-298 to 8.4-205 ([#38](https://github.com/che-incubator/jetbrains-editor-images/pull/38))
 
 ### Fixed
 

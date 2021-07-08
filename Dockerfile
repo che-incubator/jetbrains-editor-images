@@ -30,7 +30,7 @@
 #   2. If buildGradle build argument is set to false, then consumes built Projector assembly from the host.
 #       2.1 Otherwise starts Gradle build of Projector Server and Projector Client.
 #   3. Copies static files to the Projector assembly (entrypoint, launcher, configuration).
-FROM registry.access.redhat.com/ubi8-minimal:8.3-298 as projectorAssembly
+FROM registry.access.redhat.com/ubi8-minimal:8.4-205 as projectorAssembly
 ENV PROJECTOR_DIR /projector
 ENV JAVA_HOME /usr/lib/jvm/java-11
 ARG idePackagingUrl
@@ -67,7 +67,7 @@ RUN set -ex \
 
 # Stage 2. Build the main image with necessary environment for running Projector
 #   Doesn't require to be a desktop environment. Projector runs in headless mode.
-FROM registry.access.redhat.com/ubi8-minimal:8.3-298
+FROM registry.access.redhat.com/ubi8-minimal:8.4-205
 ENV PROJECTOR_USER_NAME projector-user
 ENV PROJECTOR_DIR /projector
 ENV HOME /home/$PROJECTOR_USER_NAME
