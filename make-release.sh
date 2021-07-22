@@ -13,7 +13,7 @@ base_dir=$(cd "$(dirname "$0")" || exit; pwd)
 
 RELEASE_TAG=
 PROJECTOR_CLI_LOG_LEVEL=info
-BUILD_DIRECTORY="$base_dir"/build
+BUILD_DIRECTORY="$base_dir"/build/docker
 SKIP_CHECKS=false
 
 # Logging configuration
@@ -181,7 +181,7 @@ if [ $SKIP_CHECKS == false ]; then
     .log 7 "Check if build directory '$BUILD_DIRECTORY' exists"
     if [ ! -e "$BUILD_DIRECTORY" ]; then
       .log 7 "Creating build directory '$BUILD_DIRECTORY'"
-      mkdir "$BUILD_DIRECTORY"
+      mkdir -p "$BUILD_DIRECTORY"
     fi
     .log 7 "Build directory '$BUILD_DIRECTORY' exists"
 

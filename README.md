@@ -167,7 +167,6 @@ the predefined IDE packaging from the default configuration.
 Options:
   -t, --tag string              Name and optionally a tag in the 'name:tag' format for the result image
   -u, --url string              Downloadable URL of IntelliJ-based IDE package
-      --no-projector-build      Skip build of Projector Client and Projector Server inside the container
       --run-on-build            Run the container immediately after build
       --save-on-build           Save the image to a tar archive after build. Basename of --url.
       --mount-volumes [string]  Mount volumes to the container which was started using '--run-on-build' option
@@ -176,8 +175,10 @@ Options:
                                 Default value: $HOME/projector-user:/home/projector-user,$HOME/projector-projects:/projects
   -p, --progress string         Set type of progress output ("auto"|"plain") (default "auto")
       --config string           Specify the configuration file for predefined IDE package list (default "compatible-ide.json")
-      --projector-only          Clone and build Projector only ignoring other options. Used when need to fetch Projector
-                                sources only and assembly the binaries.
+      --prepare                 Clone and build Projector only ignoring other options. Also downloads the IDE packaging
+                                by the --url option. If --url option is omitted then interactive wizard is called to choose
+                                the right packaging to prepare. Used when need to fetch Projector sources only, assembly
+                                the binaries and download the IDE packaging.
 ```
 
 

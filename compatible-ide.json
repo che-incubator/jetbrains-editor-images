@@ -6,17 +6,17 @@
     "productVersion": [
       {
         "version": "2020.3.3",
-        "downloadUrl": "https://download.jetbrains.com/idea/ideaIC-2020.3.3.tar.gz",
+        "downloadUrl": "https://download-cdn.jetbrains.com/idea/ideaIC-2020.3.3.tar.gz",
         "latest": true
       },
       {
         "version": "2020.3.2",
-        "downloadUrl": "https://download.jetbrains.com/idea/ideaIC-2020.3.2.tar.gz",
+        "downloadUrl": "https://download-cdn.jetbrains.com/idea/ideaIC-2020.3.2.tar.gz",
         "latest": false
       },
       {
         "version": "2020.3.1",
-        "downloadUrl": "https://download.jetbrains.com/idea/ideaIC-2020.3.1.tar.gz",
+        "downloadUrl": "https://download-cdn.jetbrains.com/idea/ideaIC-2020.3.1.tar.gz",
         "latest": false
       }
     ]
@@ -28,32 +28,32 @@
     "productVersion": [
       {
         "version": "2020.3.5",
-        "downloadUrl": "https://download.jetbrains.com/python/pycharm-community-2020.3.5.tar.gz",
+        "downloadUrl": "https://download-cdn.jetbrains.com/python/pycharm-community-2020.3.5.tar.gz",
         "latest": true
       },
       {
         "version": "2020.3.4",
-        "downloadUrl": "https://download.jetbrains.com/python/pycharm-community-2020.3.4.tar.gz",
+        "downloadUrl": "https://download-cdn.jetbrains.com/python/pycharm-community-2020.3.4.tar.gz",
         "latest": false
       },
       {
         "version": "2020.3.3",
-        "downloadUrl": "https://download.jetbrains.com/python/pycharm-community-2020.3.3.tar.gz",
+        "downloadUrl": "https://download-cdn.jetbrains.com/python/pycharm-community-2020.3.3.tar.gz",
         "latest": false
       },
       {
         "version": "2020.3.2",
-        "downloadUrl": "https://download.jetbrains.com/python/pycharm-community-2020.3.2.tar.gz",
+        "downloadUrl": "https://download-cdn.jetbrains.com/python/pycharm-community-2020.3.2.tar.gz",
         "latest": false
       },
       {
         "version": "2020.3.1",
-        "downloadUrl": "https://download.jetbrains.com/python/pycharm-community-2020.3.1.tar.gz",
+        "downloadUrl": "https://download-cdn.jetbrains.com/python/pycharm-community-2020.3.1.tar.gz",
         "latest": false
       },
       {
         "version": "2020.3",
-        "downloadUrl": "https://download.jetbrains.com/python/pycharm-community-2020.3.tar.gz",
+        "downloadUrl": "https://download-cdn.jetbrains.com/python/pycharm-community-2020.3.tar.gz",
         "latest": false
       }
     ]

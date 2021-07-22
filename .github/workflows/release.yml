@@ -75,7 +75,7 @@ jobs:
               --log-level debug
       - name: Provide release asset path
         id: release_asset_path
-        run: echo ::set-output name=path::build/$(basename ${{ matrix.downloadUrl }})
+        run: echo ::set-output name=path::build/docker/$(basename ${{ matrix.downloadUrl }})
       - name: Provide release asset name
         id: release_asset_name
         run: echo ::set-output name=name::${{ steps.tag_name.outputs.sourceTag }}-$(basename ${{ matrix.downloadUrl }})

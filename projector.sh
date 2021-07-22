@@ -16,20 +16,23 @@ base_dir=$(
 
 CONTAINER_TAG=
 URL=
-SKIP_PROJECTOR_CONTAINER_BUILD=false
 
 COMMAND=
 CONTAINER_TO_RUN=
 VOLUMES="$HOME/projector-user:/home/projector-user,$HOME/projector-projects:/projects"
+BUILD_DIRECTORY="$base_dir"/build
 RUN_ON_BUILD=false
 SAVE_ON_BUILD=false
-SAVE_ON_BUILD_DIRECTORY="$base_dir"/build
+SAVE_ON_BUILD_DIRECTORY="$BUILD_DIRECTORY"/docker
+IDE_PACKAGING_DIRECTORY="$BUILD_DIRECTORY"/ide
+CURRENT_IDE_PACKAGING_SYMLINK="$BUILD_DIRECTORY"/ide-packaging
+CURRENT_PROJECTOR_ASSEMBLY_SYMLINK="$BUILD_DIRECTORY"/projector-server-assembly
 PROGRESS=auto
 CONFIG_JSON=compatible-ide.json
 CONFIG_JSON_PATH="$base_dir"/"$CONFIG_JSON"
-PROJECTOR_CLIENT_DIR="$base_dir"/../projector-client
-PROJECTOR_SERVER_DIR="$base_dir"/../projector-server
-PROJECTOR_ONLY_BUILD=false
+PROJECTOR_CLIENT_DIR="$BUILD_DIRECTORY"/projector-client
+PROJECTOR_SERVER_DIR="$BUILD_DIRECTORY"/projector-server
+PREPARE_ASSEMBLY_ONLY=false
 
 PROJECTOR_CLIENT_GIT=https://github.com/JetBrains/projector-client.git
 PROJECTOR_SERVER_GIT=https://github.com/JetBrains/projector-server.git
@@ -86,7 +89,6 @@ the predefined IDE packaging from the default configuration.
 Options:
   -t, --tag string              Name and optionally a tag in the 'name:tag' format for the result image
   -u, --url string              Downloadable URL of IntelliJ-based IDE package
-      --no-projector-build      Skip build of Projector Client and Projector Server inside the container
       --run-on-build            Run the container immediately after build
       --save-on-build           Save the image to a tar archive after build. Basename of --url.
       --mount-volumes [string]  Mount volumes to the container which was started using '--run-on-build' option
@@ -95,8 +97,10 @@ Options:
                                 Default value: \$HOME/projector-user:/home/projector-user,\$HOME/projector-projects:/projects
   -p, --progress string         Set type of progress output ("auto"|"plain") (default "auto")
       --config string           Specify the configuration file for predefined IDE package list (default "$CONFIG_JSON")
-      --projector-only          Clone and build Projector only ignoring other options. Used when need to fetch Projector
-                                sources only and assembly the binaries.
+      --prepare                 Clone and build Projector only ignoring other options. Also downloads the IDE packaging
+                                by the --url option. If --url option is omitted then interactive wizard is called to choose
+                                the right packaging to prepare. Used when need to fetch Projector sources only, assembly
+                                the binaries and download the IDE packaging.
 
 EOM
 
@@ -273,7 +277,13 @@ projectorBuild() {
   .log 6 "Build Projector on localhost"
   cd "$PROJECTOR_SERVER_DIR" || exit 1
   .log 7 "Current working directory '$(pwd)'"
+  if [ -f "$CURRENT_PROJECTOR_ASSEMBLY_SYMLINK" ]; then
+    .log 7 "Removing symlink '$CURRENT_PROJECTOR_ASSEMBLY_SYMLINK'"
+    unlink "$CURRENT_PROJECTOR_ASSEMBLY_SYMLINK"
+  fi
   ./gradlew --quiet --console="$PROGRESS" :projector-server:distZip
+  find projector-server/build/distributions -type f -name "projector-server-*.zip" -exec ln {} "$CURRENT_PROJECTOR_ASSEMBLY_SYMLINK" \;
+  .log 7 "Creating symlink '$CURRENT_PROJECTOR_ASSEMBLY_SYMLINK'"
   cd "$base_dir" || exit 1
   .log 7 "Current working directory '$(pwd)'"
 }
@@ -284,7 +294,6 @@ Pre-build container final summary
         Docker build progress configuration: $PROGRESS
         Container name: $CONTAINER_TAG
         IDE package URL: $URL
-        Skip Projector build inside the container: $SKIP_PROJECTOR_CONTAINER_BUILD
 EOM
   .log 7 "$PRE_BUILD_SUMMARY"
   .log 6 "Build '$CONTAINER_TAG'"
@@ -293,10 +302,7 @@ EOM
     docker build \
     --progress="$PROGRESS" \
     -t "$CONTAINER_TAG" \
-    --build-arg skipProjectorBuild="$SKIP_PROJECTOR_CONTAINER_BUILD" \
-    --build-arg idePackagingUrl="$URL" \
-    --build-arg dockerfileBaseDir="${PWD##*/}" \
-    -f Dockerfile ..
+    -f Dockerfile .
   # shellcheck disable=SC2181
   if [[ $? -eq 0 ]]; then
     .log 6 "Container '$CONTAINER_TAG' successfully built"
@@ -325,7 +331,7 @@ runContainerImage() {
 saveOnBuild() {
   if [ $SAVE_ON_BUILD == true ]; then
     if [ ! -e "$SAVE_ON_BUILD_DIRECTORY" ]; then
-      mkdir "$SAVE_ON_BUILD_DIRECTORY"
+      mkdir -p "$SAVE_ON_BUILD_DIRECTORY"
     fi
     local imageOutputName && imageOutputName=$(basename "$URL")
     .log 6 "Saving '$CONTAINER_TAG' to '$SAVE_ON_BUILD_DIRECTORY/$imageOutputName'"
@@ -341,9 +347,40 @@ runOnBuild() {
   fi
 }
 
-prepareProjectorAssembly() {
+prepareAssembly() {
+  if [ -z "$URL" ]; then
+    .log 7 "Ignoring --tag and --url option"
+    checkConfigurationFileExists
+
+    # Run interactive wizard to choose IDE packaging from predefined configuration
+    selectPackagingFromPredefinedConfig
+  fi
+  downloadIdePackaging
   checkProjectorSourcesExist
   projectorBuild
+}
+
+downloadIdePackaging() {
+  if [ ! -e "$IDE_PACKAGING_DIRECTORY" ]; then
+    mkdir -p "$IDE_PACKAGING_DIRECTORY"
+    .log 7 "Creating directory for storing downloaded IDEs '$IDE_PACKAGING_DIRECTORY'"
+  fi
+
+  local packagingOutputName && packagingOutputName=$(basename "$URL")
+  cd "$IDE_PACKAGING_DIRECTORY" || exit 1
+  .log 7 "Current working directory '$(pwd)'"
+
+  if [ -f "$CURRENT_IDE_PACKAGING_SYMLINK" ]; then
+    .log 7 "Removing symlink '$CURRENT_IDE_PACKAGING_SYMLINK'"
+    unlink "$CURRENT_IDE_PACKAGING_SYMLINK"
+  fi
+  # Use --timestamping option to allow local caching
+  # Above option doesn't work with -O parameter, so hoping, that base file name wouldn't change
+  wget --timestamping "$URL"
+  ln "$packagingOutputName" "$CURRENT_IDE_PACKAGING_SYMLINK"
+  .log 7 "Creating symlink '$CURRENT_IDE_PACKAGING_SYMLINK'"
+  cd "$base_dir" || exit 1
+  .log 7 "Current working directory '$(pwd)'"
 }
 
 buildContainerImage() {
@@ -356,11 +393,9 @@ buildContainerImage() {
     selectPackagingFromPredefinedConfig
   fi
 
+  downloadIdePackaging
   checkProjectorSourcesExist
-
-  if [ $SKIP_PROJECTOR_CONTAINER_BUILD == true ]; then
-    projectorBuild
-  fi
+  projectorBuild
 
   runBuild
   saveOnBuild
@@ -385,7 +420,7 @@ if [[ $? -ne 4 ]]; then
   exit 1
 fi
 
-OPTS=$(getopt -o 'hvt:up:l:' --longoptions 'help,version,no-projector-build,tag:,url:,mount-volumes:,run-on-build,save-on-build,progress:,log-level:,config:,projector-only' -u -n "$0" -- "$@")
+OPTS=$(getopt -o 'hvt:up:l:' --longoptions 'help,version,tag:,url:,mount-volumes:,run-on-build,save-on-build,progress:,log-level:,config:,prepare' -u -n "$0" -- "$@")
 # shellcheck disable=SC2181
 if [[ $? -ne 0 ]]; then
   .log 4 "Failed parsing options."
@@ -417,10 +452,6 @@ while true; do
     printVersion
     exit 0
     ;;
-  --no-projector-build)
-    SKIP_PROJECTOR_CONTAINER_BUILD=true
-    shift
-    ;;
   -t | --tag)
     CONTAINER_TAG=$2
     shift 2
@@ -448,8 +479,8 @@ while true; do
     SAVE_ON_BUILD=true
     shift
     ;;
-  --projector-only)
-    PROJECTOR_ONLY_BUILD=true
+  --prepare)
+    PREPARE_ASSEMBLY_ONLY=true
     shift
     ;;
   -p | --progress)
@@ -538,8 +569,12 @@ EOM
 done
 
 if [ "$COMMAND" == "build" ]; then
-  if [ $PROJECTOR_ONLY_BUILD == true ]; then
-    prepareProjectorAssembly
+  if [ ! -e "$BUILD_DIRECTORY" ]; then
+    mkdir "$BUILD_DIRECTORY"
+    .log 7 "Creating build directory '$BUILD_DIRECTORY'"
+  fi
+  if [ $PREPARE_ASSEMBLY_ONLY == true ]; then
+    prepareAssembly
   else
     buildContainerImage
   fi
