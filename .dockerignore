@@ -1,5 +1,5 @@
 **
 
-!/projector-client/**
-!/projector-server/**
-!/jetbrains-editor-images/static/**
+!/build/ide-packaging
+!/build/projector-server-assembly
+!/static/**

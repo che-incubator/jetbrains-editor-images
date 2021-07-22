@@ -7,6 +7,32 @@ This document reflects the project's changes made after each release cycle
 
 - Removed auxiliary patch to support single host environment
 
+- Build community images in Brew compliant way. ([#40](https://github.com/che-incubator/jetbrains-editor-images/pull/40))
+
+  To be a part of Codeready Workspaces there are some important changes come:
+
+  - Projector Build performed only on the host machine, **not inside the container**. To build the Projector Client and Projector Server it is only enough to have at least JDK 11 and configured environment variable `JAVA_HOME`.
+
+  - IDE downloads to the host machine, **not inside the container**. This allows to apply caching mechanism to speedup the image build from ~5-6 minutes to 1-2 minutes.
+
+  - Changed `compatible-ide.json` configuration by using the CDN links to have ability to cache downloaded packages.
+
+  - [Internal] Removed build arguments from the Dockerfile. So to build the image performs as usual, by calling `./projector.sh build`.
+
+  - Removed `--projector-only` parameter and introduced `--prepare` instead. This parameter will perform all necessary work to prepare the assembly before Docker build. So calling:
+
+    ```sh
+    $ ./projector.sh build --prepare
+    ```
+
+    will prepare Projector Server and Projector Client sources, download the IDE packaging and omit the Docker build step. Then Docker image can be simply built by calling:
+
+    ```sh
+    $ DOCKER_BUILDKIT=1 docker build --progress=auto -t <image_name> -f Dockerfile .
+    ```
+
+  - Removed `--no-projector-build` parameter. As far as Projector Server and Projector Client builds only on the host machine.
+
 ### Added
 
 - TBD

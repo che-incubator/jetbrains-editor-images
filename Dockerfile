@@ -26,39 +26,25 @@
 #   $ ./projector.sh build [OPTIONS]
 
 # Stage 1. Prepare JetBrains IDE with Projector.
-#   1. Downloads JetBrains IDE packaging by given downloadUrl build argument.
-#   2. If buildGradle build argument is set to false, then consumes built Projector assembly from the host.
-#       2.1 Otherwise starts Gradle build of Projector Server and Projector Client.
-#   3. Copies static files to the Projector assembly (entrypoint, launcher, configuration).
+#   Requires build/ide-packaging which should point to the ide packaging downloaded
+#   previously, usually tar.gz archive. Also requires build/projector-server-assembly
+#   which points to the built Projector Server assembly.
 FROM registry.access.redhat.com/ubi8-minimal:8.4-205 as projectorAssembly
 ENV PROJECTOR_DIR /projector
-ENV JAVA_HOME /usr/lib/jvm/java-11
-ARG idePackagingUrl
-ARG skipProjectorBuild
-ARG dockerfileBaseDir
-ADD projector-client $PROJECTOR_DIR/projector-client
-ADD projector-server $PROJECTOR_DIR/projector-server
-RUN microdnf install -y --nodocs findutils tar gzip unzip java-11-openjdk-devel
-WORKDIR $PROJECTOR_DIR/projector-server
-RUN if [ "$skipProjectorBuild" != "true" ]; then ./gradlew clean; else echo "Skipping Projector build"; fi \
-    && if [ "$skipProjectorBuild" != "true" ]; then ./gradlew --console=plain :projector-server:distZip; else echo "Skipping Projector build"; fi \
-    && cd projector-server/build/distributions \
-    && find . -maxdepth 1 -type f -name projector-server-*.zip -exec mv {} projector-server.zip \;
-WORKDIR /downloads
-RUN curl -SL $idePackagingUrl | tar -xz \
-    && find . -maxdepth 1 -type d -name * -exec mv {} $PROJECTOR_DIR/ide \;
-WORKDIR $PROJECTOR_DIR
+ADD build/ide-packaging /tmp/ide-unpacked
+ADD build/projector-server-assembly $PROJECTOR_DIR/projector-server.zip
+ADD static $PROJECTOR_DIR
 RUN set -ex \
-    && cp projector-server/projector-server/build/distributions/projector-server.zip . \
-    && rm -rf projector-client \
-    && rm -rf projector-server \
+    && microdnf install -y --nodocs findutils tar gzip unzip \
+    && cd /tmp/ide-unpacked \
+    && find . -maxdepth 1 -type d -name * -exec mv {} $PROJECTOR_DIR/ide \; \
+    && cd $PROJECTOR_DIR \
+    && rm -rf /tmp/ide-unpacked \
     && unzip projector-server.zip \
     && rm projector-server.zip \
     && find . -maxdepth 1 -type d -name projector-server-* -exec mv {} projector-server \; \
     && mv projector-server ide/projector-server \
-    && chmod 644 ide/projector-server/lib/*
-ADD $dockerfileBaseDir/static $PROJECTOR_DIR
-RUN set -ex \
+    && chmod 644 ide/projector-server/lib/* \
     && mv ide-projector-launcher.sh ide/bin \
     && find . -exec chgrp 0 {} \; -exec chmod g+rwX {} \; \
     && find . -name "*.sh" -exec chmod +x {} \; \
