@@ -1,7 +1,7 @@
 # Changelog
 This document reflects the project's changes made after each release cycle
 
-## [YYYYMMDD] Unreleased
+## [20210723]
 
 ### News
 
@@ -33,18 +33,10 @@ This document reflects the project's changes made after each release cycle
 
   - Removed `--no-projector-build` parameter. As far as Projector Server and Projector Client builds only on the host machine.
 
-### Added
-
-- TBD
-
 ### Changed
 
 - Bump Projector Client and Projector Server SHA1 revisions to fetch the latest upstream changes ([#37](https://github.com/che-incubator/jetbrains-editor-images/pull/37))
 - Update ubi image version from 8.3-298 to 8.4-205 ([#38](https://github.com/che-incubator/jetbrains-editor-images/pull/38))
-
-### Fixed
-
-- TBD
 
 ## [20210629]
 
