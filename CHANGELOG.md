@@ -1,23 +1,9 @@
 # Changelog
 This document reflects the project's changes made after each release cycle
 
-## [YYYYMMDD] Unreleased
-
-### News
-
-- TBD
-
-### Added
-
-- TBD
-
-### Changed
+## [20210727]
 
 - Prepare Dockerfile to build in OSBS ([#43](https://github.com/che-incubator/jetbrains-editor-images/pull/43))
-
-### Fixed
-
-- TBD
 
 ## [20210723]
 
