@@ -1,5 +1,7 @@
 .DS_Store
 .idea
 *.iml
-*.tar.gz
 build
+ide-packaging
+projector-server-assembly
+static-assembly

@@ -1,5 +1,5 @@
 **
 
-!/build/ide-packaging
-!/build/projector-server-assembly
-!/static/**
+!/ide-packaging
+!/projector-server-assembly
+!/static-assembly
