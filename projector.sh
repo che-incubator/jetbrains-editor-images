@@ -25,8 +25,9 @@ RUN_ON_BUILD=false
 SAVE_ON_BUILD=false
 SAVE_ON_BUILD_DIRECTORY="$BUILD_DIRECTORY"/docker
 IDE_PACKAGING_DIRECTORY="$BUILD_DIRECTORY"/ide
-CURRENT_IDE_PACKAGING_SYMLINK="$BUILD_DIRECTORY"/ide-packaging
-CURRENT_PROJECTOR_ASSEMBLY_SYMLINK="$BUILD_DIRECTORY"/projector-server-assembly
+CURRENT_IDE_PACKAGING_SYMLINK="$base_dir"/ide-packaging
+CURRENT_PROJECTOR_ASSEMBLY_SYMLINK="$base_dir"/projector-server-assembly
+CURRENT_PROJECTOR_STATIC_ASSEMBLY="$base_dir"/static-assembly
 PROGRESS=auto
 CONFIG_JSON=compatible-ide.json
 CONFIG_JSON_PATH="$base_dir"/"$CONFIG_JSON"
@@ -347,6 +348,18 @@ runOnBuild() {
   fi
 }
 
+prepareStaticFiles() {
+  cd "$base_dir" || exit 1
+  .log 7 "Current working directory '$(pwd)'"
+  if [ -f "$CURRENT_PROJECTOR_STATIC_ASSEMBLY" ]; then
+    .log 7 "Removing symlink '$CURRENT_PROJECTOR_STATIC_ASSEMBLY'"
+    rm "$CURRENT_PROJECTOR_STATIC_ASSEMBLY"
+  fi
+
+  .log 7 "Creating archive for Projector static files '$CURRENT_PROJECTOR_STATIC_ASSEMBLY'"
+  tar -czf "$CURRENT_PROJECTOR_STATIC_ASSEMBLY" static
+}
+
 prepareAssembly() {
   if [ -z "$URL" ]; then
     .log 7 "Ignoring --tag and --url option"
@@ -355,6 +368,7 @@ prepareAssembly() {
     # Run interactive wizard to choose IDE packaging from predefined configuration
     selectPackagingFromPredefinedConfig
   fi
+  prepareStaticFiles
   downloadIdePackaging
   checkProjectorSourcesExist
   projectorBuild
@@ -393,6 +407,7 @@ buildContainerImage() {
     selectPackagingFromPredefinedConfig
   fi
 
+  prepareStaticFiles
   downloadIdePackaging
   checkProjectorSourcesExist
   projectorBuild

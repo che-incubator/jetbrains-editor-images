@@ -26,25 +26,32 @@
 #   $ ./projector.sh build [OPTIONS]
 
 # Stage 1. Prepare JetBrains IDE with Projector.
-#   Requires build/ide-packaging which should point to the ide packaging downloaded
-#   previously, usually tar.gz archive. Also requires build/projector-server-assembly
-#   which points to the built Projector Server assembly.
+#   Requires ide-packaging which should point to the ide packaging downloaded
+#   previously, usually tar.gz archive. Also requires projector-server-assembly
+#   which points to the built Projector Server assembly, zip archive. Requires
+#   static-assembly a gzipped static directory.
 FROM registry.access.redhat.com/ubi8-minimal:8.4-205 as projectorAssembly
 ENV PROJECTOR_DIR /projector
-ADD build/ide-packaging /tmp/ide-unpacked
-ADD build/projector-server-assembly $PROJECTOR_DIR/projector-server.zip
-ADD static $PROJECTOR_DIR
+COPY ide-packaging /tmp/ide-unpacked/
+COPY projector-server-assembly $PROJECTOR_DIR/
+COPY static-assembly $PROJECTOR_DIR/
 RUN set -ex \
     && microdnf install -y --nodocs findutils tar gzip unzip \
     && cd /tmp/ide-unpacked \
+    && tar xf ide-packaging \
+    && rm ide-packaging \
     && find . -maxdepth 1 -type d -name * -exec mv {} $PROJECTOR_DIR/ide \; \
     && cd $PROJECTOR_DIR \
     && rm -rf /tmp/ide-unpacked \
-    && unzip projector-server.zip \
-    && rm projector-server.zip \
+    && unzip projector-server-assembly \
+    && rm projector-server-assembly \
     && find . -maxdepth 1 -type d -name projector-server-* -exec mv {} projector-server \; \
     && mv projector-server ide/projector-server \
     && chmod 644 ide/projector-server/lib/* \
+    && tar -xf static-assembly \
+    && rm static-assembly \
+    && mv static/* . \
+    && rm -rf static \
     && mv ide-projector-launcher.sh ide/bin \
     && find . -exec chgrp 0 {} \; -exec chmod g+rwX {} \; \
     && find . -name "*.sh" -exec chmod +x {} \; \
