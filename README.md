@@ -166,7 +166,7 @@ the predefined IDE packaging from the default configuration.
 
 Options:
   -t, --tag string              Name and optionally a tag in the 'name:tag' format for the result image
-  -u, --url string              Downloadable URL of IntelliJ-based IDE package
+  -u, --url string              Downloadable URL of IntelliJ-based IDE package, should be a tar.gz archive
       --run-on-build            Run the container immediately after build
       --save-on-build           Save the image to a tar archive after build. Basename of --url.
       --mount-volumes [string]  Mount volumes to the container which was started using '--run-on-build' option

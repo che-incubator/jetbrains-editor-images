@@ -26,30 +26,30 @@
 #   $ ./projector.sh build [OPTIONS]
 
 # Stage 1. Prepare JetBrains IDE with Projector.
-#   Requires ide-packaging which should point to the ide packaging downloaded
-#   previously, usually tar.gz archive. Also requires projector-server-assembly
-#   which points to the built Projector Server assembly, zip archive. Requires
-#   static-assembly a gzipped static directory.
+#   Requires the following assets:
+#       * asset-ide-packaging.tar.gz - IDE packaging downloaded previously;
+#       * asset-projector-server-assembly.zip - Projector Server assembly;
+#       * asset-static-assembly.tar.gz - archived `static/` directory.
 FROM registry.access.redhat.com/ubi8-minimal:8.4-205 as projectorAssembly
 ENV PROJECTOR_DIR /projector
-COPY ide-packaging /tmp/ide-unpacked/
-COPY projector-server-assembly $PROJECTOR_DIR/
-COPY static-assembly $PROJECTOR_DIR/
+COPY asset-ide-packaging.tar.gz /tmp/ide-unpacked/
+COPY asset-projector-server-assembly.zip $PROJECTOR_DIR/
+COPY asset-static-assembly.tar.gz $PROJECTOR_DIR/
 RUN set -ex \
     && microdnf install -y --nodocs findutils tar gzip unzip \
     && cd /tmp/ide-unpacked \
-    && tar xf ide-packaging \
-    && rm ide-packaging \
+    && tar xf asset-ide-packaging.tar.gz \
+    && rm asset-ide-packaging.tar.gz \
     && find . -maxdepth 1 -type d -name * -exec mv {} $PROJECTOR_DIR/ide \; \
     && cd $PROJECTOR_DIR \
     && rm -rf /tmp/ide-unpacked \
-    && unzip projector-server-assembly \
-    && rm projector-server-assembly \
+    && unzip asset-projector-server-assembly.zip \
+    && rm asset-projector-server-assembly.zip \
     && find . -maxdepth 1 -type d -name projector-server-* -exec mv {} projector-server \; \
     && mv projector-server ide/projector-server \
     && chmod 644 ide/projector-server/lib/* \
-    && tar -xf static-assembly \
-    && rm static-assembly \
+    && tar -xf asset-static-assembly.tar.gz \
+    && rm asset-static-assembly.tar.gz \
     && mv static/* . \
     && rm -rf static \
     && mv ide-projector-launcher.sh ide/bin \

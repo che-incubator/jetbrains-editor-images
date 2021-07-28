@@ -2,6 +2,6 @@
 .idea
 *.iml
 build
-ide-packaging
-projector-server-assembly
-static-assembly
+asset-ide-packaging.tar.gz
+asset-projector-server-assembly.zip
+asset-static-assembly.tar.gz

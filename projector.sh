@@ -25,9 +25,9 @@ RUN_ON_BUILD=false
 SAVE_ON_BUILD=false
 SAVE_ON_BUILD_DIRECTORY="$BUILD_DIRECTORY"/docker
 IDE_PACKAGING_DIRECTORY="$BUILD_DIRECTORY"/ide
-CURRENT_IDE_PACKAGING_SYMLINK="$base_dir"/ide-packaging
-CURRENT_PROJECTOR_ASSEMBLY_SYMLINK="$base_dir"/projector-server-assembly
-CURRENT_PROJECTOR_STATIC_ASSEMBLY="$base_dir"/static-assembly
+CURRENT_IDE_PACKAGING_SYMLINK="$base_dir"/asset-ide-packaging.tar.gz
+CURRENT_PROJECTOR_ASSEMBLY_SYMLINK="$base_dir"/asset-projector-server-assembly.zip
+CURRENT_PROJECTOR_STATIC_ASSEMBLY="$base_dir"/asset-static-assembly.tar.gz
 PROGRESS=auto
 CONFIG_JSON=compatible-ide.json
 CONFIG_JSON_PATH="$base_dir"/"$CONFIG_JSON"
@@ -89,7 +89,7 @@ the predefined IDE packaging from the default configuration.
 
 Options:
   -t, --tag string              Name and optionally a tag in the 'name:tag' format for the result image
-  -u, --url string              Downloadable URL of IntelliJ-based IDE package
+  -u, --url string              Downloadable URL of IntelliJ-based IDE package, should be a tar.gz archive
       --run-on-build            Run the container immediately after build
       --save-on-build           Save the image to a tar archive after build. Basename of --url.
       --mount-volumes [string]  Mount volumes to the container which was started using '--run-on-build' option

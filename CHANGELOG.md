@@ -1,23 +1,11 @@
 # Changelog
 This document reflects the project's changes made after each release cycle
 
-## [YYYYMMDD] Unreleased
-
-### News
-
-- TBD
-
-### Added
-
-- TBD
+## [20210728]
 
 ### Changed
 
-- TBD
-
-### Fixed
-
-- TBD
+- Change asset's names according to brew conventions ([#46](https://github.com/che-incubator/jetbrains-editor-images/pull/46))
 
 ## [20210727]
 
