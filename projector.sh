@@ -360,7 +360,30 @@ prepareStaticFiles() {
   tar -czf "$CURRENT_PROJECTOR_STATIC_ASSEMBLY" static
 }
 
+checkInstalledJava() {
+  .log 6 "Check for installed Java"
+  .log 6 "Read JAVA_HOME env: $JAVA_HOME"
+  .log 6 "Read PATH env: $PATH"
+  if [ -n "$(type -p java)" ]; then
+    .log 6 "Found 'java' executable in PATH"
+    java_exec=java
+  elif [ -n "$JAVA_HOME" ] && [ -x "$JAVA_HOME/bin/java" ]; then
+    .log 6 "Found 'java' executable in JAVA_HOME"
+    java_exec="$JAVA_HOME/bin/java"
+  else
+    .log 3 "No 'java' executable found"
+    exit 1
+  fi
+
+  if [ "$java_exec" ]; then
+      java_version=$("$java_exec" -version 2>&1 | awk -F '"' '/version/ {print $2}')
+      .log 6 "Java version: $java_version"
+  fi
+}
+
 prepareAssembly() {
+  .log 6 "Prepare assembly"
+  checkInstalledJava
   if [ -z "$URL" ]; then
     .log 7 "Ignoring --tag and --url option"
     checkConfigurationFileExists
@@ -406,6 +429,8 @@ buildContainerImage() {
     # Run interactive wizard to choose IDE packaging from predefined configuration
     selectPackagingFromPredefinedConfig
   fi
+
+  checkInstalledJava
 
   prepareStaticFiles
   downloadIdePackaging
