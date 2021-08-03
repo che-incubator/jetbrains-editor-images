@@ -67,15 +67,19 @@ ENV HOME /home/$PROJECTOR_USER_NAME
 ENV PROJECTOR_CONFIG_DIR $HOME/.config
 RUN set -ex \
     && microdnf install -y --nodocs \
-    shadow-utils wget git nss procps findutils which socat \
-    # Packages required by JetBrains products.
-    libsecret jq \
+    shadow-utils wget git nss procps findutils which socat jq \
     # Java 11 support
     java-11-openjdk-devel \
     # Python support
     python2 python39 \
     # Packages needed for AWT.
     libXext libXrender libXtst libXi libX11-xcb mesa-libgbm libdrm freetype \
+    # Install libsecret for the particular platform
+    && { [ $(uname -m) == "s390x" ] && yum install -y --nodocs \
+        https://rpmfind.net/linux/fedora-secondary/releases/34/Everything/s390x/os/Packages/l/libsecret-0.20.4-2.fc34.s390x.rpm \
+        https://rpmfind.net/linux/fedora-secondary/development/rawhide/Everything/s390x/os/Packages/l/libsecret-devel-0.20.4-3.fc35.s390x.rpm || true; } \
+    && { [ $(uname -m) == "ppc64le" ] && yum install -y --nodocs libsecret https://rpmfind.net/linux/centos/8-stream/BaseOS/ppc64le/os/Packages/libsecret-devel-0.18.6-1.el8.ppc64le.rpm || true; } \
+    && { [ $(uname -m) == "x86_64" ] && yum install -y --nodocs libsecret || true; } \
     && adduser -r -u 1002 -G root -d $HOME -m -s /bin/sh $PROJECTOR_USER_NAME \
     && echo "%wheel ALL=(ALL) NOPASSWD: ALL" >> /etc/sudoers \
     && mkdir /projects \
