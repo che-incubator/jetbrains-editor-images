@@ -74,7 +74,7 @@ RUN set -ex \
     python2 python39 \
     # Packages needed for AWT.
     libXext libXrender libXtst libXi libX11-xcb mesa-libgbm libdrm freetype \
-    # Install libsecret for the particular platform
+    # Install platform specific libs
     && if [ $(uname -m) == "s390x" ]; then \
          yum install -y --nodocs \
            https://rpmfind.net/linux/fedora-secondary/releases/34/Everything/s390x/os/Packages/l/libsecret-0.20.4-2.fc34.s390x.rpm \
