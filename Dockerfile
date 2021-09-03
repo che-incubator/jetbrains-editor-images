@@ -30,7 +30,8 @@
 #       * asset-ide-packaging.tar.gz - IDE packaging downloaded previously;
 #       * asset-projector-server-assembly.zip - Projector Server assembly;
 #       * asset-static-assembly.tar.gz - archived `static/` directory.
-FROM registry.access.redhat.com/ubi8-minimal:8.4-205 as projectorAssembly
+# https://access.redhat.com/containers/?tab=tags#/registry.access.redhat.com/ubi8-minimal
+FROM registry.access.redhat.com/ubi8-minimal:8.4-208 as projectorAssembly
 ENV PROJECTOR_DIR /projector
 COPY asset-ide-packaging.tar.gz /tmp/ide-unpacked/
 COPY asset-projector-server-assembly.zip $PROJECTOR_DIR/
@@ -60,7 +61,8 @@ RUN set -ex \
 
 # Stage 2. Build the main image with necessary environment for running Projector
 #   Doesn't require to be a desktop environment. Projector runs in headless mode.
-FROM registry.access.redhat.com/ubi8-minimal:8.4-205
+# https://access.redhat.com/containers/?tab=tags#/registry.access.redhat.com/ubi8-minimal
+FROM registry.access.redhat.com/ubi8-minimal:8.4-208
 ENV PROJECTOR_USER_NAME projector-user
 ENV PROJECTOR_DIR /projector
 ENV HOME /home/$PROJECTOR_USER_NAME
