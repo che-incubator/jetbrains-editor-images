@@ -61,6 +61,22 @@ function .log() {
   fi
 }
 
+function log:emerg() {
+  .log 0 "$@"
+}
+function log:err() {
+  .log 3 "$@"
+}
+function log:warning() {
+  .log 4 "$@"
+}
+function log:info() {
+  .log 6 "$@"
+}
+function log:debug() {
+  .log 7 "$@"
+}
+
 read -r -d '' HELP_SUMMARY <<-EOM
 Usage: $0 COMMAND [OPTIONS]
 
@@ -137,7 +153,7 @@ selectWithDefault() {
     read -r index
     [ -z "$index" ] && break
     ((index >= 1 && index <= numItems)) 2>/dev/null || {
-      .log 4 "Choose correct item" >&2
+      log:warning "Choose correct item" >&2
       continue
     }
     break
@@ -147,125 +163,125 @@ selectWithDefault() {
 }
 
 checkConfigurationFileExists() {
-  .log 7 "Check if configuration file '$CONFIG_JSON_PATH' exists"
+  log:debug "Check if configuration file '$CONFIG_JSON_PATH' exists"
   if [ ! -e "$CONFIG_JSON_PATH" ]; then
-    .log 4 "Configuration file '$CONFIG_JSON_PATH' not found"
+    log:warning "Configuration file '$CONFIG_JSON_PATH' not found"
     exit 1
   fi
-  .log 7 "Configuration file '$CONFIG_JSON_PATH' found"
+  log:debug "Configuration file '$CONFIG_JSON_PATH' found"
 }
 
 selectPackagingFromPredefinedConfig() {
-  .log 7 "Prompt user to choose IDE packaging from predefined configuration"
+  log:debug "Prompt user to choose IDE packaging from predefined configuration"
 
   IFS=$'\n' read -r -d '' -a IDEName < <(jq -c -r ".[] | .displayName" <"$CONFIG_JSON_PATH")
-  .log 6 "Select the IDE package to build (default is '${IDEName[0]}'):"
+  log:info "Select the IDE package to build (default is '${IDEName[0]}'):"
   local selectedIDEName && selectedIDEName=$(selectWithDefault "${IDEName[@]}")
   case $selectedIDEName in
   '') selectedIDEName=${IDEName[0]} ;;
   esac
-  .log 7 "Selected '$selectedIDEName' package"
+  log:debug "Selected '$selectedIDEName' package"
 
   IFS=$'\n' read -r -d '' -a IDEVersion < <(jq -c -r ".[] | {displayName, dockerImage, productCode} + (.productVersion[]) | select(.displayName == \"$selectedIDEName\") | .version" <"$CONFIG_JSON_PATH")
-  .log 6 "Select the IDE package version to build (default is '${IDEVersion[0]}'):"
+  log:info "Select the IDE package version to build (default is '${IDEVersion[0]}'):"
   local selectedIDEVersion && selectedIDEVersion=$(selectWithDefault "${IDEVersion[@]}")
   case $selectedIDEVersion in
   '') selectedIDEVersion=${IDEVersion[0]} ;;
   esac
-  .log 7 "Selected '$selectedIDEVersion' package version"
+  log:debug "Selected '$selectedIDEVersion' package version"
 
   IFS=$'\n' read -r -d '' -a dockerImageNameToSelect < <(jq -c -r ".[] | {displayName, dockerImage, productCode} + (.productVersion[]) | select(.displayName == \"$selectedIDEName\") | select(.version == \"$selectedIDEVersion\") | .dockerImage" <"$CONFIG_JSON_PATH")
   CONTAINER_TAG="${dockerImageNameToSelect[0]}:$selectedIDEVersion"
-  .log 6 "Read the container name '$CONTAINER_TAG'"
+  log:info "Read the container name '$CONTAINER_TAG'"
   IFS=$'\n' read -r -d '' -a downloadUrlToSelect < <(jq -c -r ".[] | {displayName, dockerImage, productCode} + (.productVersion[]) | select(.displayName == \"$selectedIDEName\") | select(.version == \"$selectedIDEVersion\") | .downloadUrl" <"$CONFIG_JSON_PATH")
   URL=${downloadUrlToSelect[0]}
-  .log 6 "Read the URL for IDE packaging '$URL'"
+  log:info "Read the URL for IDE packaging '$URL'"
 }
 
 checkProjectorClientSources() {
-  .log 6 "Check Projector Client source directory"
+  log:info "Check Projector Client source directory"
   if [ ! -d "$PROJECTOR_CLIENT_DIR" ]; then
-    .log 4 "Projector Client source directory '$PROJECTOR_CLIENT_DIR' doesn't exist"
-    .log 6 "Cloning Projector Client sources to '$PROJECTOR_CLIENT_DIR'"
+    log:warning "Projector Client source directory '$PROJECTOR_CLIENT_DIR' doesn't exist"
+    log:info "Cloning Projector Client sources to '$PROJECTOR_CLIENT_DIR'"
 
     # Clone the Projector Client, stick to the particular version and apply necessary patches if needed
     git clone --quiet "$PROJECTOR_CLIENT_GIT" "$PROJECTOR_CLIENT_DIR"
     cd "$PROJECTOR_CLIENT_DIR" || exit 1
-    .log 7 "Current working directory '$(pwd)'"
-    .log 6 "Checkout Projector Client to SHA1 '$PROJECTOR_CLIENT_SHA1'"
-    .log 6 "$(git reset --hard $PROJECTOR_CLIENT_SHA1)"
+    log:debug "Current working directory '$(pwd)'"
+    log:info "Checkout Projector Client to SHA1 '$PROJECTOR_CLIENT_SHA1'"
+    log:info "$(git reset --hard $PROJECTOR_CLIENT_SHA1)"
 
     # Apply patches for Projector Client
     if [ -d "$base_dir/patches/projector-client" ]; then
-      .log 6 "Applying patches for Projector Client"
+      log:info "Applying patches for Projector Client"
       find "$base_dir"/patches/projector-client -name "*.patch" -exec printf '%7s%s\n' "" "Patching Projector Client with '{}'" \; -exec git apply {} \;
     fi
     cd "$base_dir" || exit 1
-    .log 7 "Current working directory '$(pwd)'"
+    log:debug "Current working directory '$(pwd)'"
   else
-    .log 7 "Projector Client source directory '$PROJECTOR_CLIENT_DIR' exists"
+    log:debug "Projector Client source directory '$PROJECTOR_CLIENT_DIR' exists"
     cd "$PROJECTOR_CLIENT_DIR" || exit 1
-    .log 7 "Current working directory '$(pwd)'"
+    log:debug "Current working directory '$(pwd)'"
 
     local projectorServerHead && projectorServerHead=$(git rev-parse HEAD)
     if [ "$PROJECTOR_CLIENT_SHA1" == "$projectorServerHead" ]; then
-      .log 6 "Projector Client HEAD '$projectorServerHead' is the same as provided in configuration '$PROJECTOR_CLIENT_SHA1'"
+      log:info "Projector Client HEAD '$projectorServerHead' is the same as provided in configuration '$PROJECTOR_CLIENT_SHA1'"
     else
       read -r -d '' HEAD_CHECK_FAILED <<-EOM
 Projector Client HEAD '$projectorServerHead' is different than configured '$PROJECTOR_CLIENT_SHA1'.
           In this case build of container image may be unpredictable.
           Consider to remove '$PROJECTOR_CLIENT_DIR' directory or move it to a different place and re-run build again.
 EOM
-      .log 4 "$HEAD_CHECK_FAILED"
+      log:warning "$HEAD_CHECK_FAILED"
       exit 1
     fi
 
     cd "$base_dir" || exit 1
-    .log 7 "Current working directory '$(pwd)'"
+    log:debug "Current working directory '$(pwd)'"
   fi
 }
 
 checkProjectorServerSources() {
-  .log 6 "Check Projector Server source directory"
+  log:info "Check Projector Server source directory"
   if [ ! -d "$PROJECTOR_SERVER_DIR" ]; then
-    .log 4 "Projector Server source directory '$PROJECTOR_SERVER_DIR' doesn't exist"
-    .log 6 "Cloning Projector Server sources to '$PROJECTOR_SERVER_DIR'"
+    log:warning "Projector Server source directory '$PROJECTOR_SERVER_DIR' doesn't exist"
+    log:info "Cloning Projector Server sources to '$PROJECTOR_SERVER_DIR'"
 
     # Clone the Projector Server, stick to the particular version and apply necessary patches if needed
     git clone --quiet "$PROJECTOR_SERVER_GIT" "$PROJECTOR_SERVER_DIR"
     cd "$PROJECTOR_SERVER_DIR" || exit 1
-    .log 7 "Current working directory '$(pwd)'"
-    .log 6 "Checkout Projector Client to SHA1 '$PROJECTOR_SERVER_SHA1'"
-    .log 6 "$(git reset --hard $PROJECTOR_SERVER_SHA1)"
+    log:debug "Current working directory '$(pwd)'"
+    log:info "Checkout Projector Client to SHA1 '$PROJECTOR_SERVER_SHA1'"
+    log:info "$(git reset --hard $PROJECTOR_SERVER_SHA1)"
     echo "useLocalProjectorClient=true" >local.properties
 
     # Apply patches for Projector Server
     if [ -d "$base_dir/patches/projector-server" ]; then
-      .log 6 "Applying patches for Projector Server"
+      log:info "Applying patches for Projector Server"
       find "$base_dir"/patches/projector-server -name "*.patch" -exec printf '%7s%s\n' "" "Patching Projector Server with '{}'" \; -exec git apply {} \;
     fi
     cd "$base_dir" || exit 1
-    .log 7 "Current working directory '$(pwd)'"
+    log:debug "Current working directory '$(pwd)'"
   else
-    .log 7 "Projector Server source directory '$PROJECTOR_SERVER_DIR' exists"
+    log:debug "Projector Server source directory '$PROJECTOR_SERVER_DIR' exists"
     cd "$PROJECTOR_SERVER_DIR" || exit 1
-    .log 7 "Current working directory '$(pwd)'"
+    log:debug "Current working directory '$(pwd)'"
 
     local projectorServerHead && projectorServerHead=$(git rev-parse HEAD)
     if [ "$PROJECTOR_SERVER_SHA1" == "$projectorServerHead" ]; then
-      .log 6 "Projector Server HEAD '$projectorServerHead' is the same as provided in configuration '$PROJECTOR_SERVER_SHA1'"
+      log:info "Projector Server HEAD '$projectorServerHead' is the same as provided in configuration '$PROJECTOR_SERVER_SHA1'"
     else
       read -r -d '' HEAD_CHECK_FAILED <<-EOM
 Projector Server HEAD '$projectorServerHead' is different than configured '$PROJECTOR_SERVER_SHA1'.
           In this case build of container image may be unpredictable.
           Consider to remove '$PROJECTOR_SERVER_DIR' directory or move it to a different place and re-run build again.
 EOM
-      .log 4 "$HEAD_CHECK_FAILED"
+      log:warning "$HEAD_CHECK_FAILED"
       exit 1
     fi
 
     cd "$base_dir" || exit 1
-    .log 7 "Current working directory '$(pwd)'"
+    log:debug "Current working directory '$(pwd)'"
   fi
 }
 
@@ -275,18 +291,18 @@ checkProjectorSourcesExist() {
 }
 
 projectorBuild() {
-  .log 6 "Build Projector on localhost"
+  log:info "Build Projector on localhost"
   cd "$PROJECTOR_SERVER_DIR" || exit 1
-  .log 7 "Current working directory '$(pwd)'"
+  log:debug "Current working directory '$(pwd)'"
   if [ -f "$CURRENT_PROJECTOR_ASSEMBLY_SYMLINK" ]; then
-    .log 7 "Removing symlink '$CURRENT_PROJECTOR_ASSEMBLY_SYMLINK'"
+    log:debug "Removing symlink '$CURRENT_PROJECTOR_ASSEMBLY_SYMLINK'"
     unlink "$CURRENT_PROJECTOR_ASSEMBLY_SYMLINK"
   fi
   ./gradlew --quiet --console="$PROGRESS" :projector-server:distZip
   find projector-server/build/distributions -type f -name "projector-server-*.zip" -exec ln {} "$CURRENT_PROJECTOR_ASSEMBLY_SYMLINK" \;
-  .log 7 "Creating symlink '$CURRENT_PROJECTOR_ASSEMBLY_SYMLINK'"
+  log:debug "Creating symlink '$CURRENT_PROJECTOR_ASSEMBLY_SYMLINK'"
   cd "$base_dir" || exit 1
-  .log 7 "Current working directory '$(pwd)'"
+  log:debug "Current working directory '$(pwd)'"
 }
 
 runBuild() {
@@ -296,8 +312,8 @@ Pre-build container final summary
         Container name: $CONTAINER_TAG
         IDE package URL: $URL
 EOM
-  .log 7 "$PRE_BUILD_SUMMARY"
-  .log 6 "Build '$CONTAINER_TAG'"
+  log:debug "$PRE_BUILD_SUMMARY"
+  log:info "Build '$CONTAINER_TAG'"
 
   DOCKER_BUILDKIT=1 \
     docker build \
@@ -306,9 +322,9 @@ EOM
     -f Dockerfile .
   # shellcheck disable=SC2181
   if [[ $? -eq 0 ]]; then
-    .log 6 "Container '$CONTAINER_TAG' successfully built"
+    log:info "Container '$CONTAINER_TAG' successfully built"
   else
-    .log 4 "Container build failed"
+    log:warning "Container build failed"
     exit 1
   fi
 }
@@ -321,11 +337,11 @@ runContainerImage() {
   while IFS=',' read -ra MOUNT; do
     for i in "${MOUNT[@]}"; do
       mountOptions+=(-v "$i")
-      .log 7 "Adding volume mount '$i'"
+      log:debug "Adding volume mount '$i'"
     done
   done <<<"$mountVolumes"
 
-  .log 6 "Run container '$containerToStart'"
+  log:info "Run container '$containerToStart'"
   docker run --rm -p 8887:8887 "${mountOptions[@]}" -it "$containerToStart" 2>&1 | awk '{print "       "$0}'
 }
 
@@ -335,14 +351,14 @@ saveOnBuild() {
       mkdir -p "$SAVE_ON_BUILD_DIRECTORY"
     fi
     local imageOutputName && imageOutputName=$(basename "$URL")
-    .log 6 "Saving '$CONTAINER_TAG' to '$SAVE_ON_BUILD_DIRECTORY/$imageOutputName'"
+    log:info "Saving '$CONTAINER_TAG' to '$SAVE_ON_BUILD_DIRECTORY/$imageOutputName'"
     docker save "$CONTAINER_TAG" -o "$SAVE_ON_BUILD_DIRECTORY"/"$imageOutputName"
-    .log 6 "Image '$CONTAINER_TAG' saved to '$SAVE_ON_BUILD_DIRECTORY/$imageOutputName'"
+    log:info "Image '$CONTAINER_TAG' saved to '$SAVE_ON_BUILD_DIRECTORY/$imageOutputName'"
   fi
 }
 
 runOnBuild() {
-  .log 7 "Check if container should be run after built"
+  log:debug "Check if container should be run after built"
   if [ $RUN_ON_BUILD == true ]; then
     runContainerImage "$CONTAINER_TAG" "$VOLUMES"
   fi
@@ -350,42 +366,42 @@ runOnBuild() {
 
 prepareStaticFiles() {
   cd "$base_dir" || exit 1
-  .log 7 "Current working directory '$(pwd)'"
+  log:debug "Current working directory '$(pwd)'"
   if [ -f "$CURRENT_PROJECTOR_STATIC_ASSEMBLY" ]; then
-    .log 7 "Removing symlink '$CURRENT_PROJECTOR_STATIC_ASSEMBLY'"
+    log:debug "Removing symlink '$CURRENT_PROJECTOR_STATIC_ASSEMBLY'"
     rm "$CURRENT_PROJECTOR_STATIC_ASSEMBLY"
   fi
 
-  .log 7 "Creating archive for Projector static files '$CURRENT_PROJECTOR_STATIC_ASSEMBLY'"
+  log:debug "Creating archive for Projector static files '$CURRENT_PROJECTOR_STATIC_ASSEMBLY'"
   tar -czf "$CURRENT_PROJECTOR_STATIC_ASSEMBLY" static
 }
 
 checkInstalledJava() {
-  .log 6 "Check for installed Java"
-  .log 6 "Read JAVA_HOME env: $JAVA_HOME"
-  .log 6 "Read PATH env: $PATH"
+  log:info "Check for installed Java"
+  log:info "Read JAVA_HOME env: $JAVA_HOME"
+  log:info "Read PATH env: $PATH"
   if [ -n "$(type -p java)" ]; then
-    .log 6 "Found 'java' executable in PATH"
+    log:info "Found 'java' executable in PATH"
     java_exec=java
   elif [ -n "$JAVA_HOME" ] && [ -x "$JAVA_HOME/bin/java" ]; then
-    .log 6 "Found 'java' executable in JAVA_HOME"
+    log:info "Found 'java' executable in JAVA_HOME"
     java_exec="$JAVA_HOME/bin/java"
   else
-    .log 3 "No 'java' executable found"
+    log:err "No 'java' executable found"
     exit 1
   fi
 
   if [ "$java_exec" ]; then
       java_version=$("$java_exec" -version 2>&1 | awk -F '"' '/version/ {print $2}')
-      .log 6 "Java version: $java_version"
+      log:info "Java version: $java_version"
   fi
 }
 
 prepareAssembly() {
-  .log 6 "Prepare assembly"
+  log:info "Prepare assembly"
   checkInstalledJava
   if [ -z "$URL" ]; then
-    .log 7 "Ignoring --tag and --url option"
+    log:debug "Ignoring --tag and --url option"
     checkConfigurationFileExists
 
     # Run interactive wizard to choose IDE packaging from predefined configuration
@@ -400,30 +416,30 @@ prepareAssembly() {
 downloadIdePackaging() {
   if [ ! -e "$IDE_PACKAGING_DIRECTORY" ]; then
     mkdir -p "$IDE_PACKAGING_DIRECTORY"
-    .log 7 "Creating directory for storing downloaded IDEs '$IDE_PACKAGING_DIRECTORY'"
+    log:debug "Creating directory for storing downloaded IDEs '$IDE_PACKAGING_DIRECTORY'"
   fi
 
   local packagingOutputName && packagingOutputName=$(basename "$URL")
   cd "$IDE_PACKAGING_DIRECTORY" || exit 1
-  .log 7 "Current working directory '$(pwd)'"
+  log:debug "Current working directory '$(pwd)'"
 
   if [ -f "$CURRENT_IDE_PACKAGING_SYMLINK" ]; then
-    .log 7 "Removing symlink '$CURRENT_IDE_PACKAGING_SYMLINK'"
+    log:debug "Removing symlink '$CURRENT_IDE_PACKAGING_SYMLINK'"
     unlink "$CURRENT_IDE_PACKAGING_SYMLINK"
   fi
   # Use --timestamping option to allow local caching
   # Above option doesn't work with -O parameter, so hoping, that base file name wouldn't change
   wget --timestamping "$URL"
   ln "$packagingOutputName" "$CURRENT_IDE_PACKAGING_SYMLINK"
-  .log 7 "Creating symlink '$CURRENT_IDE_PACKAGING_SYMLINK'"
+  log:debug "Creating symlink '$CURRENT_IDE_PACKAGING_SYMLINK'"
   cd "$base_dir" || exit 1
-  .log 7 "Current working directory '$(pwd)'"
+  log:debug "Current working directory '$(pwd)'"
 }
 
 buildContainerImage() {
-  .log 7 "Executing build command"
+  log:debug "Executing build command"
   if [ -z "$CONTAINER_TAG" ] || [ -z "$URL" ]; then
-    .log 7 "Ignoring --tag and --url option"
+    log:debug "Ignoring --tag and --url option"
     checkConfigurationFileExists
 
     # Run interactive wizard to choose IDE packaging from predefined configuration
@@ -447,15 +463,15 @@ printVersion() {
 $0 - CLI tool for build Projector-based IDE in Eclipse Che
        Revision: $(git show -s --format='%h %s')
 EOM
-  .log 6 "$VERSION_INFO"
+  log:info "$VERSION_INFO"
 }
 
 # getopt necessary checks
 getopt -T &>/dev/null
 if [[ $? -ne 4 ]]; then
-  .log 4 "Found outdated version of 'getopt'."
+  log:warning "Found outdated version of 'getopt'."
   if [[ "$OSTYPE" == "darwin"* ]]; then
-    .log 4 "$GETOPT_UPDATE_NEEDED"
+    log:warning "$GETOPT_UPDATE_NEEDED"
   fi
   exit 1
 fi
@@ -463,7 +479,7 @@ fi
 OPTS=$(getopt -o 'hvt:up:l:' --longoptions 'help,version,tag:,url:,mount-volumes:,run-on-build,save-on-build,progress:,log-level:,config:,prepare' -u -n "$0" -- "$@")
 # shellcheck disable=SC2181
 if [[ $? -ne 0 ]]; then
-  .log 4 "Failed parsing options."
+  log:warning "Failed parsing options."
   exit 1
 fi
 # shellcheck disable=SC2086
@@ -558,7 +574,7 @@ while true; do
       shift 2
       ;;
     *)
-      .log 4 "Unable to parse logging level: $2"
+      log:warning "Unable to parse logging level: $2"
       exit 1
       ;;
     esac
@@ -584,7 +600,7 @@ Usage: $0 run IMAGE [OPTIONS]
 
 Start Projector-based container
 EOM
-        .log 4 "$RUN_MISSING_IMAGE_NAME_MESSAGE"
+        log:warning "$RUN_MISSING_IMAGE_NAME_MESSAGE"
         exit 1
       fi
       CONTAINER_TO_RUN=$3
@@ -595,7 +611,7 @@ EOM
       exit 1
       ;;
     *)
-      .log 4 "$0: '$2' is not a valid command. See '$0 --help'."
+      log:warning "$0: '$2' is not a valid command. See '$0 --help'."
       exit 1
       ;;
     esac
@@ -611,7 +627,7 @@ done
 if [ "$COMMAND" == "build" ]; then
   if [ ! -e "$BUILD_DIRECTORY" ]; then
     mkdir "$BUILD_DIRECTORY"
-    .log 7 "Creating build directory '$BUILD_DIRECTORY'"
+    log:debug "Creating build directory '$BUILD_DIRECTORY'"
   fi
   if [ $PREPARE_ASSEMBLY_ONLY == true ]; then
     prepareAssembly
@@ -619,9 +635,9 @@ if [ "$COMMAND" == "build" ]; then
     buildContainerImage
   fi
 elif [ "$COMMAND" == "run" ]; then
-  .log 7 "Executing run command"
+  log:debug "Executing run command"
   runContainerImage "$CONTAINER_TO_RUN" "$VOLUMES"
 else
-  .log 7 "Found invalid command to execute."
+  log:debug "Found invalid command to execute."
   exit 1
 fi

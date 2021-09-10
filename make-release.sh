@@ -35,6 +35,22 @@ function .log () {
   fi
 }
 
+function log:emerg() {
+  .log 0 "$@"
+}
+function log:err() {
+  .log 3 "$@"
+}
+function log:warning() {
+  .log 4 "$@"
+}
+function log:info() {
+  .log 6 "$@"
+}
+function log:debug() {
+  .log 7 "$@"
+}
+
 read -r -d '' HELP_SUMMARY <<- EOM
 Usage: $0 [OPTIONS]
 
@@ -61,7 +77,7 @@ printVersion() {
 $0 - CLI tool for release Projector-based IDE Docker images
        Revision: $(git show -s --format='%h %s')
 EOM
-  .log 6 "$VERSION_INFO"
+  log:info "$VERSION_INFO"
 }
 
 selectWithDefault() {
@@ -75,7 +91,7 @@ selectWithDefault() {
     printf %s "${PS3-#? }" >&2
     read -r index
     [ -z "$index" ] && break
-    (( index >= 1 && index <= numItems )) 2>/dev/null || { .log 4 "Choose correct item" >&2; continue; }
+    (( index >= 1 && index <= numItems )) 2>/dev/null || { log:warning "Choose correct item" >&2; continue; }
     break
   done
 
@@ -85,16 +101,16 @@ selectWithDefault() {
 # getopt necessary checks
 getopt -T &>/dev/null
 if [[ $? -ne 4 ]]; then
-  .log 4 "Found outdated version of 'getopt'."
+  log:warning "Found outdated version of 'getopt'."
   if [[ "$OSTYPE" == "darwin"* ]]; then
-    .log 4 "$GETOPT_UPDATE_NEEDED"
+    log:warning "$GETOPT_UPDATE_NEEDED"
   fi
   exit 1
 fi
 
 OPTS=$(getopt -o 'hvt:l:' --longoptions 'help,version,tag:,log-level:,skip-checks' -u -n "$0" -- "$@")
 # shellcheck disable=SC2181
-if [[ $? -ne 0 ]] ; then .log 4 "Failed parsing options."; exit 1; fi
+if [[ $? -ne 0 ]] ; then log:warning "Failed parsing options."; exit 1; fi
 # shellcheck disable=SC2086
 set -- $OPTS
 
@@ -140,7 +156,7 @@ while true; do
           shift 2
           ;;
         * )
-          .log 4 "Unable to parse logging level: $2"
+          log:warning "Unable to parse logging level: $2"
           exit 1
       esac
       ;;
@@ -151,18 +167,18 @@ while true; do
 done
 
 if [[ $(git diff --stat) != '' ]]; then
-  .log 3 "Repository is dirty! Commit changes and re-run release '$0'"
+  log:err "Repository is dirty! Commit changes and re-run release '$0'"
   exit 1
 else
-  .log 6 "Repository is clean"
+  log:info "Repository is clean"
 fi
 
 if [ -z "$RELEASE_TAG" ]; then
-  .log 4 "Release tag not provided by '--tag' option. Generating release tag based on template 'YYYYMMDD.hashId'."
+  log:warning "Release tag not provided by '--tag' option. Generating release tag based on template 'YYYYMMDD.hashId'."
   RELEASE_TAG=$(date '+%Y%m%d').$(git rev-parse --short HEAD)
 fi
 
-.log 6 "Release tag '$RELEASE_TAG' provided"
+log:info "Release tag '$RELEASE_TAG' provided"
 
 if [ $SKIP_CHECKS == false ]; then
   BUILD_CONFIGS=$(jq -c -r ".[] | {displayName, dockerImage, productCode} + (.productVersion[]) | @base64" < "$base_dir"/compatible-ide.json)
@@ -176,40 +192,40 @@ if [ $SKIP_CHECKS == false ]; then
     version="$(_jq '.version')"
     downloadUrl="$(_jq '.downloadUrl')"
 
-    .log 6 "Process '$displayName:$version' in pre-release step"
+    log:info "Process '$displayName:$version' in pre-release step"
 
-    .log 7 "Check if build directory '$BUILD_DIRECTORY' exists"
+    log:debug "Check if build directory '$BUILD_DIRECTORY' exists"
     if [ ! -e "$BUILD_DIRECTORY" ]; then
-      .log 7 "Creating build directory '$BUILD_DIRECTORY'"
+      log:debug "Creating build directory '$BUILD_DIRECTORY'"
       mkdir -p "$BUILD_DIRECTORY"
     fi
-    .log 7 "Build directory '$BUILD_DIRECTORY' exists"
+    log:debug "Build directory '$BUILD_DIRECTORY' exists"
 
     dockerImageFilePath="$BUILD_DIRECTORY"/$(basename "$downloadUrl")
 
-    .log 7 "Docker image name to store '$dockerImageFilePath'"
+    log:debug "Docker image name to store '$dockerImageFilePath'"
     if [ -e "$dockerImageFilePath" ]; then
-      .log 7 "Docker image '$dockerImageFilePath' exists. Removing it."
+      log:debug "Docker image '$dockerImageFilePath' exists. Removing it."
       rm "$dockerImageFilePath"
     fi
 
-    .log 6 "Build Docker image for '$dockerImage:$version' from '$downloadUrl'"
+    log:info "Build Docker image for '$dockerImage:$version' from '$downloadUrl'"
     ./projector.sh build --tag "$dockerImage:$version" --url "$downloadUrl" --save-on-build --log-level "$PROJECTOR_CLI_LOG_LEVEL"
 
     if [ -e "$dockerImageFilePath" ]; then
-      .log 6 "Docker image '$dockerImage:$version' successfully built"
+      log:info "Docker image '$dockerImage:$version' successfully built"
     else
-      .log 3 "Release process postponed! See error messages above!"
+      log:err "Release process postponed! See error messages above!"
       exit 1
     fi
   done
 
-  .log 6 "All images successfully processed"
+  log:info "All images successfully processed"
 else
-  .log 4 "Skip build checks"
+  log:warning "Skip build checks"
 fi
 
-.log 6 "Release tag '$RELEASE_TAG' will be created and pushed to remote. Continue? (default is 'no')"
+log:info "Release tag '$RELEASE_TAG' will be created and pushed to remote. Continue? (default is 'no')"
 release=$(selectWithDefault "yes" "no")
 case $release in
   'yes' )
@@ -221,13 +237,13 @@ case $release in
 esac
 
 if [ "$release" = "no" ]; then
-  .log 6 "Release stopped by entered choice"
+  log:info "Release stopped by entered choice"
   exit 0
 fi
 
-.log 6 "Creating tag '$RELEASE_TAG'"
+log:info "Creating tag '$RELEASE_TAG'"
 git tag "$RELEASE_TAG"
-.log 6 "Push release tag '$RELEASE_TAG' to remote"
+log:info "Push release tag '$RELEASE_TAG' to remote"
 git push origin --tags
 
-.log 6 "Changes pushed to remote!"
+log:info "Changes pushed to remote!"
