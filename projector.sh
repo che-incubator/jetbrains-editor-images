@@ -37,8 +37,8 @@ PREPARE_ASSEMBLY_ONLY=false
 
 PROJECTOR_CLIENT_GIT=https://github.com/JetBrains/projector-client.git
 PROJECTOR_SERVER_GIT=https://github.com/JetBrains/projector-server.git
-PROJECTOR_CLIENT_SHA1=d80f9952cc520102bb2de6f1aefaad6aadb49138
-PROJECTOR_SERVER_SHA1=e8ecfda9ee04b59e8b4276215e22a3cbff212083
+PROJECTOR_CLIENT_SHA1=d7313becc9e46b80627d707c5b39a0914458d8de
+PROJECTOR_SERVER_SHA1=31b34b518080a0028843e9bc32a98a65e8431479
 
 DOC_URL=https://github.com/che-incubator/jetbrains-editor-images/tree/main/doc
 
