@@ -5,9 +5,14 @@
     "productCode": "IC",
     "productVersion": [
       {
+        "version": "2020.3.4",
+        "downloadUrl": "https://download-cdn.jetbrains.com/idea/ideaIC-2020.3.4.tar.gz",
+        "latest": true
+      },
+      {
         "version": "2020.3.3",
         "downloadUrl": "https://download-cdn.jetbrains.com/idea/ideaIC-2020.3.3.tar.gz",
-        "latest": true
+        "latest": false
       },
       {
         "version": "2020.3.2",
