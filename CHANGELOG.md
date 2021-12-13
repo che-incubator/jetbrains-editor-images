@@ -1,23 +1,23 @@
 # Changelog
 This document reflects the project's changes made after each release cycle
 
-## [YYYYMMDD] Unreleased
+## [20211213]
 
 ### News
 
-- TBD
+- Update Projector sources ([#59](https://github.com/che-incubator/jetbrains-editor-images/pull/59))
+  Now Projector Server points to the [JetBrains/projector-server@30f65af](https://github.com/JetBrains/projector-server/commit/30f65afc196605625f19b671e1cee1d012c8ee97) and Projector Client points to [JetBrains/projector-client@5f61189](https://github.com/JetBrains/projector-client/commit/5f6118900f2da668f0d84463025fea341da32175)
+- Add configuration for IDEA 2020.3.4 ([#60](https://github.com/che-incubator/jetbrains-editor-images/pull/60))
+- Updated UBI-minimal image to version 8.5-204 ([#61](https://github.com/che-incubator/jetbrains-editor-images/pull/61))
 
 ### Added
 
-- TBD
+- Add per-arch support for installation of libsecret and libsecret-devel ([#50](https://github.com/che-incubator/jetbrains-editor-images/pull/50))
 
 ### Changed
 
-- TBD
-
-### Fixed
-
-- TBD
+- Add additional debug output to the prepare assembly step ([#48](https://github.com/che-incubator/jetbrains-editor-images/pull/48))
+- Reorganise logging process in projector.sh and make-release.sh script ([#56](https://github.com/che-incubator/jetbrains-editor-images/pull/56))
 
 ## [20210728]
 
