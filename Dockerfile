@@ -76,7 +76,7 @@ RUN set -ex \
     # Python support
     python2 python39 \
     # Packages needed for AWT.
-    libXext libXrender libXtst libXi libX11-xcb mesa-libgbm libdrm freetype \
+    libXext libXrender libXtst libXi \
     # Arch specific installs of libsecret and libsecret-devel (required by JetBrains products)
     && chmod +x /tmp/install-platform-dependencies.sh && /tmp/install-platform-dependencies.sh && rm -f /tmp/install-platform-dependencies.sh \
     # create user configuration
