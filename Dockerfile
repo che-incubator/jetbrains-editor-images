@@ -32,17 +32,17 @@
 #       * asset-static-assembly.tar.gz - archived `static/` directory.
 # https://access.redhat.com/containers/?tab=tags#/registry.access.redhat.com/ubi8-minimal
 FROM registry.access.redhat.com/ubi8-minimal:8.5-218 as projectorAssembly
-ENV PROJECTOR_DIR /projector
+ENV PROJECTOR_ASSEMBLY_DIR /projector
 COPY asset-ide-packaging.tar.gz /tmp/ide-unpacked/
-COPY asset-projector-server-assembly.zip $PROJECTOR_DIR/
-COPY asset-static-assembly.tar.gz $PROJECTOR_DIR/
+COPY asset-projector-server-assembly.zip $PROJECTOR_ASSEMBLY_DIR/
+COPY asset-static-assembly.tar.gz $PROJECTOR_ASSEMBLY_DIR/
 RUN set -ex \
     && microdnf install -y --nodocs findutils tar gzip unzip \
     && cd /tmp/ide-unpacked \
     && tar xf asset-ide-packaging.tar.gz \
     && rm asset-ide-packaging.tar.gz \
-    && find . -maxdepth 1 -type d -name * -exec mv {} $PROJECTOR_DIR/ide \; \
-    && cd $PROJECTOR_DIR \
+    && find . -maxdepth 1 -type d -name * -exec mv {} $PROJECTOR_ASSEMBLY_DIR/ide \; \
+    && cd $PROJECTOR_ASSEMBLY_DIR \
     && rm -rf /tmp/ide-unpacked \
     && unzip asset-projector-server-assembly.zip \
     && rm asset-projector-server-assembly.zip \
@@ -63,9 +63,9 @@ RUN set -ex \
 #   Doesn't require to be a desktop environment. Projector runs in headless mode.
 # https://access.redhat.com/containers/?tab=tags#/registry.access.redhat.com/ubi8-minimal
 FROM registry.access.redhat.com/ubi8-minimal:8.5-218
-ENV PROJECTOR_USER_NAME projector-user
-ENV PROJECTOR_DIR /projector
-ENV HOME /home/$PROJECTOR_USER_NAME
+ENV USER projector
+ENV HOME /home/$USER
+ENV PROJECTOR_ASSEMBLY_DIR /projector
 ENV PROJECTOR_CONFIG_DIR $HOME/.config
 COPY install-platform-dependencies.sh /tmp
 RUN set -ex \
@@ -80,7 +80,7 @@ RUN set -ex \
     # Arch specific installs of libsecret and libsecret-devel (required by JetBrains products)
     && chmod +x /tmp/install-platform-dependencies.sh && /tmp/install-platform-dependencies.sh && rm -f /tmp/install-platform-dependencies.sh \
     # create user configuration
-    && adduser -r -u 1002 -G root -d $HOME -m -s /bin/sh $PROJECTOR_USER_NAME \
+    && adduser -r -u 1002 -G root -d $HOME -m -s /bin/sh $USER \
     && echo "%wheel ALL=(ALL) NOPASSWD: ALL" >> /etc/sudoers \
     && mkdir /projects \
     && for f in "${HOME}" "/etc/passwd" "/etc/group /projects"; do\
@@ -92,9 +92,9 @@ RUN set -ex \
     # Change permissions to allow editing of files for openshift user
     && find $HOME -exec chgrp 0 {} \; -exec chmod g+rwX {} \;
 
-COPY --chown=$PROJECTOR_USER_NAME:root --from=projectorAssembly $PROJECTOR_DIR $PROJECTOR_DIR
+COPY --chown=$USER:root --from=projectorAssembly $PROJECTOR_ASSEMBLY_DIR $PROJECTOR_ASSEMBLY_DIR
 
-USER $PROJECTOR_USER_NAME
+USER $USER
 WORKDIR /projects
 EXPOSE 8887
-CMD $PROJECTOR_DIR/entrypoint.sh
+ENTRYPOINT $PROJECTOR_ASSEMBLY_DIR/entrypoint.sh
