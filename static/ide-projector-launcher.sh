@@ -1,6 +1,6 @@
 #!/bin/bash
 #
-# Copyright (c) 2021 Red Hat, Inc.
+# Copyright (c) 2022 Red Hat, Inc.
 # This program and the accompanying materials are made
 # available under the terms of the Eclipse Public License 2.0
 # which is available at https://www.eclipse.org/legal/epl-2.0/
@@ -26,8 +26,9 @@
 
 # copy default configuration if it doesn't exist
 if [ ! -d "$PROJECTOR_CONFIG_DIR" ]; then
-  echo "Copy default configuration '$PROJECTOR_ASSEMBLY_DIR/.default' to '$PROJECTOR_CONFIG_DIR'."
-  cp -rp "$PROJECTOR_ASSEMBLY_DIR"/.default "$PROJECTOR_CONFIG_DIR"
+  echo "Copy default configuration '$PROJECTOR_ASSEMBLY_DIR/ide/config' to '$PROJECTOR_CONFIG_DIR'."
+  mkdir -p "$PROJECTOR_CONFIG_DIR"
+  cp -rp "$PROJECTOR_ASSEMBLY_DIR"/ide/config "$PROJECTOR_CONFIG_DIR"/
 fi
 
 # overwrite default configuration paths for IDE
@@ -121,7 +122,7 @@ sed -i 's+classpath "$CLASSPATH"+classpath "$CLASSPATH:$IDE_HOME/projector-serve
 # -Dorg.jetbrains.projector.server.classToLaunch=com.intellij.idea.Main org.jetbrains.projector.server.ProjectorLauncher
 sed -i 's+com.intellij.idea.Main+-Dorg.jetbrains.projector.server.classToLaunch=com.intellij.idea.Main org.jetbrains.projector.server.ProjectorLauncher+g' "$IDE_RUN_FILE_NAME-projector.sh"
 
-bash "$IDE_RUN_FILE_NAME-projector.sh"
+bash "$IDE_RUN_FILE_NAME-projector.sh" "nosplash"
 
 rm "$IDE_RUN_FILE_NAME-projector.sh"
 
