@@ -26,8 +26,12 @@
 
 # copy default configuration if it doesn't exist
 if [ ! -d "$PROJECTOR_CONFIG_DIR" ]; then
-  echo "Copy default configuration '$PROJECTOR_ASSEMBLY_DIR/ide/config' to '$PROJECTOR_CONFIG_DIR'."
+  echo "Copying default configuration '$PROJECTOR_ASSEMBLY_DIR/ide/config' to '$PROJECTOR_CONFIG_DIR'."
   mkdir -p "$PROJECTOR_CONFIG_DIR"
+  cp -rp "$PROJECTOR_ASSEMBLY_DIR"/ide/config "$PROJECTOR_CONFIG_DIR"/
+elif [ -z "$(ls -A -- "$PROJECTOR_CONFIG_DIR")" ]; then
+  echo "Configuration directory '$PROJECTOR_CONFIG_DIR' is empty."
+  echo "Copying default configuration '$PROJECTOR_ASSEMBLY_DIR/ide/config' to '$PROJECTOR_CONFIG_DIR'."
   cp -rp "$PROJECTOR_ASSEMBLY_DIR"/ide/config "$PROJECTOR_CONFIG_DIR"/
 fi
 
