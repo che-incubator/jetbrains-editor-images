@@ -8,33 +8,14 @@ Projector is a server-side libraries set, that allows to run Swing applications 
 
 ## Run JetBrains IDE in Eclipse Che
 
-In order to run JetBrains IDE in Eclipse Che infrastructure, current repository contains workspace configuration, which provides the ability to do that. To run the workspace you can use either Factory Link or create the Workspace from listed Devfiles below:
+In order to run JetBrains IDE in Eclipse Che infrastructure, current repository contains workspace configuration, which provides the ability to do that. To run the workspace you can use Factory Link:
 
 ##### IntelliJ IDEA Community
 
 - Che Factory pattern:
 
   ```
-  https://<your-che-host>/f?url=https://github.com/che-incubator/jetbrains-editor-images/raw/main/devfiles/latest/che-idea/latest.yaml
-  ```
-
-- Create the Workspace from [chectl](https://github.com/che-incubator/chectl/) (Requires clone the current repository):
-
-  ```sh
-  $ git clone https://github.com/che-incubator/jetbrains-editor-images && cd jetbrains-editor-images
-  $ chectl workspace:create -f devfiles/latest/che-idea/latest.yaml
-  ```
-
-- Create the Workspace from the following workspace configuration:
-
-  ```yaml
-  metadata:
-    name: che-idea
-  components:
-    - type: cheEditor
-      reference: 'https://raw.githubusercontent.com/che-incubator/jetbrains-editor-images/meta/che-idea/latest.meta.yaml'
-      alias: che-idea
-  apiVersion: 1.0.0
+  https://<your-che-host>/dashboard/#https://github.com/che-incubator/jetbrains-editor-images?che-editor=https://raw.githubusercontent.com/che-incubator/jetbrains-editor-images/main/devfiles/next/che-idea/2020.3.4-next.yaml
   ```
 
 ##### PyCharm Community
@@ -42,26 +23,7 @@ In order to run JetBrains IDE in Eclipse Che infrastructure, current repository 
 - Che Factory pattern:
 
   ```
-  https://<your-che-host>/f?url=https://github.com/che-incubator/jetbrains-editor-images/raw/main/devfiles/latest/che-pycharm/latest.yaml
-  ```
-
-- Create the Workspace from [chectl](https://github.com/che-incubator/chectl/) (Requires clone the current repository):
-
-  ```sh
-  $ git clone https://github.com/che-incubator/jetbrains-editor-images && cd jetbrains-editor-images
-  $ chectl workspace:create -f devfiles/latest/che-pycharm/latest.yaml
-  ```
-
-- Create the Workspace from the following workspace configuration:
-
-  ```yaml
-  metadata:
-    name: che-pycharm
-  components:
-    - type: cheEditor
-      reference: 'https://raw.githubusercontent.com/che-incubator/jetbrains-editor-images/meta/che-pycharm/latest.meta.yaml'
-      alias: che-pycharm
-  apiVersion: 1.0.0
+  https://<your-che-host>/dashboard/#https://github.com/che-incubator/jetbrains-editor-images?che-editor=https://raw.githubusercontent.com/che-incubator/jetbrains-editor-images/main/devfiles/next/che-pycharm/2020.3.5-next.yaml
   ```
 
 

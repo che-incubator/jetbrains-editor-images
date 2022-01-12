@@ -113,54 +113,81 @@ $ docker push superuser/che-pycharm:latest
 
 > Make sure, that you are logged in using `$ docker login` command to be able to push an image to your namespace.
 
-Now this image can be used as Che Editor in Eclipse Che. To achieve these there are two yaml configurations needs to be created:
+Now it is possible to use the built image as Che Editor in Eclipse Che. Eclipse Che uses the conception called Developer Workspace, which represents as set of configuration files placed in user's repository. In repository root there should located `devfile.yaml` which provides all necessary information about workspace name, additional projects that needs to be cloned:
 
-- `workspace.yaml` – workspace configuration. Do not forged to provide correct url to the `meta.yaml` file:
+```yaml
+schemaVersion: 2.1.0
+metadata:
+  name: <workspace name goes here>
+  namespace: <workspace namespace goes here, usually `admin-che`>
+```
 
-  ```yaml
+Also to provide the configuration for custom Che Editor there should be directory called `.che` with the file called `che-editor.yaml` which instructs Eclipse Che to load editor configuration from the current configuration file. Bellow you can find an example for Che Editor based on the IntelliJ IDEA Community Edition:
+
+```yaml
+inline:
+  schemaVersion: 2.1.0
   metadata:
-    name: <workspace name goes here>
+    name: IntelliJ IDEA Community Edition
+  commands:
+    - id: init-container-command
+      apply:
+        component: che-idea-injector
+  events:
+    preStart:
+      - init-container-command
   components:
-    - type: cheEditor
-      reference: '<url for the below meta.yaml goes here>'
-  apiVersion: 1.0.0
-  ```
-
-- `meta.yaml` – Che Editor configuration. Do not forget to replace `<username>` with the user name where image is pushed to and provide the pushed image in `image` section:
-
-  ```yaml
-  apiVersion: v2
-  publisher: <username>
-  name: jetbrains-ide
-  version: latest
-  type: Che Editor
-  displayName:  JetBrains IDE
-  title:  JetBrains IDE as Editor for Eclipse Che
-  description:  JetBrains IDE running using Projector
-  icon: https://www.jetbrains.com/apple-touch-icon.png
-  category: Editor
-  repository: https://github.com/che-incubator/jetbrains-editor-images
-  firstPublicationDate: "2021-04-10"
-  spec:
-    endpoints:
-     -  name: "intellij"
-        public: true
-        targetPort: 8887
-        attributes:
-          protocol: http
-          type: ide
-          path: /projector-client/index.html?backgroundColor=434343&wss
-    containers:
-     - name: jetbrains-ide
-       image: "<username>/<containerName>:latest"
-       mountSources: true
-       volumes:
-           - mountPath: "/home/projector-user"
-             name: projector-user
-       ports:
-           - exposedPort: 8887
-       memoryLimit: "4096M"
-  ```
+    - name: che-idea-runtime-description
+      container:
+        image: 'quay.io/devfile/universal-developer-image:ubi8-eda6672'
+        command: 
+          - /projector/entrypoint-volume.sh
+        env:
+          - name: PROJECTOR_ASSEMBLY_DIR
+            value: /projector
+          - name: PROJECTOR_CONFIG_DIR
+            value: /home/user/.jetbrains
+        volumeMounts:
+          - name: projector-volume
+            path: /projector
+        memoryLimit: 2048Mi
+        memoryRequest: 256Mi
+        cpuLimit: 500m
+        cpuRequest: 30m
+        endpoints:
+          - name: intellij
+            attributes:
+              type: main
+              cookiesAuthEnabled: true
+              discoverable: false
+              urlRewriteSupported: true
+            targetPort: 8887
+            exposure: public
+            path: '/?backgroundColor=434343&wss'
+            secure: false
+            protocol: http
+      attributes:
+        app.kubernetes.io/component: che-idea-injector
+        app.kubernetes.io/part-of: che-idea.eclipse.org
+    - name: projector-volume
+      volume: {}
+    - name: che-idea-injector
+      container:
+        image: 'quay.io/che-incubator/che-idea:2020.3.4-next'
+        command: ["/projector/entrypoint-init-container.sh"]
+        env:
+          - name: PROJECTOR_VOLUME_MOUNT
+            value: /projector-volume
+          - name: PROJECTOR_ASSEMBLY_DIR
+            value: /projector
+        volumeMounts:
+          - name: projector-volume
+            path: /projector-volume
+        memoryLimit: 128Mi
+        memoryRequest: 32Mi
+        cpuLimit: 500m
+        cpuRequest: 30m
+```
 
 
 
