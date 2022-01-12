@@ -18,6 +18,7 @@ on:
       - 'doc/**'
       - 'devfiles/**'
       - 'kubernetes/**'
+      - 'devfile.yaml'
 
 jobs:
   prepare_environment:
