@@ -18,6 +18,7 @@ on:
       - 'doc/**'
       - 'devfiles/**'
       - 'kubernetes/**'
+      - 'devfile.yaml'
     branches: [ main ]
 
 jobs:
