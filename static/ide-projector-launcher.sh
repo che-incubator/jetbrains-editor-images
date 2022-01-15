@@ -126,7 +126,23 @@ sed -i 's+classpath "$CLASSPATH"+classpath "$CLASSPATH:$IDE_HOME/projector-serve
 # -Dorg.jetbrains.projector.server.classToLaunch=com.intellij.idea.Main org.jetbrains.projector.server.ProjectorLauncher
 sed -i 's+com.intellij.idea.Main+-Dorg.jetbrains.projector.server.classToLaunch=com.intellij.idea.Main org.jetbrains.projector.server.ProjectorLauncher+g' "$IDE_RUN_FILE_NAME-projector.sh"
 
-bash "$IDE_RUN_FILE_NAME-projector.sh" "nosplash"
+pathCandidate=""
+
+# che specific configuration to auto open projects
+if [ -x "$(command -v yq)" ] && [ -f "$DEVWORKSPACE_FLATTENED_DEVFILE" ] && [ -d "$PROJECTS_ROOT" ]; then
+  configuredProjectNames=$(yq -r ".projects[]?.name" < "$DEVWORKSPACE_FLATTENED_DEVFILE")
+  if [ "$(echo -n "$configuredProjectNames" | grep "^.*$" -c)" == 1 ]; then
+    pathCandidate="$PROJECTS_ROOT/$configuredProjectNames"
+  else
+    pathCandidate="$PROJECTS_ROOT"
+  fi
+fi
+
+if [ -n "$pathCandidate" ] && [ -d "$pathCandidate" ]; then
+  bash "$IDE_RUN_FILE_NAME-projector.sh" "nosplash" "$pathCandidate"
+else
+  bash "$IDE_RUN_FILE_NAME-projector.sh" "nosplash"
+fi
 
 rm "$IDE_RUN_FILE_NAME-projector.sh"
 
