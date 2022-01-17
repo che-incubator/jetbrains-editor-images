@@ -1,23 +1,31 @@
 # Changelog
 This document reflects the project's changes made after each release cycle
 
-## [YYYYMMDD] Unreleased
+## [20220117]
 
 ### News
 
-- TBD
+- Provide sidecar-less model ([#70](https://github.com/che-incubator/jetbrains-editor-images/pull/70))
+  Introduce new model, when editor in Eclipse Che environment injected to the runtime container. 
+  This means that editor does not run in container where it was built. It left for local run, in docker environment.
+  Sidecar-less model described in the following issue: [New workspace model to run VS Code as a Che editor](https://github.com/eclipse/che/issues/20435)
+  
+- Update devfiles to version 2.1 ([#71](https://github.com/che-incubator/jetbrains-editor-images/pull/71))
+  With sidecar-less model workspace configuration now should be provided by version v2.1 instead v1 to run in Eclipse Che.
 
 ### Added
 
-- TBD
+- Auto opening projects in Eclipse Che environment ([#75](https://github.com/che-incubator/jetbrains-editor-images/pull/75))
 
 ### Changed
 
-- TBD
+- Update from ubi8-minimal:8.5-204 to ubi8-minimal:8.5-218 ([#67](https://github.com/che-incubator/jetbrains-editor-images/pull/67))
+- Simplify entrypoint.sh by moving necessary code to ide-projector-launcher.sh ([#69](https://github.com/che-incubator/jetbrains-editor-images/pull/69))
+- Update README.md and Developer-Guide.md to reflect latest changes ([#73](https://github.com/che-incubator/jetbrains-editor-images/pull/73))
 
 ### Fixed
 
-- TBD
+- Update mechanism of syncing configuration ([#74](https://github.com/che-incubator/jetbrains-editor-images/pull/74))
 
 ## [20211213]
 
