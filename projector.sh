@@ -305,7 +305,36 @@ projectorBuild() {
   log:debug "Current working directory '$(pwd)'"
 }
 
+runPluginsBuild() {
+  cd "$base_dir/plugins/devfile-plugin" || exit 1
+  log:debug "Current working directory '$(pwd)'"
+
+  read -r -d '' PRE_BUILD_SUMMARY <<-EOM
+Pre-build plugins container final summary
+        Docker build progress configuration: $PROGRESS
+        Container name: devfile-plugin-builder
+EOM
+  log:debug "$PRE_BUILD_SUMMARY"
+  log:info "Build 'devfile-plugin-builder'"
+
+  DOCKER_BUILDKIT=1 \
+    docker build \
+    --progress="$PROGRESS" \
+    -t "devfile-plugin-builder" \
+    -f Dockerfile .
+  # shellcheck disable=SC2181
+  if [[ $? -eq 0 ]]; then
+    log:info "Container 'devfile-plugin-builder' successfully built"
+  else
+    log:warning "Container build failed"
+    exit 1
+  fi
+}
+
 runBuild() {
+  cd "$base_dir" || exit 1
+  log:debug "Current working directory '$(pwd)'"
+
   read -r -d '' PRE_BUILD_SUMMARY <<-EOM
 Pre-build container final summary
         Docker build progress configuration: $PROGRESS
@@ -453,6 +482,7 @@ buildContainerImage() {
   checkProjectorSourcesExist
   projectorBuild
 
+  runPluginsBuild
   runBuild
   saveOnBuild
   runOnBuild

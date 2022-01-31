@@ -2,6 +2,8 @@
 .idea
 *.iml
 build
+.gradle
+build
 asset-ide-packaging.tar.gz
 asset-projector-server-assembly.zip
 asset-static-assembly.tar.gz
