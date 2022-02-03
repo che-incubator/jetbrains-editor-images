@@ -1,0 +1,20 @@
+<idea-plugin>
+    <id>che.incubator.devfile.devfile-plugin</id>
+    <name>Devfile Run Configuration Provider</name>
+    <vendor url="http://www.redhat.com">Red Hat</vendor>
+
+    <description>
+        <![CDATA[
+            Devfile Run Configuration Provider
+
+            Provides parsed Devfile commands and transforms them to IntelliJ Run Configurations.
+        ]]>
+    </description>
+
+    <depends>com.intellij.modules.platform</depends>
+
+    <extensions defaultExtensionNs="com.intellij">
+        <configurationType implementation="che.incubator.devfile.DevfileRunConfigurationType"/>
+        <postStartupActivity implementation="che.incubator.devfile.DevfileRunConfigurationService"/>
+    </extensions>
+</idea-plugin>
