@@ -11,7 +11,7 @@ events:
 components:
   - name: che-pycharm-runtime-description
     container:
-      image: 'quay.io/devfile/universal-developer-image:ubi8-eda6672'
+      image: 'quay.io/devfile/universal-developer-image:ubi8-0e189d9'
       command:
         - /projector/entrypoint-volume.sh
       env:
@@ -22,10 +22,12 @@ components:
       volumeMounts:
         - name: projector-volume
           path: /projector
-      memoryLimit: 2048Mi
-      memoryRequest: 256Mi
-      cpuLimit: 500m
-      cpuRequest: 30m
+        - name: projector-configuration
+          path: /home/user/.jetbrains
+      memoryLimit: 6144Mi
+      memoryRequest: 2048Mi
+      cpuLimit: 2000m
+      cpuRequest: 1500m
       endpoints:
         - name: intellij
           attributes:
@@ -42,7 +44,9 @@ components:
       app.kubernetes.io/component: che-pycharm-injector
       app.kubernetes.io/part-of: che-pycharm.eclipse.org
   - name: projector-volume
-    volume: {}
+    volume: { }
+  - name: projector-configuration
+    volume: { }
   - name: che-pycharm-injector
     container:
       image: 'quay.io/che-incubator/che-pycharm:2020.3.5-next'
