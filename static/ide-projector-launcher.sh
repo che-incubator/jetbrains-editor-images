@@ -24,24 +24,7 @@
 # limitations under the License.
 #
 
-# copy default configuration if it doesn't exist
-if [ ! -d "$PROJECTOR_CONFIG_DIR" ]; then
-  echo "Copying default configuration '$PROJECTOR_ASSEMBLY_DIR/ide/config' to '$PROJECTOR_CONFIG_DIR'."
-  mkdir -p "$PROJECTOR_CONFIG_DIR"
-  cp -rp "$PROJECTOR_ASSEMBLY_DIR"/ide/config "$PROJECTOR_CONFIG_DIR"/
-elif [ -z "$(ls -A -- "$PROJECTOR_CONFIG_DIR")" ]; then
-  echo "Configuration directory '$PROJECTOR_CONFIG_DIR' is empty."
-  echo "Copying default configuration '$PROJECTOR_ASSEMBLY_DIR/ide/config' to '$PROJECTOR_CONFIG_DIR'."
-  cp -rp "$PROJECTOR_ASSEMBLY_DIR"/ide/config "$PROJECTOR_CONFIG_DIR"/
-fi
-
-# overwrite default configuration paths for IDE
-cat <<EOT >> "$PROJECTOR_ASSEMBLY_DIR"/ide/bin/idea.properties
-idea.config.path=$PROJECTOR_CONFIG_DIR/config
-idea.system.path=$PROJECTOR_CONFIG_DIR/caches
-idea.plugins.path=$PROJECTOR_CONFIG_DIR/plugins
-idea.log.path=$PROJECTOR_CONFIG_DIR/logs
-EOT
+bash "$PROJECTOR_ASSEMBLY_DIR"/default-configuration-provider.sh
 
 # provide necessary environment variables
 echo "export JAVA_HOME=/usr/lib/jvm/java-11" >> "${HOME}"/.bashrc
