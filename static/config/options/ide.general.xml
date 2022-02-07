@@ -1,7 +1,0 @@
-<application>
-  <component name="GeneralSettings">
-    <option name="defaultProjectDirectory" value="/projects" />
-    <option name="autoSaveIfInactive" value="true" />
-    <option name="inactiveTimeout" value="5" />
-  </component>
-</application>

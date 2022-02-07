@@ -77,8 +77,7 @@ RUN tar -xf asset-static-assembly.tar.gz && rm asset-static-assembly.tar.gz && \
     chown -R 0:0 static && \
     mv static/* . && rm -rf static && \
     chmod +x *.sh && \
-    mv ide-projector-launcher.sh ide/bin && \
-    mv config ide/
+    mv ide-projector-launcher.sh ide/bin
 
 COPY --from=devfile-plugin-builder --chown=0:0 /devfile-plugin /mnt/rootfs/projector/ide/plugins/devfile-plugin
 
