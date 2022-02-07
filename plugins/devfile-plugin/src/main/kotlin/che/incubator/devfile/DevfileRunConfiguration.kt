@@ -26,6 +26,10 @@ class DevfileRunConfiguration(project: Project, factory: ConfigurationFactory, n
     var runId = ""
     var scriptText = ""
     var workingDir = ""
+        get() = field.ifEmpty { "\${PROJECT_SOURCE}" }
+        set(value) {
+            value.ifEmpty { "\${PROJECT_SOURCE}" }.also { field = it }
+        }
     var environment: EnvironmentVariablesData = EnvironmentVariablesData.DEFAULT
 
     override fun getState(executor: Executor, environment: ExecutionEnvironment): RunProfileState {
