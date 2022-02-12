@@ -19,7 +19,7 @@ URL=
 
 COMMAND=
 CONTAINER_TO_RUN=
-VOLUMES="$HOME/projector-user:/home/projector-user,$HOME/projector-projects:/projects"
+VOLUMES="$HOME/projector-user:/home/projector,$HOME/projector-projects:/projects"
 BUILD_DIRECTORY="$base_dir"/build
 RUN_ON_BUILD=false
 SAVE_ON_BUILD=false
