@@ -16,5 +16,6 @@
     <extensions defaultExtensionNs="com.intellij">
         <configurationType implementation="che.incubator.devfile.DevfileRunConfigurationType"/>
         <postStartupActivity implementation="che.incubator.devfile.DevfileRunConfigurationService"/>
+        <postStartupActivity implementation="che.incubator.ide.IdeFrameConfigurationService"/>
     </extensions>
 </idea-plugin>
