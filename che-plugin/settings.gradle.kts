@@ -10,4 +10,4 @@
  *   Red Hat, Inc. - initial API and implementation
  */
 
-rootProject.name = "devfile-plugin"
+rootProject.name = "che-plugin"
