@@ -37,7 +37,7 @@ jobs:
           git fetch upstream-projector-server master
       - name: Rebase Projector sources
         run: |
-          ./rebase-projector-sources.sh
+          ./projector.sh rebase
       - name: Validate Docker build
         run: |
           docker build -f build/dockerfiles/projector-server-builder.Dockerfile .
