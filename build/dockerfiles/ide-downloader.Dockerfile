@@ -17,4 +17,4 @@ RUN packagingOutputName=$(basename "$URL") && \
     # Use --timestamping option to allow local caching
     # Above option doesn't work with -O parameter, so hoping, that base file name wouldn't change
     wget --timestamping "$URL" && \
-    mv "$packagingOutputName" "asset-ide-packaging.tar.gz"
+    mv "$packagingOutputName" "asset-ide-packaging.tar.gz" \
