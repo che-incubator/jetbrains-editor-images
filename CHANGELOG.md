@@ -1,23 +1,38 @@
 # Changelog
 This document reflects the project's changes made after each release cycle
 
-## [YYYYMMDD] Unreleased
+## [20220221]
 
 ### News
 
-- TBD
+- Integrated Projector [server](https://github.com/JetBrains/projector-server) and [client](https://github.com/JetBrains/projector-client) source code as git subtree to the repository which can be rebased with upstream repository by calling `./projector.sh rebase` command. ([#89](https://github.com/che-incubator/jetbrains-editor-images/pull/89)) Before performing the rebase there is some git configuration should be performed by adding remotes for the Projector server and client:
+
+  ```sh
+  $ git remote add upstream-projector-server https://github.com/JetBrains/projector-server
+  $ git fetch upstream-projector-server master
+  $ git remote add upstream-projector-client https://github.com/JetBrains/projector-client
+  $ git fetch upstream-projector-client master
+  ```
+- Provided plugin for IntelliJ-Platform based IDEs that handles necessary operations with Devfile such as provision Run Configuration based on the Devfile commands ([#78](https://github.com/che-incubator/jetbrains-editor-images/pull/78))
 
 ### Added
 
-- TBD
+- Suppress data sharing prompt for a user ([#81](https://github.com/che-incubator/jetbrains-editor-images/pull/81))
+- Persist Java preferences folder ([#82](https://github.com/che-incubator/jetbrains-editor-images/pull/82))
+- Add `PROJECTS_ROOT` to a trusted paths configuration ([#83](https://github.com/che-incubator/jetbrains-editor-images/pull/83))
+- Use `PROJECT_SOURCE` as default working directory ([#85](https://github.com/che-incubator/jetbrains-editor-images/pull/85))
+- Publish next tag for latest dev image ([#86](https://github.com/che-incubator/jetbrains-editor-images/pull/86))
 
 ### Changed
 
-- TBD
+- Removed git patches ([#88](https://github.com/che-incubator/jetbrains-editor-images/pull/88))
+- Sync devfiles with plugin-registry ([#80](https://github.com/che-incubator/jetbrains-editor-images/pull/80))
+- Update from ubi8-minimal:8.5-218 to ubi8-minimal:8.5-230 ([#84](https://github.com/che-incubator/jetbrains-editor-images/pull/84))
 
 ### Fixed
 
-- TBD
+- Provide user to passwd and group file ([#79](https://github.com/che-incubator/jetbrains-editor-images/pull/79))
+- Fix default volume mount for local run ([#87](https://github.com/che-incubator/jetbrains-editor-images/pull/87))
 
 ## [20220117]
 
