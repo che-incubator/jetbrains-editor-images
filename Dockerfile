@@ -25,8 +25,6 @@
 # To build the cuurent Dockerfile there is the following flow:
 #   $ ./projector.sh build [OPTIONS]
 
-FROM devfile-plugin-builder as devfile-plugin-builder
-
 # Stage 1. Prepare JetBrains IDE with Projector.
 #   Requires the following assets:
 #       * asset-ide-packaging.tar.gz - IDE packaging downloaded previously;
@@ -79,7 +77,9 @@ RUN tar -xf asset-static-assembly.tar.gz && rm asset-static-assembly.tar.gz && \
     chmod +x *.sh && \
     mv ide-projector-launcher.sh ide/bin
 
-COPY --from=devfile-plugin-builder --chown=0:0 /devfile-plugin /mnt/rootfs/projector/ide/plugins/devfile-plugin
+COPY --chown=0:0 asset-che-plugin-assembly.zip .
+RUN unzip asset-che-plugin-assembly.zip && rm asset-che-plugin-assembly.zip && \
+    find . -maxdepth 1 -type d -name che-plugin -exec mv {} ide/plugins/che-plugin \;
 
 RUN for f in "/mnt/rootfs/bin/" "/mnt/rootfs/home/projector" "/mnt/rootfs/etc/passwd" "/mnt/rootfs/etc/group" "/mnt/rootfs/projects" "/mnt/rootfs/projector/ide/bin" ; do\
            chgrp -R 0 ${f} && \

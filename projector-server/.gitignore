@@ -1,0 +1,11 @@
+.gradle/
+!.idea/
+.idea/*
+!.idea/codeStyles/
+!.idea/copyright/
+!.idea/runConfigurations/
+!.idea/scopes/
+build/
+out/
+local.properties
+pluginVersions.txt

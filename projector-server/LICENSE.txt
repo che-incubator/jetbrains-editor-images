@@ -1,0 +1,1 @@
+See the license in GPLv2+CPE.txt file.
