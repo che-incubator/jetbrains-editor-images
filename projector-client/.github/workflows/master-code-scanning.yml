@@ -1,0 +1,15 @@
+name: Qodana master code scanning
+on:
+  workflow_dispatch:
+  push:
+    branches: [ master, 'releases/*']
+
+jobs:
+  qodana-master:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: 'Qodana Scan'
+        uses: JetBrains/qodana-action@v4.2.2
+        with:
+          linter: jetbrains/qodana-jvm

@@ -1,0 +1,90 @@
+<!--
+  ~ MIT License
+  ~
+  ~ Copyright (c) 2019-2022 JetBrains s.r.o.
+  ~
+  ~ Permission is hereby granted, free of charge, to any person obtaining a copy
+  ~ of this software and associated documentation files (the "Software"), to deal
+  ~ in the Software without restriction, including without limitation the rights
+  ~ to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+  ~ copies of the Software, and to permit persons to whom the Software is
+  ~ furnished to do so, subject to the following conditions:
+  ~
+  ~ The above copyright notice and this permission notice shall be included in all
+  ~ copies or substantial portions of the Software.
+  ~
+  ~ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+  ~ IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+  ~ FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+  ~ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+  ~ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+  ~ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+  ~ SOFTWARE.
+  -->
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <base href="./">
+  <meta content="width=device-width, initial-scale=1, shrink-to-fit=no" name="viewport">
+  <link href="favicon.ico" rel="icon" type="image/x-icon">
+  <link href="main.css" rel="stylesheet"> <!-- <- webpack output -->
+  <link crossorigin="anonymous" href="assets/css/styles.css" rel="stylesheet">
+  <title>Projector</title>
+</head>
+<body class="text-center">
+<div class="cover-container d-flex h-100 p-3 mx-auto flex-column">
+
+  <header class="stdhead mb-auto">
+    <div class="inner">
+      <h3 class="stdhead-brand"><a class="navbar-left" href="#"><img class="stdhead-brand-img" src="assets/img/pj512px.png"></a>Projector
+      </h3>
+      <nav class="nav nav-stdhead justify-content-center">
+        <a class="nav-link" href="https://github.com/JetBrains/projector-server">GitHub</a>
+        <a class="nav-link"
+           href="https://github.com/JetBrains/projector-server/blob/master/README-JETBRAINS.md">Readme</a>
+        <a class="nav-link" href="https://jetbrains.com">JetBrains</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="inner cover" role="main">
+    <div class="container cont-md">
+      <div *ngIf="pconnections.length > 0" class="row">
+        <div class="col-md-12">
+          <!--                <h1>Connection URL</h1>-->
+        </div>
+      </div>
+
+      <div class="row">
+        <div class="col-md-12" style="padding-bottom: 20px;">
+          <div class="form-group">
+            <datalist id="url-data-list"></datalist>
+            <input aria-describedby="URL" class="form-control" id="url-text-field" placeholder="Connection URL" type="text"
+                   list="url-data-list">
+            <small class="form-text text-muted" id="passwordHelpBlock">
+              Standard URL template: http://void:8887/?host=void&port=8887
+            </small>
+          </div>
+        </div>
+      </div>
+
+      <div class="row">
+        <div class="col-md-12">
+          <button class="btn btn-lg btn-main" id="connect-button" type="button">Connect</button>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <footer class="stdfoot mt-auto">
+    <div class="inner">
+      <p></p>
+    </div>
+  </footer>
+
+</div>
+
+<script crossorigin="anonymous" type="module" src="assets/js/main.js"></script>
+</body>
+</html>

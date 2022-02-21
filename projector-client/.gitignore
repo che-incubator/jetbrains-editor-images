@@ -1,0 +1,10 @@
+.gradle/
+!.idea/
+.idea/*
+!.idea/codeStyles/
+!.idea/copyright/
+!.idea/runConfigurations/
+build/
+out/
+JacocoReports/
+local.properties
