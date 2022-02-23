@@ -609,10 +609,6 @@ EOM
 done
 
 if [ "$COMMAND" == "build" ]; then
-  if [ ! -e "$BUILD_DIRECTORY" ]; then
-    mkdir "$BUILD_DIRECTORY"
-    log:debug "Creating build directory '$BUILD_DIRECTORY'"
-  fi
   if [ $PREPARE_ASSEMBLY_ONLY == true ]; then
     prepareBuildAssets
   else

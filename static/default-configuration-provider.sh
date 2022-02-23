@@ -26,6 +26,7 @@ read -r -d '' IDE_GENERAL_XML <<-EOM
     <option name="defaultProjectDirectory" value="$PROJECTS_ROOT" />
     <option name="autoSaveIfInactive" value="true" />
     <option name="inactiveTimeout" value="5" />
+    <option name="showTipsOnStartup" value="false" />
   </component>
 </application>
 EOM
