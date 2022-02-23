@@ -24,6 +24,7 @@
 package org.jetbrains.projector.client.web.window
 
 import kotlinx.browser.document
+import kotlinx.browser.window
 import kotlinx.dom.addClass
 import org.jetbrains.projector.client.common.SingleRenderingSurfaceProcessor
 import org.jetbrains.projector.client.common.canvas.DomCanvas
@@ -39,14 +40,12 @@ import org.jetbrains.projector.client.web.state.ClientAction
 import org.jetbrains.projector.client.web.state.ClientStateMachine
 import org.jetbrains.projector.client.web.state.LafListener
 import org.jetbrains.projector.client.web.state.ProjectorUI
+import org.jetbrains.projector.common.protocol.data.CommonIntSize
 import org.jetbrains.projector.common.protocol.data.CommonRectangle
 import org.jetbrains.projector.common.protocol.data.CursorType
 import org.jetbrains.projector.common.protocol.toClient.WindowData
 import org.jetbrains.projector.common.protocol.toClient.WindowType
-import org.jetbrains.projector.common.protocol.toServer.ClientWindowCloseEvent
-import org.jetbrains.projector.common.protocol.toServer.ClientWindowMoveEvent
-import org.jetbrains.projector.common.protocol.toServer.ClientWindowResizeEvent
-import org.jetbrains.projector.common.protocol.toServer.ResizeDirection
+import org.jetbrains.projector.common.protocol.toServer.*
 import org.w3c.dom.HTMLCanvasElement
 import kotlin.math.roundToInt
 
@@ -264,6 +263,23 @@ class WebWindow(windowData: WindowData, private val stateMachine: ClientStateMac
     fun createRenderingSurface(canvas: HTMLCanvasElement) = when (ParamsProvider.DOUBLE_BUFFERING) {
       true -> DoubleBufferedRenderingSurface(DomCanvasFactory, DomCanvas(canvas))
       false -> UnbufferedRenderingSurface(DomCanvas(canvas))
+    }
+  }
+
+  init {
+    if (windowData.windowType == WindowType.IDEA_WINDOW) {
+      val userScalingRatio = ParamsProvider.USER_SCALING_RATIO
+      stateMachine.fire(
+        ClientAction.AddEvent(
+          ClientResizeEvent(
+            size = CommonIntSize(
+              width = (window.innerWidth / userScalingRatio).roundToInt(),
+              height = (window.innerHeight / userScalingRatio).roundToInt()
+            )
+          )
+        )
+      )
+      stateMachine.fire(ClientAction.WindowResize)
     }
   }
 }
