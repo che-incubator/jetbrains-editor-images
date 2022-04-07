@@ -22,7 +22,6 @@ jobs:
         uses: actions/checkout@v2
         with:
           fetch-depth: 0
-          token: ${{ GITHUB_TOKEN }}
       - name: Git configure
         run: |
           git config --global user.email "vzhukovs+sync-projector@redhat.com"
