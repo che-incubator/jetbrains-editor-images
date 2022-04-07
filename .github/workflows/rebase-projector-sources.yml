@@ -9,11 +9,9 @@
 
 name: Rebase Projector Sources
 
-# Trigger on demand or every 4 hour
+# Trigger on demand
 on:
   workflow_dispatch:
-  schedule:
-    - cron: "10 */4 * * *"
 
 jobs:
   rebase-projector-sources:
@@ -41,7 +39,5 @@ jobs:
       - name: Validate Docker build
         run: |
           docker build -f build/dockerfiles/projector-server-builder.Dockerfile .
-      - name: Push changes to main
-        run: |
-          set -e
-          git push origin main
+      - name: Create Pull Request
+        uses: peter-evans/create-pull-request@v4.0.1
