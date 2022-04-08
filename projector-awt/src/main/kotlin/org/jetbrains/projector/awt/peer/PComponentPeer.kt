@@ -28,12 +28,14 @@ package org.jetbrains.projector.awt.peer
 import org.jetbrains.projector.awt.PToolkit
 import org.jetbrains.projector.awt.PWindow
 import org.jetbrains.projector.awt.image.PVolatileImage
+import sun.awt.PaintEventDispatcher
 import sun.awt.image.ToolkitImage
 import sun.java2d.pipe.Region
 import java.awt.*
 import java.awt.BufferCapabilities.FlipContents
 import java.awt.dnd.DropTarget
 import java.awt.dnd.peer.DropTargetPeer
+import java.awt.event.ComponentEvent
 import java.awt.event.FocusEvent
 import java.awt.event.PaintEvent
 import java.awt.image.ColorModel
@@ -71,7 +73,12 @@ abstract class PComponentPeer(target: Component, private val isFocusable: Boolea
 
   override fun setVisible(v: Boolean) {
     if (v) {
-      pWindow.target.repaint()  // todo: why XToolkit doesn't use this?  // maybe should do smth like dispatchEvent(ComponentEvent.COMPONENT_SHOWN)
+      // like XWindow.postPaintEvent does: without it, popups will be initially transparent when shown (PRJ-552)
+      val paintEvent = PaintEventDispatcher
+        .getPaintEventDispatcher()
+        .createPaintEvent(pWindow.target, 0, 0, pWindow.target.width, pWindow.target.height)
+
+      paintEvent?.let { PToolkit.systemEventQueueImplPP.postEvent(it) }
     }
 
     pWindow.target.isVisible = v
@@ -97,7 +104,20 @@ abstract class PComponentPeer(target: Component, private val isFocusable: Boolea
     pWindow.target.print(g)
   }
 
-  override fun setBounds(x: Int, y: Int, width: Int, height: Int, op: Int) {}
+  override fun setBounds(x: Int, y: Int, width: Int, height: Int, op: Int) {
+    fun dispatchIfNeeded(eventId: Int) {
+      (pWindow.target as? Window)?.dispatchEvent(ComponentEvent(pWindow.target, eventId))
+    }
+
+    when (op) {
+      ComponentPeer.SET_BOUNDS -> {
+        dispatchIfNeeded(ComponentEvent.COMPONENT_MOVED)
+        dispatchIfNeeded(ComponentEvent.COMPONENT_RESIZED)
+      }
+      ComponentPeer.SET_LOCATION -> dispatchIfNeeded(ComponentEvent.COMPONENT_MOVED)
+      ComponentPeer.SET_SIZE, ComponentPeer.SET_CLIENT_SIZE -> dispatchIfNeeded(ComponentEvent.COMPONENT_RESIZED)
+    }
+  }
 
   override fun handleEvent(e: AWTEvent) {}
 
