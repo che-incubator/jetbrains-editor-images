@@ -49,11 +49,12 @@ import javax.xml.parsers.DocumentBuilderFactory
 import org.w3c.dom.Document
 import java.util.function.Function
 import java.io.File
+import java.security.SecureRandom
 import javax.xml.transform.OutputKeys
 import javax.xml.transform.TransformerFactory
 import javax.xml.transform.dom.DOMSource
 import javax.xml.transform.stream.StreamResult
-import kotlin.random.Random
+import kotlin.random.asKotlinRandom
 
 fun productName(): String = ApplicationInfo.getInstance().versionName
 
@@ -181,7 +182,8 @@ const val RANDOM_PASSWORD_LEN = 11
 
 fun generatePassword(): String {
   val charPool = ('a'..'z') + ('A'..'Z') + ('0'..'9')
-  return generateSequence { charPool.random() }
+  val random = SecureRandom().asKotlinRandom()
+  return generateSequence { charPool.random(random) }
     .take(RANDOM_PASSWORD_LEN)
     .joinToString("")
 }
