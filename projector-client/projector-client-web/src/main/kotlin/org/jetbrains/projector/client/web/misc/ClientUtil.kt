@@ -21,12 +21,21 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package org.jetbrains.projector.client.web.electron
+package org.jetbrains.projector.client.web.misc
 
 import kotlinx.browser.window
 import org.jetbrains.projector.client.web.externalDeclarartion.process
 
-// adopted from https://github.com/cheton/is-electron
+/**
+ * Checks if running in Gecko-based browser (e.g. Firefox)
+ *
+ * Adopted from https://stackoverflow.com/a/9851769
+ */
+internal fun isGecko() = isDefined(window.asDynamic().InstallTrigger)
+
+/**
+ * Adopted from https://github.com/cheton/is-electron
+ */
 internal fun isElectron(): Boolean {
   // Renderer process
   if (isDefined(window) && jsTypeOf(window.process) == "object" && window.process.type == "renderer") {
@@ -44,15 +53,12 @@ internal fun isElectron(): Boolean {
   }
 
   // Detect the user agent when the `nodeIntegration` option is set to true
-  if (jsTypeOf(window.navigator) == "object" && jsTypeOf(window.navigator.userAgent) == "string" && window.navigator.userAgent.contains("Electron")) {
+  if (jsTypeOf(window.navigator) == "object"
+      && jsTypeOf(window.navigator.userAgent) == "string"
+      && window.navigator.userAgent.contains("Electron")
+  ) {
     return true
   }
 
   return false
 }
-
-@Suppress("NOTHING_TO_INLINE", "UNUSED_PARAMETER")
-private inline fun jsBoolean(expression: Any?): Boolean = js("Boolean(expression)") as Boolean
-
-@Suppress("NOTHING_TO_INLINE")
-private inline fun isDefined(obj: Any?): Boolean = jsTypeOf(obj) != "undefined"

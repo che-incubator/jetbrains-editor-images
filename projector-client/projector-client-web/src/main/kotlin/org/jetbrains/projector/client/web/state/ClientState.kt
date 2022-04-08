@@ -73,9 +73,16 @@ import kotlin.math.roundToInt
 
 sealed class ClientState {
 
-  open fun consume(action: ClientAction): ClientState {
-    logger.error { "${this::class.simpleName}: can't consume ${action::class.simpleName}" }
-    return this
+  open fun consume(action: ClientAction): ClientState = when (action) {
+    is ClientAction.WindowResize -> {
+      OnScreenMessenger.updatePosition()
+      this
+    }
+
+    else -> {
+      logger.error { "${this::class.simpleName}: can't consume ${action::class.simpleName}" }
+      this
+    }
   }
 
   private class AppLayers(
@@ -356,7 +363,7 @@ sealed class ClientState {
       }
     }
 
-    private val serverEventsProcessor = ServerEventsProcessor(windowManager, windowDataEventsProcessor, renderingQueue)
+    private val serverEventsProcessor = ServerEventsProcessor(windowManager, windowDataEventsProcessor, renderingQueue, stateMachine)
 
     private val messagingPolicy = (
       ParamsProvider.FLUSH_DELAY
@@ -424,10 +431,6 @@ sealed class ClientState {
 
     private val connectionWatcher = ConnectionWatcher { stateMachine.fire(ClientAction.WebSocket.NoReplies(it)) }.apply {
       setWatcher()
-    }
-
-    init {
-      windowSizeController.addListener()
     }
 
     @OptIn(ExperimentalStdlibApi::class)
@@ -508,12 +511,25 @@ sealed class ClientState {
       is ClientAction.AddEvent -> {
         val event = action.event
 
-        if (event is ClientKeyPressEvent) {
-          typing.addEventChar(event)
+        fun addEvent() {
+          eventsToSend.add(event)
+          messagingPolicy.onAddEvent()
         }
 
-        eventsToSend.add(event)
-        messagingPolicy.onAddEvent()
+        var latency = 0
+
+        if (event is ClientKeyPressEvent) {
+          val added = typing.addEventChar(event)
+          if (added) {
+            latency = ParamsProvider.SPECULATIVE_TYPING_LATENCY
+          }
+        }
+
+        if (latency > 0) {
+          window.setTimeout(::addEvent, latency)
+        } else {
+          addEvent()
+        }
 
         this
       }
@@ -542,7 +558,6 @@ sealed class ClientState {
             pingStatistics.onClose()
             windowDataEventsProcessor.onClose()
             inputController.removeListeners()
-            windowSizeController.removeListener()
             typing.dispose()
             markdownPanelManager.disposeAll()
             closeBlocker.removeListener()
@@ -569,7 +584,6 @@ sealed class ClientState {
       drawPendingEvents.cancel()
       pingStatistics.onClose()
       inputController.removeListeners()
-      windowSizeController.removeListener()
       typing.dispose()
       connectionWatcher.removeWatcher()
 
@@ -610,10 +624,10 @@ sealed class ClientState {
 
         false -> OnScreenMessenger.showText(
           "Connection problem",
-          "There is no connection to <strong>$url</strong>. " +
+          "There is no connection to $url. " +
           "The browser console can contain the error and a more detailed description. " +
-          "Everything we know is that <code>CloseEvent.code=${action.code}</code>, " +
-          "<code>CloseEvent.wasClean=${action.wasClean}</code>. $reason",
+          "Everything we know is that CloseEvent.code=${action.code}, " +
+          "CloseEvent.wasClean=${action.wasClean}. $reason",
           canReload = true
         )
       }
