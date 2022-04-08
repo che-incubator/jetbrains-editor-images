@@ -1,11 +1,29 @@
 # Unreleased
 
+## Added
+- Allow specifying server logger factory
+- PRJ-496 Allow disabling server integrations with IDE
+
+## Fixed
+- PRJ-58 Fix Markdown client components couldn't be shrunk
+- PRJ-868 Avoid using HTML plain text injections
+- Support linear gradient paint (Fixes Nyan Progress Bar, for example)
+
+# 1.7.0
+
+## Added
+- PRJ-127 To-client clipboard synchronization without asynchronous clipboard API for Web client
+
 ## Fixed
 - PRJ-691 PRJ-750 PRJ-779 Fix JetBrains account login
 - Infinite transport initialization on relay failure
+- (partial) PRJ-552 Fix transparent pop-ups in some cases
+- (full) PRJ-62 PRJ-552 Fix incorrect window size in some cases
+- PRJ-565 Fix wrong header position after the window is resized
 
 ## Changed
 - Switch to JS IR compilation for projector-client-web
+- Server startup logic - now the server does not require successful initialization of all transports and starts if at least one transport is successfully initialized
 
 # 1.6.0
 
