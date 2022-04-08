@@ -29,6 +29,10 @@ import kotlinx.coroutines.*
 import org.jetbrains.projector.util.loading.UseProjectorLoader
 import org.jetbrains.projector.util.logging.Logger
 
+// This must be before logger declaration, as loggers will try to call other methods in this file
+@OptIn(DelicateCoroutinesApi::class)
+private val scope = CoroutineScope(newSingleThreadContext("stateListenerThread"))
+
 private val logger = Logger("IdeState")
 
 /**
@@ -58,7 +62,7 @@ public fun IdeState.whenOccurred(
  */
 public fun registerStateListener(purpose: String?, listener: IdeStateListener) {
   if (!IdeState.isIdeAttached) {
-    if (purpose != null) {
+    if (purpose != null && IdeState.attachToIde) {
       logger.info { "Can't $purpose. It's OK if you don't run an IntelliJ platform based app." }
     }
     return
@@ -103,6 +107,3 @@ private suspend fun runLoopForListener(purpose: String?, listener: IdeStateListe
     delay(5)
   }
 }
-
-@OptIn(DelicateCoroutinesApi::class)
-private val scope = CoroutineScope(newSingleThreadContext("stateListenerThread"))

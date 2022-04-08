@@ -32,6 +32,7 @@ import org.jetbrains.projector.client.web.state.ProjectorUI
 import org.jetbrains.projector.common.protocol.data.CommonRectangle
 import org.jetbrains.projector.util.logging.Logger
 import org.w3c.dom.HTMLDivElement
+import org.w3c.dom.HTMLParagraphElement
 
 object OnScreenMessenger : LafListener {
 
@@ -57,7 +58,7 @@ object OnScreenMessenger : LafListener {
     }
   }
 
-  private val text = (document.createElement("div") as HTMLDivElement).apply {
+  private val text = (document.createElement("p") as HTMLParagraphElement).apply {
     div.appendChild(this)
   }
 
@@ -75,7 +76,7 @@ object OnScreenMessenger : LafListener {
     logger.info { "$title - $content" }
 
     header.title = title
-    text.innerHTML = "<p>$content</p>"
+    text.innerText = content
 
     reload.style.display = canReload.toDisplayType()
 
@@ -83,6 +84,13 @@ object OnScreenMessenger : LafListener {
       document.body!!.appendChild(div)
     }
 
+    updatePosition()
+    header.visible = true
+    header.zIndex = div.style.zIndex.toInt()
+    header.draw()
+  }
+
+  fun updatePosition() {
     val userScalingRatio = ParamsProvider.USER_SCALING_RATIO
     val mainDivBounds = div.getBoundingClientRect()
     header.bounds = CommonRectangle(
@@ -91,9 +99,6 @@ object OnScreenMessenger : LafListener {
       div.clientWidth * userScalingRatio,
       ProjectorUI.headerHeight * userScalingRatio
     )
-    header.visible = true
-    header.zIndex = div.style.zIndex.toInt()
-    header.draw()
   }
 
   fun hide() {
