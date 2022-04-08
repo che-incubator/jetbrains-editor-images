@@ -27,6 +27,7 @@ import com.intellij.diagnostic.LoadingState
 import com.intellij.ide.WindowsCommandLineProcessor
 import org.jetbrains.projector.util.loading.ProjectorClassLoaderSetup
 import org.jetbrains.projector.util.loading.UseProjectorLoader
+import org.jetbrains.projector.util.loading.getOption
 
 /**
  * Mirrors states from com.intellij.diagnostic.LoadingState and introduces some helper ones
@@ -63,14 +64,24 @@ public enum class IdeState {
     }
 
   public companion object {
-    public val isIdeAttached: Boolean get() = try {
-      WindowsCommandLineProcessor.ourMainRunnerClass
-      true
-    } catch (t: Throwable) {
-      false
-    }
+    public val isIdeAttached: Boolean
+      get() = when (attachToIde) {
+        false -> false
+
+        true -> try {
+          WindowsCommandLineProcessor.ourMainRunnerClass
+          true
+        }
+        catch (t: Throwable) {
+          false
+        }
+      }
 
     private val isIdeClassLoaderInstantiated: Boolean
       get() = isIdeAttached && WindowsCommandLineProcessor.ourMainRunnerClass != null
+
+    public val attachToIde: Boolean get() = getOption(ATTACH_TO_IDE_PROPERTY_NAME, "true").toBooleanStrict()
+
+    public const val ATTACH_TO_IDE_PROPERTY_NAME: String = "ORG_JETBRAINS_PROJECTOR_SERVER_ATTACH_TO_IDE"
   }
 }
