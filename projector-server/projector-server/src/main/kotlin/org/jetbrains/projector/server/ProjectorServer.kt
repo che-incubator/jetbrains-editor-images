@@ -25,6 +25,9 @@
 
 package org.jetbrains.projector.server
 
+import com.intellij.notification.Notification
+import com.intellij.notification.NotificationType
+import com.intellij.notification.Notifications
 import org.jetbrains.projector.awt.PClipboard
 import org.jetbrains.projector.awt.PToolkit
 import org.jetbrains.projector.awt.PWindow
@@ -49,12 +52,14 @@ import org.jetbrains.projector.server.core.ij.IdeColors
 import org.jetbrains.projector.server.core.ij.IjInjectorAgentInitializer
 import org.jetbrains.projector.server.core.ij.KeymapSetter
 import org.jetbrains.projector.server.core.ij.SettingsInitializer
-import org.jetbrains.projector.server.core.ij.log.DelegatingJvmLogger
 import org.jetbrains.projector.server.core.ij.md.PanelUpdater
 import org.jetbrains.projector.server.core.protocol.HandshakeTypesSelector
 import org.jetbrains.projector.server.core.protocol.KotlinxJsonToClientHandshakeEncoder
 import org.jetbrains.projector.server.core.protocol.KotlinxJsonToServerHandshakeDecoder
-import org.jetbrains.projector.server.core.util.*
+import org.jetbrains.projector.server.core.util.LaterInvokator
+import org.jetbrains.projector.server.core.util.distinctUpdatedOnscreenSurfaces
+import org.jetbrains.projector.server.core.util.focusOwnerOrTarget
+import org.jetbrains.projector.server.core.util.getWildcardHostAddress
 import org.jetbrains.projector.server.idea.CaretInfoUpdater
 import org.jetbrains.projector.server.idea.forbidUpdates
 import org.jetbrains.projector.server.service.ProjectorAwtInitializer
@@ -63,6 +68,8 @@ import org.jetbrains.projector.server.service.ProjectorImageCacher
 import org.jetbrains.projector.server.util.*
 import org.jetbrains.projector.server.websocket.WebsocketServer
 import org.jetbrains.projector.util.loading.UseProjectorLoader
+import org.jetbrains.projector.util.loading.getOption
+import org.jetbrains.projector.util.loading.state.IdeState
 import org.jetbrains.projector.util.logging.Logger
 import org.jetbrains.projector.util.logging.loggerFactory
 import sun.awt.AWTAccessor
@@ -92,10 +99,11 @@ class ProjectorServer private constructor(
   private val transports: MutableSet<ServerTransport> = ConcurrentHashMap<ServerTransport, Unit>().keySet(Unit)
 
   // Reading the wasStarted property will block execution of the thread until
-  // all transports have been initialized (successfully or not)
+  // at least one transport will be successfully initialized
+  // or all transports will be initialized unsuccessfully
   val wasStarted: Boolean
     get() {
-      return transports.all { it.wasStarted }
+      return transports.any { it.wasStarted }
     }
 
   private lateinit var updateThread: Thread
@@ -183,9 +191,6 @@ class ProjectorServer private constructor(
           )
 
           PVolatileImage.images.forEach(PVolatileImage::invalidate)
-          PWindow.windows.forEach {
-            SwingUtilities.invokeAndWait { it.target.revalidate() }  // this solves PRJ-69
-          }
           PWindow.windows.forEach(PWindow::repaint)
           previousWindowEvents = emptySet()
           caretInfoUpdater.createCaretInfoEvent()
@@ -307,6 +312,7 @@ class ProjectorServer private constructor(
           isAutoRequestFocus = window.isAutoRequestFocus,
           isAlwaysOnTop = window.isAlwaysOnTop,
           parentId = window.parentWindow?.id,
+          renderingScale = window.renderingScale
         )
       }
 
@@ -496,6 +502,19 @@ class ProjectorServer private constructor(
 
       is ClientWindowsDeactivationEvent -> {
         updateWindowsState(message.windowIds, WindowEvent.WINDOW_DEACTIVATED)
+      }
+      is ClientNotificationEvent -> {
+        if (!IdeState.isIdeAttached) return
+
+        val intellijNotificationType = when (message.notificationType) {
+          ClientNotificationType.INFORMATION -> NotificationType.INFORMATION
+          ClientNotificationType.WARNING -> NotificationType.WARNING
+          ClientNotificationType.ERROR -> NotificationType.ERROR
+        }
+
+        @Suppress("UnresolvedPluginConfigReference")
+        val notification = Notification("ProjectorClient", message.title, message.message, intellijNotificationType)
+        Notifications.Bus.notify(notification)
       }
     }
   }
@@ -874,14 +893,19 @@ class ProjectorServer private constructor(
     }
 
     @JvmStatic
-    fun startServer(isAgent: Boolean, initializer: Runnable): ProjectorServer {
-      loggerFactory = { DelegatingJvmLogger(it) }
+    fun startServer(isAgent: Boolean, logFactory: (tag: String) -> Logger, initializer: Runnable): ProjectorServer {
+      loggerFactory = logFactory
 
       ProjectorAwtInitializer.initProjectorAwt()
 
       initializer.run()
 
-      IjInjectorAgentInitializer.init(isAgent)
+      if (IdeState.isIdeAttached) {
+        IjInjectorAgentInitializer.init(isAgent)
+      }
+      else {
+        logger.info { "Skipping IDE injections" }
+      }
 
       ProjectorAwtInitializer.initDefaults()  // this should be done after setting classes because some headless operations can happen here
 

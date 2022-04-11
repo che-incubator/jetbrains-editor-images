@@ -136,6 +136,13 @@ Name | Type | Default value
 
 Setting this option to `false` will enable the platform and plugins updates.
 
+### Disabling attaching to the IDE
+
+Name | Type | Default value
+---|---|---
+`ORG_JETBRAINS_PROJECTOR_SERVER_ATTACH_TO_IDE` | Boolean | `true`
+
+Setting this option to `false` will disable integrations of Projector with the IDE. By default (`true`), Projector decides it automatically: it attaches if it's able to do so.
 
 ## Difference between env vars and system props
 
