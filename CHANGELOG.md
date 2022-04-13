@@ -1,6 +1,18 @@
 # Changelog
 This document reflects the project's changes made after each release cycle
 
+## [20220413]
+
+### News
+
+- Updated base ubi-minimal image to 8.5-240.1648458092 ([#100](https://github.com/che-incubator/jetbrains-editor-images/pull/100))
+- Updated Projector Server sources to [c3fa667](https://github.com/JetBrains/projector-server/commit/c3fa6678a4e3ce146799c20d28af963b8ddefe94) ([#101](https://github.com/che-incubator/jetbrains-editor-images/pull/101))
+- Updated Projector Client sources to [2811e60](https://github.com/JetBrains/projector-client/commit/2811e60f3e11b9109c6670a42af70124d9b6c052) ([#99](https://github.com/che-incubator/jetbrains-editor-images/pull/99))
+
+### Changed
+- Revert changes related to IDE frame expansion ([#91](https://github.com/che-incubator/jetbrains-editor-images/pull/91))
+  - Moved code that expands IDE frame to Plugin to Projector code base
+
 ## [20220221]
 
 ### News
