@@ -26,6 +26,7 @@ package org.jetbrains.projector.agent.common.transformation
 import javassist.ClassPool
 import javassist.CtClass
 import javassist.LoaderClassPath
+import java.lang.instrument.ClassDefinition
 import java.lang.instrument.ClassFileTransformer
 import java.lang.instrument.Instrumentation
 
@@ -81,7 +82,8 @@ public interface TransformerSetup<Params> {
    * @param unavailableReasonConsumer pass a reason why you return false. Only last passed value is used
    * @return true if transformations of thus transformer are applicable for given parameters, false otherwise
    */
-  public fun isTransformerAvailable(parameters: Params, unavailableReasonConsumer: (String) -> Unit): Boolean = isTransformerAvailable(parameters)
+  public fun isTransformerAvailable(parameters: Params, unavailableReasonConsumer: (String) -> Unit): Boolean =
+    isTransformerAvailable(parameters)
 
   /**
    * Runs transformation (returned from [getTransformations]) of this transformer.
@@ -124,6 +126,10 @@ public interface TransformerSetup<Params> {
     instrumentation.apply {
       addTransformer(transformer, canRetransform)
       retransformClasses(*transformations.keys.toTypedArray())
+
+      val pool = ClassPool().apply { appendClassPath(LoaderClassPath(loader)) }
+
+      redefineClasses(*transformations.map { ClassDefinition(it.key, it.value(pool[it.key.name])) }.toTypedArray())
     }
   }
 }
