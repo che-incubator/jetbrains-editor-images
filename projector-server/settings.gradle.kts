@@ -59,5 +59,9 @@ if (localProperties["useLocalProjectorClient"] == "true") {
 
 include("projector-agent")
 include("projector-awt")
+include("projector-awt-common")
+include("projector-awt-jdk17")
 include("projector-plugin")
 include("projector-server")
+include("projector-server-common")
+include("projector-server-jdk17")

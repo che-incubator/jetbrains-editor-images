@@ -29,11 +29,15 @@ plugins {
 publishToSpace()
 
 val kotlinVersion: String by project
-val projectorClientVersion: String by project
-val projectorClientGroup: String by project
-version = project(":projector-server").version
+version = project(":projector-server-common").version
 
 dependencies {
-  implementation("$projectorClientGroup:projector-util-logging:$projectorClientVersion")
+  api(project(":projector-awt-common"))
   testImplementation(kotlin("test", kotlinVersion))
+}
+
+kotlin {
+  jvmToolchain {
+    (this as JavaToolchainSpec).languageVersion.set(JavaLanguageVersion.of(11))
+  }
 }
