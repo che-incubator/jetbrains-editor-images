@@ -1,223 +1,113 @@
-# JetBrains Projector Editor Images
+# projector-server
+[![JetBrains incubator project](https://jb.gg/badges/incubator.svg)](https://confluence.jetbrains.com/display/ALL/JetBrains+on+GitHub)
+[![Tests status badge](https://github.com/JetBrains/projector-server/workflows/Tests/badge.svg)](https://github.com/JetBrains/projector-server/actions)
 
-Contains utilites and scripts, which allows to run JetBrains products in Eclipse Che infrastructure using [Projector](https://github.com/JetBrains/projector-server).
+Server-side library for running Swing applications remotely.
 
-Projector is a server-side libraries set, that allows to run Swing applications remotely.
+[Documentation](https://jetbrains.github.io/projector-client/mkdocs/latest/) | [Issue tracker](https://youtrack.jetbrains.com/issues/PRJ)
 
+## Building
+The following command creates a zip file with the whole runtime classpath:
 
-
-## Run JetBrains IDE in Eclipse Che
-
-In order to run JetBrains IDE in Eclipse Che infrastructure, current repository contains workspace configuration, which provides the ability to do that. To run the workspace you can use Factory Link:
-
-##### IntelliJ IDEA Community
-
-- Che Factory pattern:
-
-  ```
-  https://<your-che-host>/dashboard/#https://github.com/che-incubator/jetbrains-editor-images?che-editor=https://raw.githubusercontent.com/che-incubator/jetbrains-editor-images/main/devfiles/next/che-idea/2020.3.4-next.yaml
-  ```
-
-##### PyCharm Community
-
-- Che Factory pattern:
-
-  ```
-  https://<your-che-host>/dashboard/#https://github.com/che-incubator/jetbrains-editor-images?che-editor=https://raw.githubusercontent.com/che-incubator/jetbrains-editor-images/main/devfiles/next/che-pycharm/2020.3.5-next.yaml
-  ```
-
-
-
-## Run JetBrains IDE in Docker
-
-In order to run JetBrains IDE in Docker, it is enough to pull one from two images, which publicitly deployed to [quay.io](https://quay.io/).
-
-At this moment it is **community** version for **IntelliJ IDEA** and **PyCharm**.
-
-```sh
-$ docker pull quay.io/che-incubator/che-idea
-$ docker pull quay.io/che-incubator/che-pycharm
+```shell script
+./gradlew :projector-server:distZip
 ```
 
-Then it is enough to run the particular container, passing the run options, as shown below:
+You can find the file here: `projector-server/build/distibution/projector-server-VERSION.zip`.
 
-```sh
-$ docker run --env --rm -p 8887:8887 -it quay.io/che-incubator/che-idea
-$ docker run --env --rm -p 8887:8887 -it quay.io/che-incubator/che-pycharm
+By default, a proper revision of `projector-client:projector-common` at GitHub will be used as a dependency. If you want to **use
+local** `projector-client`, please specify a special local property `useLocalProjectorClient=true` as a line in `local.properties` file (
+create this file if you don't have one). You can find an example in [local.properties.example](local.properties.example) file. After
+specifying this property and reloading Gradle build script, local `projector-client` from `../projector-client` will be used as the
+dependency.
+
+## How to run my application using this?
+There are two ways.
+
+### Not modifying your application code
+This is the recommended way. You can use it if you don't have any preference. You don't need to rebuild your app at all here.
+
+In the `projector-server` project, there is a `ProjectorLauncher` main class. It sets headless stuff up itself and then calls another main class. The name of the class-to-launch is obtained from the System Properties and program arguments are passed to the `main` of the class-to-launch without changing.
+
+Extract `libs` folder from `projector-server-VERSION.zip` to add it to classpath later.
+
+To launch your app, change your run script like this:
+```Shell Script
+java \
+-classpath YOUR_USUAL_CLASSPATH:libs/* \
+-Dorg.jetbrains.projector.server.classToLaunch=YOUR_USUAL_MAIN_CLASS \
+org.jetbrains.projector.server.ProjectorLauncher \
+YOUR_USUAL_MAIN_ARGUMENTS
 ```
 
-This will run the latest supported JetBrains IDE locally on your host.
+As you see, you should add the `libs` folder to you classpath. Also, you should change the main class to the `ProjectorLauncher` but pass your original main class as a special System Property.
 
-Then navigate to [http://localhost:8887](http://localhost:8887), to access the JetBrains IDE.
+We have an example in our demo app called [projector-demo](https://github.com/JetBrains/projector-demo).
 
-
-
-## Run JetBrains IDE in Docker (manual build)
-
-In order to build the image, need to make sure, that **Docker version higher than 18.09**, since the build scripts, is using [Docker BuildKit](https://docs.docker.com/develop/develop-images/build_enhancements/).
-
-Clone current repository and perform the following steps:
-
-```sh
-$ git clone https://github.com/che-incubator/jetbrains-editor-images && cd jetbrains-editor-images
-$ ./projector.sh build
-$ ./projector.sh run CONTAINER
+Also, we've tested this variant with IntelliJ IDEA. Just download it from [the download page](https://www.jetbrains.com/idea/download/index.html) and only change the `idea.sh` script. In the end of default script, the are lines like the following:
+```shell script
+"$JAVA_BIN" \
+  -classpath "$CLASSPATH" \
+  ${VM_OPTIONS} \
+  "-XX:ErrorFile=$HOME/java_error_in_IDEA_%p.log" \
+  "-XX:HeapDumpPath=$HOME/java_error_in_IDEA.hprof" \
+  -Didea.paths.selector=IdeaIC2019.3 \
+  "-Djb.vmOptionsFile=$VM_OPTIONS_FILE" \
+  ${IDE_PROPERTIES_PROPERTY} \
+  -Didea.platform.prefix=Idea -Didea.jre.check=true \
+  com.intellij.idea.Main \
+  "$@"
 ```
 
-The following sequence prompt user to choose the **IDE packaging** to build. Then automatically performs clonning **Projector Client** and **Projector Server** sources, build them and build Docker image. The build image name will be printed in the end of build process, which can be run pass to `run` command to start the container locally.
-
-After that, navigate to [http://localhost:8887](http://localhost:8887), to access the JetBrains IDE.
-
-More information is available in [Developer Guide](doc/Developer-Guide.md).
-
-
-
-## Scripts reference
-
-### `projector.sh`
-
-The main entrypoint to build and run of IntelliJ-based IDEs to run in Eclipse Che environment.
-
-Calling the
-
-```sh
-$ ./projector.sh
+You should change them to:
+```shell script
+"$JAVA_BIN" \
+  -classpath "$CLASSPATH:$IDE_HOME/projector-server/lib/*" \
+  ${VM_OPTIONS} \
+  "-XX:ErrorFile=$HOME/java_error_in_IDEA_%p.log" \
+  "-XX:HeapDumpPath=$HOME/java_error_in_IDEA.hprof" \
+  -Didea.paths.selector=IdeaIC2019.3 \
+  "-Djb.vmOptionsFile=$VM_OPTIONS_FILE" \
+  ${IDE_PROPERTIES_PROPERTY} \
+  -Didea.platform.prefix=Idea -Didea.jre.check=true \
+  -Dorg.jetbrains.projector.server.classToLaunch=com.intellij.idea.Main \
+  org.jetbrains.projector.server.ProjectorLauncher \
+  "$@"
 ```
 
- without any parameters and commands will print the help information section:
+Don't forget to place JARs from `projector-server` distribution to `$IDE_HOME/projector-server/lib`.
 
-```sh
-Usage: ./projector.sh COMMAND [OPTIONS]
+Also, you can find this example in [projector-docker](https://github.com/JetBrains/projector-docker) where these actions are done automatically.
 
-Projector-based container manager
+### Modifying your application code
+Using this way, you can add a custom condition to start the server.
 
-Options:
-  -h, --help              Display help information
-  -v, --version           Display version information
-  -l, --log-level string  Set the logging level ("debug"|"info"|"warn"|"error"|"fatal") (default "info")
+Add a dependency to the `projector-server` project to your app. In the **beginning** of your `main`, decide if you want to run the app headlessly. If yes, invoke `System.setProperty("org.jetbrains.projector.server.enable", "true")` and call the `startServer` method of the `HeadlessServer`.
 
-Commands:
-  build   Build an image for the particular IntelliJ-based IDE package
-  run     Start a container with IntelliJ-based IDE
+When you go this way, ensure that no AWT nor Swing operations are performed before the initialization of the server. Such operations can cause some lazy operations of AWT happen and our server doesn't support that.
 
-Run './projector.sh COMMAND --help' for more information on a command.
-To get more help with the './projector.sh' check out guides at https://github.com/che-incubator/jetbrains-editor-images/tree/main/doc
-```
+This way is demonstrated in [projector-demo](https://github.com/JetBrains/projector-demo) too.
 
+### Run with Gradle tasks
+There are two gradle tasks for running server. They are handy when developing. To enable them, you should set some properties in `local.properties` file in the project root. Use [local.properties.example](local.properties.example) as a reference.
 
+1. `runServer` &mdash; launch your app with Projector Server. Required properties:
+    * `projectorLauncher.targetClassPath` &mdash; classpath of your application;
+    * `projectorLauncher.classToLaunch` &mdash; FQN of your application main class.
 
-#### `projector.sh build`
+2. `runIdeaServer` &mdash; launch IntelliJ IDEA with Projector Server. Required property:
+    * `projectorLauncher.ideaPath` &mdash; path to IDEA's root directory.
 
-Performs build an image for particular IntelliJ-based IDE package.
+## Connection from browser
+When the server is launched, you can open `localhost:8887` in the browser to access the app.
 
-Calling the
+## Notes
+Currently, `projector-server` supports only Linux and JetBrains Runtime 11 and 17 as JRE.
 
-```sh
-$ ./projector.sh build --help
-```
-
-will print the help information section:
-
-```sh
-Usage: ./projector.sh build [OPTIONS]
-
-Build an image for the particular IntelliJ-based IDE package
-
-Note, that if '--tag' or '--url' option is missed, then interactive wizard will be invoked to choose
-the predefined IDE packaging from the default configuration.
-
-Options:
-  -t, --tag string              Name and optionally a tag in the 'name:tag' format for the result image
-  -u, --url string              Downloadable URL of IntelliJ-based IDE package, should be a tar.gz archive
-      --run-on-build            Run the container immediately after build
-      --save-on-build           Save the image to a tar archive after build. Basename of --url.
-      --mount-volumes [string]  Mount volumes to the container which was started using '--run-on-build' option
-                                Volumes should be separated by comma, e.g. "/l/path_1:/r/path_1,/l/path_2:/r/path_2".
-                                If option value is omitted, then default value is loaded.
-                                Default value: $HOME/projector-user:/home/projector-user,$HOME/projector-projects:/projects
-  -p, --progress string         Set type of progress output ("auto"|"plain") (default "auto")
-      --config string           Specify the configuration file for predefined IDE package list (default "compatible-ide.json")
-      --prepare                 Clone and build Projector only ignoring other options. Also downloads the IDE packaging
-                                by the --url option. If --url option is omitted then interactive wizard is called to choose
-                                the right packaging to prepare. Used when need to fetch Projector sources only, assembly
-                                the binaries and download the IDE packaging.
-```
-
-
-
-#### `projector.sh run`
-
-Starts the container with IntelliJ-based IDE locally.
-
-Calling the
-
-```sh
-$ ./projector.sh run --help
-```
-
-will print the help information section:
-
-```sh
-Usage: ./projector.sh run CONTAINER [OPTIONS]
-
-Start a container with IntelliJ-based IDE
-
-Options:
-      --mount-volumes [string]  Mount volumes to the container which was started using '--run-on-build' option.
-                                Volumes should be separated by comma, e.g. "/l/path_1:/r/path_1,/l/path_2:/r/path_2".
-                                If option value is omitted, then default value is loaded.
-                                Default value: $HOME/projector-user:/home/projector-user,$HOME/projector-projects:/projects
-```
-
-
-
-### `make-release.sh`
-
-Performes the release process for editor images. Steps performed in this shell script:
-
-- Fetch configuration about all supported IDEs
-- Perform build the docker images locally and checks whether there are an errors during build
-- Creates tag and pushes to the remote
-
-Calling the
-
-```sh
-$ ./make-release.sh --help
-```
-
-will print the help information section:
-
-```sh
-Usage: ./make-release.sh [OPTIONS]
-
-Performs the release of editor images.
-
-Options:
-  -h, --help              Display help information
-  -v, --version           Display version information
-  -t, --tag string        Release tag name (e.g. "YYYYMMDD.hashId")
-  -l, --log-level string  Set the logging level ("debug"|"info"|"warn"|"error"|"fatal") (default "info")
-      --skip-checks       Skip pre-release checks. WARNING! Use this option if you know what you do!
-```
-
-More information is available in [Developer Guide](doc/Developer-Guide.md).
-
-
-
-## Upstream
-
-The code in the current repository is mainly based on the upstream [projector-docker](https://github.com/JetBrains/projector-docker) with the modifications, that allows to run JetBrains products inside Eclipse Che infractructure.
-
-
-
-## Tested IDEs
-
-During the manual build, it is possible to provide an optional `downloadUrl` parameter of an IDE packaging.
-
-You can find the up-to-date list of tested IDEs here: [Compatible-IDE.md](doc/Compatible-IDE.md).
-
-
+To set the port which will be used by Projector Server for WebSocket, use the `-Dorg.jetbrains.projector.server.port=8001` System Property.
 
 ## Contributing
+[CONTRIBUTING.md](https://github.com/JetBrains/projector-server/blob/master/docs/CONTRIBUTING.md).
 
-The guide which provides necessary information how to build different JetBrains IDEs, you can find here: [Developer-Guide.md](doc/Developer-Guide.md).
+## License
+[GPLv2+CPE](LICENSE.txt).

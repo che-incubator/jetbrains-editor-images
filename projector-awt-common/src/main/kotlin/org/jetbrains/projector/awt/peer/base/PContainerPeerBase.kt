@@ -21,17 +21,25 @@
  * Please contact JetBrains, Na Hrebenech II 1718/10, Prague, 14000, Czech Republic
  * if you need additional information or have any questions.
  */
+@file:Suppress("JAVA_MODULE_DOES_NOT_EXPORT_PACKAGE")
 
-plugins {
-  kotlin("jvm")
-  application
-  `maven-publish`
-}
+package org.jetbrains.projector.awt.peer.base
 
-applyCommonServerConfiguration(application)
+import java.awt.Container
+import java.awt.Insets
+import java.awt.peer.ContainerPeer
 
-kotlin {
-  jvmToolchain {
-    (this as JavaToolchainSpec).languageVersion.set(JavaLanguageVersion.of(11))
+abstract class PContainerPeerBase(target: Container) : PComponentPeerBase(target), ContainerPeer {
+
+  override fun getInsets(): Insets {
+    return Insets(0, 0, 0, 0)
   }
+
+  override fun beginLayout() {}
+
+  override fun endLayout() {}
+
+  override fun beginValidate() {}
+
+  override fun endValidate() {}
 }

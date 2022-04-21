@@ -21,17 +21,29 @@
  * Please contact JetBrains, Na Hrebenech II 1718/10, Prague, 14000, Czech Republic
  * if you need additional information or have any questions.
  */
+@file:Suppress("JAVA_MODULE_DOES_NOT_EXPORT_PACKAGE")
 
-plugins {
-  kotlin("jvm")
-  application
-  `maven-publish`
-}
+package org.jetbrains.projector.awt.peer.base
 
-applyCommonServerConfiguration(application)
+import java.awt.Adjustable
+import java.awt.ScrollPane
+import java.awt.peer.ScrollPanePeer
 
-kotlin {
-  jvmToolchain {
-    (this as JavaToolchainSpec).languageVersion.set(JavaLanguageVersion.of(11))
+abstract class PScrollPanePeerBase(target: ScrollPane) : PContainerPeerBase(target), ScrollPanePeer {
+
+  override fun getHScrollbarHeight(): Int {
+    return 0
   }
+
+  override fun getVScrollbarWidth(): Int {
+    return 0
+  }
+
+  override fun setScrollPosition(x: Int, y: Int) {}
+
+  override fun childResized(w: Int, h: Int) {}
+
+  override fun setUnitIncrement(adj: Adjustable, u: Int) {}
+
+  override fun setValue(adj: Adjustable, v: Int) {}
 }

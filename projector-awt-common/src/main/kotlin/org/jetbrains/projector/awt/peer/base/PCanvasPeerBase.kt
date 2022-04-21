@@ -21,17 +21,17 @@
  * Please contact JetBrains, Na Hrebenech II 1718/10, Prague, 14000, Czech Republic
  * if you need additional information or have any questions.
  */
+@file:Suppress("JAVA_MODULE_DOES_NOT_EXPORT_PACKAGE")
 
-plugins {
-  kotlin("jvm")
-  application
-  `maven-publish`
-}
+package org.jetbrains.projector.awt.peer.base
 
-applyCommonServerConfiguration(application)
+import java.awt.Canvas
+import java.awt.GraphicsConfiguration
+import java.awt.peer.CanvasPeer
 
-kotlin {
-  jvmToolchain {
-    (this as JavaToolchainSpec).languageVersion.set(JavaLanguageVersion.of(11))
+abstract class PCanvasPeerBase(target: Canvas) : PComponentPeerBase(target), CanvasPeer {
+
+  override fun getAppropriateGraphicsConfiguration(gc: GraphicsConfiguration): GraphicsConfiguration {
+    return gc
   }
 }

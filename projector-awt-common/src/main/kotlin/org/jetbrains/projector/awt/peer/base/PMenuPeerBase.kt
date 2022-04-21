@@ -21,17 +21,17 @@
  * Please contact JetBrains, Na Hrebenech II 1718/10, Prague, 14000, Czech Republic
  * if you need additional information or have any questions.
  */
+@file:Suppress("JAVA_MODULE_DOES_NOT_EXPORT_PACKAGE")
 
-plugins {
-  kotlin("jvm")
-  application
-  `maven-publish`
-}
+package org.jetbrains.projector.awt.peer.base
 
-applyCommonServerConfiguration(application)
+import org.jetbrains.projector.awt.peer.PMenuItemPeer
+import java.awt.MenuItem
+import java.awt.peer.MenuPeer
 
-kotlin {
-  jvmToolchain {
-    (this as JavaToolchainSpec).languageVersion.set(JavaLanguageVersion.of(11))
-  }
+abstract class PMenuPeerBase : PMenuItemPeer(), MenuPeer {
+
+  override fun addItem(item: MenuItem) {}
+
+  override fun delItem(index: Int) {}
 }

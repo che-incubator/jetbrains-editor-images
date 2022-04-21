@@ -21,17 +21,46 @@
  * Please contact JetBrains, Na Hrebenech II 1718/10, Prague, 14000, Czech Republic
  * if you need additional information or have any questions.
  */
+import org.jetbrains.kotlin.gradle.dsl.KotlinCompile
+import org.jetbrains.kotlin.gradle.dsl.KotlinJvmCompile
 
 plugins {
-  kotlin("jvm")
-  application
+  kotlin("jvm") apply false
   `maven-publish`
 }
 
-applyCommonServerConfiguration(application)
+val kotlinVersion: String by project
+val targetJvm: String by project
 
-kotlin {
-  jvmToolchain {
-    (this as JavaToolchainSpec).languageVersion.set(JavaLanguageVersion.of(11))
+subprojects {
+  group = "org.jetbrains.projector"
+
+  repositories {
+    mavenCentral()
+    maven("https://jitpack.io")
+    maven("https://www.jetbrains.com/intellij-repository/releases")
+    maven("https://cache-redirector.jetbrains.com/intellij-dependencies")
+  }
+
+  val jvmVersion = when {
+    name.endsWith("jdk17") -> "17"
+    else -> targetJvm
+  }
+
+  tasks.withType<JavaCompile> {
+    sourceCompatibility = jvmVersion
+  }
+
+  tasks.withType<KotlinCompile<*>> {
+    kotlinOptions {
+      freeCompilerArgs = freeCompilerArgs + "-Xopt-in=kotlin.RequiresOptIn"
+      //allWarningsAsErrors = true  // todo: resolve "different Kotlin JARs in runtime classpath" and "bundled Kotlin runtime"
+    }
+  }
+
+  tasks.withType<KotlinJvmCompile> {
+    kotlinOptions {
+      jvmTarget = jvmVersion
+    }
   }
 }

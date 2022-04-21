@@ -21,17 +21,29 @@
  * Please contact JetBrains, Na Hrebenech II 1718/10, Prague, 14000, Czech Republic
  * if you need additional information or have any questions.
  */
+@file:Suppress("JAVA_MODULE_DOES_NOT_EXPORT_PACKAGE")
 
-plugins {
-  kotlin("jvm")
-  application
-  `maven-publish`
-}
+package org.jetbrains.projector.awt.peer.base
 
-applyCommonServerConfiguration(application)
+import org.jetbrains.projector.awt.peer.PTextComponentPeer
+import java.awt.Dimension
+import java.awt.TextField
+import java.awt.im.InputMethodRequests
+import java.awt.peer.TextFieldPeer
 
-kotlin {
-  jvmToolchain {
-    (this as JavaToolchainSpec).languageVersion.set(JavaLanguageVersion.of(11))
+abstract class PTextFieldPeerBase(target: TextField) : PTextComponentPeer(target), TextFieldPeer {
+
+  override fun getInputMethodRequests(): InputMethodRequests? {
+    return null
+  }
+
+  override fun setEchoChar(echoChar: Char) {}
+
+  override fun getPreferredSize(columns: Int): Dimension? {
+    return null
+  }
+
+  override fun getMinimumSize(columns: Int): Dimension? {
+    return null
   }
 }

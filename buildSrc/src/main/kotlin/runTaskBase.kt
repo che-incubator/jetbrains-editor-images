@@ -22,16 +22,35 @@
  * if you need additional information or have any questions.
  */
 
-plugins {
-  kotlin("jvm")
-  application
-  `maven-publish`
-}
+import org.gradle.api.Project
+import org.gradle.api.plugins.ExtensionAware
+import org.gradle.api.tasks.JavaExec
+import org.gradle.api.tasks.SourceSetContainer
+import org.gradle.jvm.tasks.Jar
+import org.gradle.kotlin.dsl.get
+import org.gradle.kotlin.dsl.named
+import org.gradle.kotlin.dsl.task
 
-applyCommonServerConfiguration(application)
+public fun Project.createRunProjectorTask(
+  name: String,
+  classToLaunchProperty: String,
+  classToLaunch: String,
+  launcherClassName: String,
+  configuration: JavaExec.() -> Unit,
+) {
 
-kotlin {
-  jvmToolchain {
-    (this as JavaToolchainSpec).languageVersion.set(JavaLanguageVersion.of(11))
+  task<JavaExec>(name) {
+    group = "projector"
+    mainClass.set(launcherClassName)
+    classpath(sourceSets["main"].runtimeClasspath, tasks.named<Jar>("jar"))
+    jvmArgs(
+      "-D$classToLaunchProperty=$classToLaunch",
+      "-Djdk.attach.allowAttachSelf=true",
+    )
+    jvmArgs(openAndExportJvmArgs)
+    configuration()
   }
 }
+
+private val Project.sourceSets: SourceSetContainer
+  get() = (this as ExtensionAware).extensions.getByName("sourceSets") as SourceSetContainer

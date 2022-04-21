@@ -21,14 +21,20 @@
  * Please contact JetBrains, Na Hrebenech II 1718/10, Prague, 14000, Czech Republic
  * if you need additional information or have any questions.
  */
-
 plugins {
   kotlin("jvm")
-  application
   `maven-publish`
 }
 
-applyCommonServerConfiguration(application)
+publishToSpace()
+
+val kotlinVersion: String by project
+version = project(":projector-server-common").version
+
+dependencies {
+  api(project(":projector-awt-common"))
+  testImplementation(kotlin("test", kotlinVersion))
+}
 
 kotlin {
   jvmToolchain {

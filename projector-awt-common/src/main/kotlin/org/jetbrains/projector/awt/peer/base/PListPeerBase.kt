@@ -21,17 +21,39 @@
  * Please contact JetBrains, Na Hrebenech II 1718/10, Prague, 14000, Czech Republic
  * if you need additional information or have any questions.
  */
+@file:Suppress("JAVA_MODULE_DOES_NOT_EXPORT_PACKAGE")
 
-plugins {
-  kotlin("jvm")
-  application
-  `maven-publish`
-}
+package org.jetbrains.projector.awt.peer.base
 
-applyCommonServerConfiguration(application)
+import java.awt.Dimension
+import java.awt.List
+import java.awt.peer.ListPeer
 
-kotlin {
-  jvmToolchain {
-    (this as JavaToolchainSpec).languageVersion.set(JavaLanguageVersion.of(11))
+abstract class PListPeerBase(target: List) : PComponentPeerBase(target, isFocusable = true), ListPeer {
+
+  override fun getSelectedIndexes(): IntArray? {
+    return null
+  }
+
+  override fun add(item: String, index: Int) {}
+
+  override fun delItems(start: Int, end: Int) {}
+
+  override fun removeAll() {}
+
+  override fun select(index: Int) {}
+
+  override fun deselect(index: Int) {}
+
+  override fun makeVisible(index: Int) {}
+
+  override fun setMultipleMode(m: Boolean) {}
+
+  override fun getPreferredSize(rows: Int): Dimension? {
+    return null
+  }
+
+  override fun getMinimumSize(v: Int): Dimension? {
+    return null
   }
 }

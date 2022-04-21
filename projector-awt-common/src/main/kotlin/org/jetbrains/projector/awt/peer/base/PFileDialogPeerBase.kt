@@ -21,17 +21,19 @@
  * Please contact JetBrains, Na Hrebenech II 1718/10, Prague, 14000, Czech Republic
  * if you need additional information or have any questions.
  */
+@file:Suppress("JAVA_MODULE_DOES_NOT_EXPORT_PACKAGE")
 
-plugins {
-  kotlin("jvm")
-  application
-  `maven-publish`
-}
+package org.jetbrains.projector.awt.peer.base
 
-applyCommonServerConfiguration(application)
+import java.awt.FileDialog
+import java.awt.peer.FileDialogPeer
+import java.io.FilenameFilter
 
-kotlin {
-  jvmToolchain {
-    (this as JavaToolchainSpec).languageVersion.set(JavaLanguageVersion.of(11))
-  }
+abstract class PFileDialogPeerBase(target: FileDialog) : PDialogPeerBase(target), FileDialogPeer {
+
+  override fun setFile(file: String) {}
+
+  override fun setDirectory(dir: String) {}
+
+  override fun setFilenameFilter(filter: FilenameFilter) {}
 }

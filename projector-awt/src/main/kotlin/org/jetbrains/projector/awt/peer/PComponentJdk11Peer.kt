@@ -21,17 +21,32 @@
  * Please contact JetBrains, Na Hrebenech II 1718/10, Prague, 14000, Czech Republic
  * if you need additional information or have any questions.
  */
+@file:Suppress("JAVA_MODULE_DOES_NOT_EXPORT_PACKAGE")
 
-plugins {
-  kotlin("jvm")
-  application
-  `maven-publish`
-}
+package org.jetbrains.projector.awt.peer
 
-applyCommonServerConfiguration(application)
+import sun.awt.image.ToolkitImage
+import java.awt.Image
+import java.awt.Toolkit
+import java.awt.image.ImageObserver
+import java.awt.image.ImageProducer
+import java.awt.peer.ComponentPeer
 
-kotlin {
-  jvmToolchain {
-    (this as JavaToolchainSpec).languageVersion.set(JavaLanguageVersion.of(11))
+interface PComponentJdk11Peer : ComponentPeer {
+
+  private val toolkit: Toolkit
+    get() = Toolkit.getDefaultToolkit()
+
+  override fun createImage(producer: ImageProducer?): Image {
+    return ToolkitImage(producer)
   }
+
+  override fun prepareImage(img: Image, w: Int, h: Int, o: ImageObserver?): Boolean {
+    return toolkit.prepareImage(img, w, h, o)
+  }
+
+  override fun checkImage(img: Image, w: Int, h: Int, o: ImageObserver?): Int {
+    return toolkit.checkImage(img, w, h, o)
+  }
+
 }

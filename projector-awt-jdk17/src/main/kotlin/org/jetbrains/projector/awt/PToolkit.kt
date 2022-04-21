@@ -21,17 +21,6 @@
  * Please contact JetBrains, Na Hrebenech II 1718/10, Prague, 14000, Czech Republic
  * if you need additional information or have any questions.
  */
+package org.jetbrains.projector.awt
 
-plugins {
-  kotlin("jvm")
-  application
-  `maven-publish`
-}
-
-applyCommonServerConfiguration(application)
-
-kotlin {
-  jvmToolchain {
-    (this as JavaToolchainSpec).languageVersion.set(JavaLanguageVersion.of(11))
-  }
-}
+class PToolkit : PToolkitBase(PPeerFactoryJdk17)

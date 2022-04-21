@@ -22,16 +22,12 @@
  * if you need additional information or have any questions.
  */
 
-plugins {
-  kotlin("jvm")
-  application
-  `maven-publish`
-}
+import org.gradle.api.Project
+import org.gradle.api.tasks.testing.Test
+import org.gradle.kotlin.dsl.withType
 
-applyCommonServerConfiguration(application)
-
-kotlin {
-  jvmToolchain {
-    (this as JavaToolchainSpec).languageVersion.set(JavaLanguageVersion.of(11))
+public fun Project.setupTesting() {
+  tasks.withType<Test> {
+    jvmArgs(openAndExportJvmArgs)
   }
 }

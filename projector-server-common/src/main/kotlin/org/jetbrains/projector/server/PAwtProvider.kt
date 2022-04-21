@@ -21,17 +21,14 @@
  * Please contact JetBrains, Na Hrebenech II 1718/10, Prague, 14000, Czech Republic
  * if you need additional information or have any questions.
  */
+package org.jetbrains.projector.server
 
-plugins {
-  kotlin("jvm")
-  application
-  `maven-publish`
-}
+import org.jetbrains.projector.awt.PToolkitBase
 
-applyCommonServerConfiguration(application)
+interface PAwtProvider {
 
-kotlin {
-  jvmToolchain {
-    (this as JavaToolchainSpec).languageVersion.set(JavaLanguageVersion.of(11))
-  }
+  fun createToolkit(): PToolkitBase
+
+  val toolkitClass: Class<out PToolkitBase>
+
 }

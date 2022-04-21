@@ -21,17 +21,38 @@
  * Please contact JetBrains, Na Hrebenech II 1718/10, Prague, 14000, Czech Republic
  * if you need additional information or have any questions.
  */
+@file:Suppress("JAVA_MODULE_DOES_NOT_EXPORT_PACKAGE")
 
-plugins {
-  kotlin("jvm")
-  application
-  `maven-publish`
-}
+package org.jetbrains.projector.awt.peer.base
 
-applyCommonServerConfiguration(application)
+import java.awt.Frame
+import java.awt.MenuBar
+import java.awt.Rectangle
+import java.awt.peer.FramePeer
 
-kotlin {
-  jvmToolchain {
-    (this as JavaToolchainSpec).languageVersion.set(JavaLanguageVersion.of(11))
+abstract class PFramePeerBase(target: Frame) : PWindowPeerBase(target), FramePeer {
+
+  override fun setTitle(title: String?) {
+    pWindow.title = title
   }
+
+  override fun setMenuBar(mb: MenuBar) {}
+
+  override fun setResizable(resizeable: Boolean) {}
+
+  override fun setState(state: Int) {}
+
+  override fun getState(): Int {
+    return 0
+  }
+
+  override fun setMaximizedBounds(bounds: Rectangle?) {}
+
+  override fun setBoundsPrivate(x: Int, y: Int, width: Int, height: Int) {}
+
+  override fun getBoundsPrivate(): Rectangle? {
+    return null
+  }
+
+  override fun emulateActivation(b: Boolean) {}
 }

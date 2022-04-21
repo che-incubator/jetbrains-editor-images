@@ -21,17 +21,19 @@
  * Please contact JetBrains, Na Hrebenech II 1718/10, Prague, 14000, Czech Republic
  * if you need additional information or have any questions.
  */
+@file:Suppress("JAVA_MODULE_DOES_NOT_EXPORT_PACKAGE")
 
-plugins {
-  kotlin("jvm")
-  application
-  `maven-publish`
-}
+package org.jetbrains.projector.awt.peer.base
 
-applyCommonServerConfiguration(application)
+import java.awt.Checkbox
+import java.awt.CheckboxGroup
+import java.awt.peer.CheckboxPeer
 
-kotlin {
-  jvmToolchain {
-    (this as JavaToolchainSpec).languageVersion.set(JavaLanguageVersion.of(11))
-  }
+abstract class PCheckboxPeerBase(target: Checkbox) : PComponentPeerBase(target, isFocusable = true), CheckboxPeer {
+
+  override fun setState(state: Boolean) {}
+
+  override fun setCheckboxGroup(g: CheckboxGroup) {}
+
+  override fun setLabel(label: String) {}
 }

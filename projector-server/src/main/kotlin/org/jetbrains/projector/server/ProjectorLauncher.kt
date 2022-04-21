@@ -21,17 +21,30 @@
  * Please contact JetBrains, Na Hrebenech II 1718/10, Prague, 14000, Czech Republic
  * if you need additional information or have any questions.
  */
+package org.jetbrains.projector.server
 
-plugins {
-  kotlin("jvm")
-  application
-  `maven-publish`
-}
+import org.jetbrains.projector.server.core.ij.log.DelegatingJvmLogger
+import org.jetbrains.projector.util.logging.Logger
 
-applyCommonServerConfiguration(application)
+object ProjectorLauncher : ProjectorLauncherBase() {
 
-kotlin {
-  jvmToolchain {
-    (this as JavaToolchainSpec).languageVersion.set(JavaLanguageVersion.of(11))
+  @JvmStatic
+  fun main(args: Array<String>) {
+    start(args, PAwtProviderJdk11)
   }
+
+  @JvmStatic
+  fun runProjectorServer() = runProjectorServer(PAwtProviderJdk11)
+
+  // For compatibility with CWM
+  @Suppress("unused")
+  private object Starter : ProjectorStarter() {
+
+    // "invoked from CWM code as the generic launcher can't be used there"
+    @JvmStatic
+    @JvmOverloads
+    fun runProjectorServer(loggerFactory: (tag: String) -> Logger = ::DelegatingJvmLogger) = runProjectorServer(PAwtProviderJdk11, loggerFactory)
+
+  }
+
 }
