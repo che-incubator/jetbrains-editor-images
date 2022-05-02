@@ -32,7 +32,7 @@
 #       * asset-static-assembly.tar.gz - archived `static/` directory.
 # https://access.redhat.com/containers/?tab=tags#/registry.access.redhat.com/ubi8
 FROM registry.access.redhat.com/ubi8/ubi:8.5-214 as ubi-builder
-COPY --chown=0:0 cve-fixed-packages /tmp/cve-fixed-packages
+COPY --chown=0:0 asset-required-rpms.txt /tmp/cve-fixed-packages
 
 RUN mkdir -p /mnt/rootfs
 RUN yum install unzip -y --nodocs && \
@@ -42,7 +42,7 @@ RUN yum install unzip -y --nodocs && \
         java-11-openjdk-devel \
         python2 python39 \
         libXext libXrender libXtst libXi \
-        $(cat /tmp/cve-fixed-packages) \
+        $(cat /tmp/asset-required-rpms.txt) \
             --releasever 8 --setopt install_weak_deps=false --nodocs -y && \
     yum --installroot /mnt/rootfs clean all
 RUN rm -rf /mnt/rootfs/var/cache/* /mnt/rootfs/var/log/dnf* /mnt/rootfs/var/log/yum.*
