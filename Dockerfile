@@ -32,26 +32,17 @@
 #       * asset-static-assembly.tar.gz - archived `static/` directory.
 # https://access.redhat.com/containers/?tab=tags#/registry.access.redhat.com/ubi8
 FROM registry.access.redhat.com/ubi8/ubi:8.5-214 as ubi-builder
+COPY --chown=0:0 cve-fixed-packages /tmp/cve-fixed-packages
+
 RUN mkdir -p /mnt/rootfs
 RUN yum install unzip -y --nodocs && \
-    if [[ $(uname -m) == "s390x" ]]; then LIBSECRET="\
-        https://rpmfind.net/linux/fedora-secondary/releases/34/Everything/s390x/os/Packages/l/libsecret-0.20.4-2.fc34.s390x.rpm \
-        https://rpmfind.net/linux/fedora-secondary/releases/34/Everything/s390x/os/Packages/l/libsecret-devel-0.20.4-2.fc34.s390x.rpm \
-        glib2-devel pcre-cpp pcre-devel pcre-utf16 pcre-utf32"; \
-    elif [[ $(uname -m) == "ppc64le" ]]; then LIBSECRET="\
-        https://rpmfind.net/linux/centos/8-stream/BaseOS/ppc64le/os/Packages/libsecret-devel-0.18.6-1.el8.ppc64le.rpm \
-        libsecret"; \
-    elif [[ $(uname -m) == "x86_64" ]]; then LIBSECRET="\
-        https://rpmfind.net/linux/centos/8-stream/BaseOS/x86_64/os/Packages/libsecret-devel-0.18.6-1.el8.x86_64.rpm \
-        libsecret"; \
-    fi && \
     yum install --installroot /mnt/rootfs \
         brotli libstdc++ coreutils glibc-minimal-langpack \
         jq shadow-utils wget git nss procps findutils which socat \
         java-11-openjdk-devel \
         python2 python39 \
         libXext libXrender libXtst libXi \
-        $LIBSECRET \
+        $(cat /tmp/cve-fixed-packages) \
             --releasever 8 --setopt install_weak_deps=false --nodocs -y && \
     yum --installroot /mnt/rootfs clean all
 RUN rm -rf /mnt/rootfs/var/cache/* /mnt/rootfs/var/log/dnf* /mnt/rootfs/var/log/yum.*
