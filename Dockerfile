@@ -84,7 +84,7 @@ FROM registry.access.redhat.com/ubi8-minimal:8.5-240.1648458092
 ENV HOME=/home/projector
 ENV PROJECTOR_ASSEMBLY_DIR /projector
 ENV PROJECTOR_CONFIG_DIR $HOME/.jetbrains
-COPY --from=ubi-builder /mnt/rootfs/ /
+COPY --chown=0:0 --from=ubi-builder ./mnt/rootfs/ .
 USER 1001
 EXPOSE 8887
 ENTRYPOINT $PROJECTOR_ASSEMBLY_DIR/entrypoint.sh
