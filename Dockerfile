@@ -77,6 +77,7 @@ RUN for f in "/mnt/rootfs/bin/" "/mnt/rootfs/home/projector" "/mnt/rootfs/etc/pa
            chmod -R g+rwX ${f}; \
     done
 
+RUN rm /mnt/rootfs/etc/hosts
 
 # Stage 2. Copy from build environment Projector assembly to the runtime. Projector runs in headless mode.
 # https://access.redhat.com/containers/?tab=tags#/registry.access.redhat.com/ubi8-minimal
