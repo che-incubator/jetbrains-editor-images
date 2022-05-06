@@ -92,6 +92,13 @@ read -r -d '' UPDATES_XML <<-EOM
 </application>
 EOM
 
+WEB_BROWSERS_XML_PATH="$CONFIG_OPTIONS_DIR/web-browsers.xml"
+read -r -d '' WEB_BROWSERS_XML <<-EOM
+<application>
+  <component name="WebBrowsersConfiguration" showHover="false" />
+</application>
+EOM
+
 createConfigFiles() {
   mkdir -p "$CONFIG_OPTIONS_DIR"
 
@@ -118,6 +125,9 @@ createConfigFiles() {
 
   echo "Creating '$UPDATES_XML_PATH'"
   echo "$UPDATES_XML" > "$UPDATES_XML_PATH"
+
+  echo "Creating '$WEB_BROWSERS_XML_PATH'"
+  echo "$WEB_BROWSERS_XML" > "$WEB_BROWSERS_XML_PATH"
 }
 
 # copy default configuration if it doesn't exist

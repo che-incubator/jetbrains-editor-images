@@ -5,23 +5,28 @@
     "productCode": "IC",
     "productVersion": [
       {
-        "version": "2020.3.4",
-        "downloadUrl": "https://download-cdn.jetbrains.com/idea/ideaIC-2020.3.4.tar.gz",
+        "version": "2022.1",
+        "downloadUrl": "https://download-cdn.jetbrains.com/idea/ideaIC-2022.1.tar.gz",
         "latest": true
       },
       {
-        "version": "2020.3.3",
-        "downloadUrl": "https://download-cdn.jetbrains.com/idea/ideaIC-2020.3.3.tar.gz",
+        "version": "2021.3",
+        "downloadUrl": "https://download-cdn.jetbrains.com/idea/ideaIC-2021.3.3.tar.gz",
         "latest": false
       },
       {
-        "version": "2020.3.2",
-        "downloadUrl": "https://download-cdn.jetbrains.com/idea/ideaIC-2020.3.2.tar.gz",
+        "version": "2021.2",
+        "downloadUrl": "https://download-cdn.jetbrains.com/idea/ideaIC-2021.2.4.tar.gz",
         "latest": false
       },
       {
-        "version": "2020.3.1",
-        "downloadUrl": "https://download-cdn.jetbrains.com/idea/ideaIC-2020.3.1.tar.gz",
+        "version": "2021.1",
+        "downloadUrl": "https://download-cdn.jetbrains.com/idea/ideaIC-2021.1.3.tar.gz",
+        "latest": false
+      },
+      {
+        "version": "2020.3",
+        "downloadUrl": "https://download-cdn.jetbrains.com/idea/ideaIC-2020.3.4.tar.gz",
         "latest": false
       }
     ]
@@ -32,33 +37,28 @@
     "productCode": "PY",
     "productVersion": [
       {
-        "version": "2020.3.5",
-        "downloadUrl": "https://download-cdn.jetbrains.com/python/pycharm-community-2020.3.5.tar.gz",
+        "version": "2022.1",
+        "downloadUrl": "https://download-cdn.jetbrains.com/python/pycharm-community-2022.1.tar.gz",
         "latest": true
       },
       {
-        "version": "2020.3.4",
-        "downloadUrl": "https://download-cdn.jetbrains.com/python/pycharm-community-2020.3.4.tar.gz",
+        "version": "2021.3",
+        "downloadUrl": "https://download-cdn.jetbrains.com/python/pycharm-community-2021.3.3.tar.gz",
         "latest": false
       },
       {
-        "version": "2020.3.3",
-        "downloadUrl": "https://download-cdn.jetbrains.com/python/pycharm-community-2020.3.3.tar.gz",
+        "version": "2021.2",
+        "downloadUrl": "https://download-cdn.jetbrains.com/python/pycharm-community-2021.2.4.tar.gz",
         "latest": false
       },
       {
-        "version": "2020.3.2",
-        "downloadUrl": "https://download-cdn.jetbrains.com/python/pycharm-community-2020.3.2.tar.gz",
-        "latest": false
-      },
-      {
-        "version": "2020.3.1",
-        "downloadUrl": "https://download-cdn.jetbrains.com/python/pycharm-community-2020.3.1.tar.gz",
+        "version": "2021.1",
+        "downloadUrl": "https://download-cdn.jetbrains.com/python/pycharm-community-2021.1.3.tar.gz",
         "latest": false
       },
       {
         "version": "2020.3",
-        "downloadUrl": "https://download-cdn.jetbrains.com/python/pycharm-community-2020.3.tar.gz",
+        "downloadUrl": "https://download-cdn.jetbrains.com/python/pycharm-community-2020.3.5.tar.gz",
         "latest": false
       }
     ]

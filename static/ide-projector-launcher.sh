@@ -103,11 +103,14 @@ cp "$IDE_RUN_FILE_NAME.sh" "$IDE_RUN_FILE_NAME-projector.sh"
 # classpath "$CLASSPATH:$IDE_HOME/projector-server/lib/*"
 sed -i 's+classpath "$CLASSPATH"+classpath "$CLASSPATH:$IDE_HOME/projector-server/lib/*"+g' "$IDE_RUN_FILE_NAME-projector.sh"
 
+# update classpath for 2022
+sed -i 's+classpath "$CLASS_PATH"+classpath "$CLASS_PATH:$IDE_HOME/projector-server/lib/*"+g' "$IDE_RUN_FILE_NAME-projector.sh"
+
 # change
 # com.intellij.idea.Main
 # to
 # -Dorg.jetbrains.projector.server.classToLaunch=com.intellij.idea.Main org.jetbrains.projector.server.ProjectorLauncher
-sed -i 's+com.intellij.idea.Main+-Drsch.send.usage.stat=false -Djb.consents.confirmation.enabled=false -Didea.suppress.statistics.report=true -Dorg.jetbrains.projector.server.classToLaunch=com.intellij.idea.Main org.jetbrains.projector.server.ProjectorLauncher+g' "$IDE_RUN_FILE_NAME-projector.sh"
+sed -i 's+com.intellij.idea.Main+-Drsch.send.usage.stat=false -Djb.consents.confirmation.enabled=false -Didea.suppress.statistics.report=true -Dide.browser.jcef.enabled=false -Dorg.jetbrains.projector.server.classToLaunch=com.intellij.idea.Main org.jetbrains.projector.server.ProjectorLauncher+g' "$IDE_RUN_FILE_NAME-projector.sh"
 
 pathCandidate=""
 
