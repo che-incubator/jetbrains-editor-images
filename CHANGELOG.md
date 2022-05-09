@@ -1,6 +1,56 @@
 # Changelog
 This document reflects the project's changes made after each release cycle
 
+## [20220509]
+
+### News
+
+Provided ability to build the IntelliJ IDEA Community Edition and PyCharm Community Edition version 2022 and 2021.
+  
+Due to optimisation images build the following images will not build:
+
+- `che-idea:2020.3.3`
+- `che-idea:2020.3.2`
+- `che-idea:2020.3.1`
+- `che-pycharm:2020.3.4`
+- `che-pycharm:2020.3.3`
+- `che-pycharm:2020.3.2`
+- `che-pycharm:2020.3.1`
+
+How the new release scheme will work?
+
+IntelliJ IDEA Community Edition released major version `2021.3`, but from the download page it allows downloading the latest version `2021.3.3`, so this version will be used for image `che-idea:2021.3` and the same approach for other major versions. This has been done for image count optimisation. There is a need to avoid a huge bunch of images, which needs to be maintained.
+  
+So with this update there will be a following list of images pushed to [quay.io](https://quay.io):
+
+- `che-idea:2022.1` - with latest released version `2022.1`
+- `che-idea:2021.3` - with latest released minor version `2021.3.3`
+- `che-idea:2021.2` - with latest released minor version `2021.2.4`
+- `che-idea:2021.1` - with latest released minor version `2021.1.3`
+- `che-idea:2020.3` - with latest released minor version `2020.3.4`
+- `che-pycharm:2022.1` - with latest released version `2022.1`
+- `che-pycharm:2021.3` - with latest released minor version `2021.3.3`
+- `che-pycharm:2021.2` - with latest released minor version `2021.2.4`
+- `che-pycharm:2021.1` - with latest released minor version `2021.1.3`
+- `che-pycharm:2020.3` - with latest released minor version `2020.3.5`
+
+Further, when IntelliJ IDEA Community Edition or PyCharm Community Edition `2022.1` will release e.g. `2022.1.2`, this version will be used for `che-idea:2022.1` or `che-pycharm:2022.1` correspondingly.
+
+Related changes made withing [#112](https://github.com/che-incubator/jetbrains-editor-images/pull/112)
+
+---
+
+- Updated ubi8 image to 8.5-239.1651231664 ([#113](https://github.com/che-incubator/jetbrains-editor-images/pull/113))
+- Updated ubi8-minimal image to 8.5-243.1651231653 ([#106](https://github.com/che-incubator/jetbrains-editor-images/pull/106))
+- Updated Projector Server sources to [847e4010](https://github.com/JetBrains/projector-client/commit/847e401026d6ce4c6bfb0c04d357066eb7f91761) ([#108](https://github.com/che-incubator/jetbrains-editor-images/pull/108))
+- Updated Projector Client sources to [93ea76b1](https://github.com/JetBrains/projector-server/commit/93ea76b1f8c45068913445493df0e9d04bfef5c2) ([#108](https://github.com/che-incubator/jetbrains-editor-images/pull/108))
+
+
+### Changed
+
+- JCEF has been disabled by system property `-Dide.browser.jcef.enabled=false` ([#112](https://github.com/che-incubator/jetbrains-editor-images/pull/112))
+- Update devfiles according to the latest changes ([#114](https://github.com/che-incubator/jetbrains-editor-images/pull/114))
+
 ## [20220413]
 
 ### News
