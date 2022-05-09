@@ -11,7 +11,7 @@ events:
 components:
   - name: che-idea-runtime-description
     container:
-      image: 'quay.io/devfile/universal-developer-image:ubi8-0e189d9'
+      image: 'quay.io/devfile/universal-developer-image:ubi8-9436df2'
       command:
         - /projector/entrypoint-volume.sh
       env:

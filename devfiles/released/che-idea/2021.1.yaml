@@ -11,7 +11,7 @@ events:
 components:
   - name: che-idea-runtime-description
     container:
-      image: 'quay.io/devfile/universal-developer-image:ubi8-0e189d9'
+      image: 'quay.io/devfile/universal-developer-image:ubi8-9436df2'
       command:
         - /projector/entrypoint-volume.sh
       env:
@@ -53,7 +53,7 @@ components:
     volume: { }
   - name: che-idea-injector
     container:
-      image: 'quay.io/che-incubator/che-idea:2020.3.1-next'
+      image: 'quay.io/che-incubator/che-idea:2021.1'
       command: ["/projector/entrypoint-init-container.sh"]
       env:
         - name: PROJECTOR_VOLUME_MOUNT
