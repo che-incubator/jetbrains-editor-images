@@ -70,25 +70,8 @@ jobs:
           ./projector.sh build \
               --tag ${{ secrets.QUAY_REPOSITORY }}/${{ matrix.dockerImage }}:${{ matrix.version }} \
               --url ${{ matrix.downloadUrl }} \
-              --save-on-build \
               --progress plain \
               --log-level debug
-      - name: Provide release asset path
-        id: release_asset_path
-        run: echo ::set-output name=path::build/docker/$(basename ${{ matrix.downloadUrl }})
-      - name: Provide release asset name
-        id: release_asset_name
-        run: echo ::set-output name=name::${{ steps.tag_name.outputs.sourceTag }}-$(basename ${{ matrix.downloadUrl }})
-      - name: Upload release asset
-        id: upload-release-asset
-        uses: actions/upload-release-asset@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          upload_url: ${{ needs.create_release.outputs.upload_url }}
-          asset_path: ${{ steps.release_asset_path.outputs.path }}
-          asset_name: ${{ steps.release_asset_name.outputs.name }}
-          asset_content_type: application/gzip
       - name: Publish released image to quay.io
         run: |
           # publish `repo/name:version`
