@@ -17,4 +17,16 @@
         <configurationType implementation="che.incubator.devfile.DevfileRunConfigurationType"/>
         <postStartupActivity implementation="che.incubator.devfile.DevfileRunConfigurationService"/>
     </extensions>
+
+    <actions>
+        <action
+                id="che.incubator.dashboard.OpenDashboardAction"
+                class="che.incubator.dashboard.OpenDashboardAction"
+                text="Open Dashboard"
+                description="Open dashboard">
+            <add-to-group group-id="WindowMenu" anchor="first"/>
+            <add-to-group group-id="NavBarToolBar" anchor="last"/>
+            <add-to-group group-id="MainToolBar" anchor="last"/>
+        </action>
+    </actions>
 </idea-plugin>
