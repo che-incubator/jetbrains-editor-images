@@ -19,4 +19,7 @@ fi
 # PROJECTOR_ASSEMBLY_DIR env variable provided by Docker environment
 cd "$PROJECTOR_ASSEMBLY_DIR"/ide/bin || exit
 
+export CHE_PLUGIN_DEV_MODE=true
+export PROJECT_SOURCE=/projects
+
 ./ide-projector-launcher.sh

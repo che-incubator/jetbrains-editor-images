@@ -1,0 +1,199 @@
+commands:
+  - apply:
+      component: che-idea-injector
+    attributes:
+      controller.devfile.io/imported-by: intellij-idea-community-edition-workspace76293fc23cb643d1
+    id: init-container-command
+  - exec:
+      commandLine: mvn package
+      component: tools
+      group:
+        isDefault: true
+        kind: build
+      workingDir: ${PROJECT_SOURCE}/getting-started
+    id: package
+  - exec:
+      commandLine: mvn package -Dnative -Dmaven.test.skip -Dquarkus.native.native-image-xmx=2G
+      component: tools
+      group:
+        kind: build
+      label: Package Native
+      workingDir: ${PROJECT_SOURCE}/getting-started
+    id: package-native
+  - exec:
+      commandLine: mvn compile quarkus:dev
+      component: dev
+      group:
+        isDefault: true
+        kind: run
+      label: Start Development mode (Hot reload + debug)
+      workingDir: ${PROJECT_SOURCE}/getting-started
+    id: start-dev
+  - exec:
+      commandLine: ./getting-started-1.0.0-SNAPSHOT-runner
+      component: ubi-minimal
+      group:
+        kind: run
+      label: Start Native
+      workingDir: ${PROJECT_SOURCE}/getting-started/target
+    id: start-native
+components:
+  - attributes:
+      app.kubernetes.io/component: che-idea-injector
+      app.kubernetes.io/part-of: che-idea.eclipse.org
+      controller.devfile.io/imported-by: intellij-idea-community-edition-workspace76293fc23cb643d1
+    container:
+      command:
+        - /projector/entrypoint-volume.sh
+      cpuLimit: 2000m
+      cpuRequest: 1500m
+      endpoints:
+        - attributes:
+            controller.devfile.io/endpoint-url: https://che-dogfooding.apps.che-dev.x6e0.p1.openshiftapps.com/workspace76293fc23cb643d1/che-idea-runtime-description/8887/?backgroundColor=434343&wss
+            cookiesAuthEnabled: true
+            discoverable: false
+            type: main
+            urlRewriteSupported: true
+          exposure: public
+          name: intellij
+          path: /?backgroundColor=434343&wss
+          protocol: http
+          secure: false
+          targetPort: 8887
+      env:
+        - name: PROJECTOR_ASSEMBLY_DIR
+          value: /projector
+        - name: PROJECTOR_CONFIG_DIR
+          value: /home/user/.jetbrains
+        - name: CHE_DASHBOARD_URL
+          value: https://che-dogfooding.apps.che-dev.x6e0.p1.openshiftapps.com
+        - name: CHE_PLUGIN_REGISTRY_URL
+          value: https://che-dogfooding.apps.che-dev.x6e0.p1.openshiftapps.com/plugin-registry/v3
+        - name: CHE_PLUGIN_REGISTRY_INTERNAL_URL
+          value: http://plugin-registry.dogfooding.svc:8080/v3
+      image: quay.io/devfile/universal-developer-image:ubi8-9436df2
+      memoryLimit: 6144Mi
+      memoryRequest: 2048Mi
+      sourceMapping: /projects
+      volumeMounts:
+        - name: projector-volume
+          path: /projector
+        - name: projector-configuration
+          path: /home/user/.jetbrains
+        - name: projector-java-configuration
+          path: /home/user/.java
+    name: che-idea-runtime-description
+  - attributes:
+      controller.devfile.io/imported-by: intellij-idea-community-edition-workspace76293fc23cb643d1
+    name: projector-volume
+    volume: {}
+  - attributes:
+      controller.devfile.io/imported-by: intellij-idea-community-edition-workspace76293fc23cb643d1
+    name: projector-configuration
+    volume: {}
+  - attributes:
+      controller.devfile.io/imported-by: intellij-idea-community-edition-workspace76293fc23cb643d1
+    name: projector-java-configuration
+    volume: {}
+  - attributes:
+      controller.devfile.io/imported-by: intellij-idea-community-edition-workspace76293fc23cb643d1
+    container:
+      command:
+        - /projector/entrypoint-init-container.sh
+      cpuLimit: 500m
+      cpuRequest: 30m
+      env:
+        - name: PROJECTOR_VOLUME_MOUNT
+          value: /projector-volume
+        - name: PROJECTOR_ASSEMBLY_DIR
+          value: /projector
+        - name: CHE_DASHBOARD_URL
+          value: https://che-dogfooding.apps.che-dev.x6e0.p1.openshiftapps.com
+        - name: CHE_PLUGIN_REGISTRY_URL
+          value: https://che-dogfooding.apps.che-dev.x6e0.p1.openshiftapps.com/plugin-registry/v3
+        - name: CHE_PLUGIN_REGISTRY_INTERNAL_URL
+          value: http://plugin-registry.dogfooding.svc:8080/v3
+      image: quay.io/vzhukovs/che-idea:commands
+      memoryLimit: 128Mi
+      memoryRequest: 32Mi
+      sourceMapping: /projects
+      volumeMounts:
+        - name: projector-volume
+          path: /projector-volume
+    name: che-idea-injector
+  - attributes:
+      app.kubernetes.io/component: telemetry
+      app.kubernetes.io/part-of: che-theia.eclipse.org
+      controller.devfile.io/imported-by: default-f00c9bc0a1587654ccb8
+      workspaceEnv:
+        - name: DEVWORKSPACE_TELEMETRY_BACKEND_PORT
+          value: "4167"
+    container:
+      env:
+        - name: WOOPRA_DOMAIN
+          value: test.sandbox
+        - name: SEGMENT_WRITE_KEY
+          value: 9inZE8hmlkWb0BQyJEWtdl6gRaAdOCVc
+      image: quay.io/eclipse/devworkspace-telemetry-woopra-plugin:e63545b
+    name: devworkspace-telemetry-woopra-plugin
+  - container:
+      endpoints:
+        - exposure: none
+          name: debug
+          protocol: tcp
+          targetPort: 5005
+        - attributes:
+            controller.devfile.io/endpoint-url: http://workspace76293fc23cb643d1-1.apps.che-dev.x6e0.p1.openshiftapps.com/hello/greeting/che-user
+          exposure: public
+          name: hello-greeting-endpoint
+          path: /hello/greeting/che-user
+          protocol: http
+          targetPort: 8080
+      env:
+        - name: QUARKUS_HTTP_HOST
+          value: 0.0.0.0
+        - name: CHE_DASHBOARD_URL
+          value: https://che-dogfooding.apps.che-dev.x6e0.p1.openshiftapps.com
+        - name: CHE_PLUGIN_REGISTRY_URL
+          value: https://che-dogfooding.apps.che-dev.x6e0.p1.openshiftapps.com/plugin-registry/v3
+        - name: CHE_PLUGIN_REGISTRY_INTERNAL_URL
+          value: http://plugin-registry.dogfooding.svc:8080/v3
+      image: quay.io/devfile/universal-developer-image:ubi8-3055e6d
+      memoryLimit: 4.7G
+      mountSources: true
+      sourceMapping: /projects
+      volumeMounts:
+        - name: m2
+          path: /home/user/.m2
+    name: tools
+  - container:
+      args:
+        - -f
+        - /dev/null
+      command:
+        - tail
+      env:
+        - name: CHE_DASHBOARD_URL
+          value: https://che-dogfooding.apps.che-dev.x6e0.p1.openshiftapps.com
+        - name: CHE_PLUGIN_REGISTRY_URL
+          value: https://che-dogfooding.apps.che-dev.x6e0.p1.openshiftapps.com/plugin-registry/v3
+        - name: CHE_PLUGIN_REGISTRY_INTERNAL_URL
+          value: http://plugin-registry.dogfooding.svc:8080/v3
+      image: registry.access.redhat.com/ubi8/ubi-minimal
+      memoryLimit: 64M
+      mountSources: true
+      sourceMapping: /projects
+    name: ubi-minimal
+  - name: m2
+    volume:
+      size: 1G
+events:
+  preStart:
+    - init-container-command
+projects:
+  - git:
+      checkoutFrom:
+        revision: devfilev2
+      remotes:
+        origin: https://github.com/vzhukovs/quarkus-quickstarts.git
+    name: quarkus-quickstarts

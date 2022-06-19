@@ -72,6 +72,8 @@ COPY --chown=0:0 asset-che-plugin-assembly.zip .
 RUN unzip asset-che-plugin-assembly.zip && rm asset-che-plugin-assembly.zip && \
     find . -maxdepth 1 -type d -name che-plugin -exec mv {} ide/plugins/che-plugin \;
 
+COPY --chown=0:0 asset-machine-exec ide/bin/machine-exec
+
 RUN for f in "/mnt/rootfs/bin/" "/mnt/rootfs/home/projector" "/mnt/rootfs/etc/passwd" "/mnt/rootfs/etc/group" "/mnt/rootfs/projects" "/mnt/rootfs/projector/ide/bin" ; do\
            chgrp -R 0 ${f} && \
            chmod -R g+rwX ${f}; \

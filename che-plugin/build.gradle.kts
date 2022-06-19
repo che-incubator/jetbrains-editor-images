@@ -11,11 +11,12 @@
  */
 
 plugins {
-    id("org.jetbrains.intellij") version "1.3.1"
-    kotlin("jvm") version "1.6.10"
+    id("java")
+    id("org.jetbrains.kotlin.jvm") version "1.6.20"
+    id("org.jetbrains.intellij") version "1.5.2"
 }
 
-group = "che.incubator.devfile"
+group = "che.incubator.intellij.remote.devfile"
 version = "1.0-SNAPSHOT"
 
 repositories {
@@ -24,13 +25,22 @@ repositories {
 
 dependencies {
     implementation(kotlin("stdlib"))
-    implementation("com.fasterxml.jackson.module:jackson-module-kotlin:2.13.+")
-    implementation("com.fasterxml.jackson.dataformat:jackson-dataformat-yaml:2.11.2")
+    implementation("org.eclipse.jetty.websocket:websocket-jetty-client:11.0.9")
+    implementation("com.google.code.gson:gson:2.9.0")
+    implementation("io.github.che-incubator:che-api:1.0")
 }
 
 
 intellij {
-    version.set("2020.3.4")
+    version.set("2021.2")
+    plugins.add("terminal")
+}
+
+tasks {
+    patchPluginXml {
+        sinceBuild.set("212")
+        untilBuild.set("222.*")
+    }
 }
 
 tasks.buildSearchableOptions {
