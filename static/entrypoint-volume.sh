@@ -19,6 +19,10 @@ fi
 # necessary environment variable: PROJECTOR_ASSEMBLY_DIR
 if [ -n "$PROJECTOR_ASSEMBLY_DIR" ]; then
   cd "$PROJECTOR_ASSEMBLY_DIR"/ide/bin || exit
+
+  # start the machine-exec component in background
+  nohup ./machine-exec --url '0.0.0.0:3333' &
+
   ./ide-projector-launcher.sh
 else
   echo "Environment variable PROJECTOR_ASSEMBLY_DIR is not set"

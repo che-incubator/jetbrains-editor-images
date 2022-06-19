@@ -1,5 +1,7 @@
 # JetBrains Projector Editor Images
 
+![editor](https://raw.githubusercontent.com/che-incubator/jetbrains-editor-images/media/images/editor.png)
+
 Contains utilites and scripts, which allows to run JetBrains products in Eclipse Che infrastructure using [Projector](https://github.com/JetBrains/projector-server).
 
 Projector is a server-side libraries set, that allows to run Swing applications remotely.
@@ -207,14 +209,6 @@ More information is available in [Developer Guide](doc/Developer-Guide.md).
 ## Upstream
 
 The code in the current repository is mainly based on the upstream [projector-docker](https://github.com/JetBrains/projector-docker) with the modifications, that allows to run JetBrains products inside Eclipse Che infractructure.
-
-
-
-## Tested IDEs
-
-During the manual build, it is possible to provide an optional `downloadUrl` parameter of an IDE packaging.
-
-You can find the up-to-date list of tested IDEs here: [Compatible-IDE.md](doc/Compatible-IDE.md).
 
 
 

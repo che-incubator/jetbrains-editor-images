@@ -42,6 +42,10 @@ PROJECTOR_SERVER_IMAGE="projector:latest"
 PROJECTOR_SERVER_ASSET_SRC=projector/asset-projector-server-assembly.zip
 PROJECTOR_SERVER_ASSET_DEST="$base_dir"/asset-projector-server-assembly.zip
 
+MACHINE_EXEC_IMAGE="machine-exec-provider:latest"
+MACHINE_EXEC_ASSET_SRC=exec/machine-exec
+MACHINE_EXEC_ASSET_DEST="$base_dir"/asset-machine-exec
+
 DOC_URL=https://github.com/che-incubator/jetbrains-editor-images/tree/main/doc
 
 # Logging configuration
@@ -256,6 +260,34 @@ EOM
   extractFromContainer "$PLUGIN_BUILDER_IMAGE" "$PLUGIN_ASSET_SRC" "$PLUGIN_ASSET_DEST"
 }
 
+prepareMachineExecBinary() {
+  cd "$base_dir" || exit 1
+  log:debug "Current working directory '$(pwd)'"
+  if [ -f "$MACHINE_EXEC_ASSET_DEST" ]; then
+    log:debug "Removing '$MACHINE_EXEC_ASSET_DEST'"
+    rm "$MACHINE_EXEC_ASSET_DEST"
+  fi
+
+  read -r -d '' PRE_BUILD_SUMMARY <<-EOM
+    Pre-build $MACHINE_EXEC_IMAGE container final summary
+            Docker build progress configuration: $PROGRESS
+            Container name: $MACHINE_EXEC_IMAGE
+EOM
+    log:debug "$PRE_BUILD_SUMMARY"
+    log:info "Build '$MACHINE_EXEC_IMAGE'"
+
+    docker build --progress="$PROGRESS" -f build/dockerfiles/machine-exec-provider.Dockerfile  -t "$MACHINE_EXEC_IMAGE" .
+    # shellcheck disable=SC2181
+    if [[ $? -eq 0 ]]; then
+      log:info "Container '$MACHINE_EXEC_IMAGE' successfully built"
+    else
+      log:warning "Container build failed"
+      exit 1
+    fi
+
+  extractFromContainer "$MACHINE_EXEC_IMAGE" "$MACHINE_EXEC_ASSET_SRC" "$MACHINE_EXEC_ASSET_DEST"
+}
+
 buildAssembly() {
   cd "$base_dir" || exit 1
   log:debug "Current working directory '$(pwd)'"
@@ -372,6 +404,7 @@ prepareBuildAssets() {
   prepareIdePackagingAsset
   prepareProjectorServerAsset
   prepareChePluginAsset
+  prepareMachineExecBinary
 }
 
 buildContainerImage() {

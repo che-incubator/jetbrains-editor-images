@@ -1,32 +1,78 @@
 <idea-plugin>
-    <id>che.incubator.devfile.devfile-plugin</id>
-    <name>Devfile Run Configuration Provider</name>
+    <id>io.github.che_incubator.plugin</id>
+    <name>Che Incubator</name>
     <vendor url="http://www.redhat.com">Red Hat</vendor>
+    <version>1.0.0</version>
 
     <description>
         <![CDATA[
-            Devfile Run Configuration Provider
-
-            Provides parsed Devfile commands and transforms them to IntelliJ Run Configurations.
+            Provides integrations within <a href="https://www.eclipse.org/che/">Eclipse Che</a>.
+            <p>Includes support for:
+            <ul>
+                <li>dashboard interaction</li>
+                <li>parsing Devfile commands as Run Configuration</li>
+                <li>displaying component endpoints</li>
+            </ul>
+            </p>
         ]]>
     </description>
 
     <depends>com.intellij.modules.platform</depends>
+    <depends>org.jetbrains.plugins.terminal</depends>
+
+    <resource-bundle>messages.DashboardBundle</resource-bundle>
+    <resource-bundle>messages.EndpointBundle</resource-bundle>
 
     <extensions defaultExtensionNs="com.intellij">
-        <configurationType implementation="che.incubator.devfile.DevfileRunConfigurationType"/>
-        <postStartupActivity implementation="che.incubator.devfile.DevfileRunConfigurationService"/>
+        <toolWindow id="Commands" factoryClass="io.github.che_incubator.plugin.execution.ui.CommandToolWindowFactory"
+                    canCloseContents="false" anchor="right"/>
+        <projectService serviceImplementation="io.github.che_incubator.plugin.execution.ui.CommandToolWindow"/>
+        <toolWindow id="Endpoints" factoryClass="io.github.che_incubator.plugin.endpoint.ui.EndpointsToolWindowFactory"
+                    canCloseContents="false" anchor="right"/>
+        <projectService serviceImplementation="io.github.che_incubator.plugin.endpoint.ui.EndpointsToolWindow"/>
+        <projectService serviceInterface="io.github.che_incubator.plugin.spec.SpecTemplateProvider"
+                        serviceImplementation="io.github.che_incubator.plugin.spec.SpecTemplateProviderDelegator"/>
+        <projectService serviceInterface="io.github.che_incubator.plugin.endpoint.scanner.InternalScanner"
+                        serviceImplementation="io.github.che_incubator.plugin.endpoint.scanner.InternalScannerDelegator"/>
+        <notificationGroup displayType="BALLOON" id="Endpoints"/>
+        <notificationGroup displayType="BALLOON" id="Commands"/>
+        <webHelpProvider implementation="io.github.che_incubator.plugin.PluginHelpProvider"/>
+        <configurationType implementation="io.github.che_incubator.plugin.execution.run.CommandRunConfigurationType"/>
+        <projectService serviceImplementation="io.github.che_incubator.plugin.execution.provider.RuntimeListProvider"/>
+        <projectService
+                serviceImplementation="io.github.che_incubator.plugin.execution.provider.CommandListActionProvider"/>
+        <runAnything.executionProvider
+                implementation="io.github.che_incubator.plugin.execution.provider.CommandRunAnythingProvider"/>
     </extensions>
 
     <actions>
         <action
-                id="che.incubator.dashboard.OpenDashboardAction"
-                class="che.incubator.dashboard.OpenDashboardAction"
+                id="io.github.che_incubator.plugin.dashboard.GoToDashboardAction"
+                class="io.github.che_incubator.plugin.dashboard.GoToDashboardAction"
                 text="Open Dashboard"
                 description="Open dashboard">
             <add-to-group group-id="WindowMenu" anchor="first"/>
             <add-to-group group-id="NavBarToolBar" anchor="last"/>
             <add-to-group group-id="MainToolBar" anchor="last"/>
         </action>
+
+        <group id="Endpoints.StructureComponent.ToolbarActions">
+            <reference ref="ExpandAll"/>
+            <reference ref="CollapseAll"/>
+            <action id="Endpoints.ToolWindow.OpenEndpointInBrowser"
+                    class="io.github.che_incubator.plugin.endpoint.action.OpenEndpointInBrowserAction"/>
+            <action id="Endpoints.ToolWindow.CopyEndpointUrl"
+                    class="io.github.che_incubator.plugin.endpoint.action.CopyEndpointUrlAction"/>
+        </group>
+
+        <group id="Commands.StructureComponent.ToolbarActions">
+            <action id="Commands.ToolWindow.ExecuteAnyCommand"
+                    class="io.github.che_incubator.plugin.execution.action.ExecuteAnyCommandAction"/>
+            <action id="Commands.ToolWindow.ExecuteCommand"
+                    class="io.github.che_incubator.plugin.execution.action.ExecuteSelectedCommandAction"/>
+            <separator/>
+            <reference ref="ExpandAll"/>
+            <reference ref="CollapseAll"/>
+        </group>
     </actions>
 </idea-plugin>
