@@ -1,6 +1,22 @@
 # Changelog
 This document reflects the project's changes made after each release cycle
 
+## [20220622]
+
+### News
+
+Incubator Plugin now provides ability to communicate with Machine Exec and allows to run Devfile Commands in developer components (containers).
+Also, it provides ability to display Workspace Endpoints and ask user to forward opened ports in case if there is a new service is listening for incoming connections.
+
+All featured changes are described in the following pull request [#121](https://github.com/che-incubator/jetbrains-editor-images/pull/121)
+
+---
+
+- Updated ubi8-minimal image to 8.6-751.1655117800 [#119](https://github.com/che-incubator/jetbrains-editor-images/pull/119)
+
+### Added
+- Open Dashboard action added to a toolbar [#118](https://github.com/che-incubator/jetbrains-editor-images/pull/118)
+
 ## [20220509]
 
 ### News
