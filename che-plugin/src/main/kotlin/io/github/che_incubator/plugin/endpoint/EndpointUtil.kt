@@ -36,7 +36,7 @@ fun isPublicDevfilePortOffline(endpoint: Endpoint?): Boolean {
 }
 
 fun isNameStartsFromRedirectPattern(name: String): Boolean {
-    return name.startsWith("code-redirect-")
+    return name.startsWith("intellij-redirect-")
 }
 
 fun isPathNullOrEmpty(path: String?): Boolean {
