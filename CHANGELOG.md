@@ -1,6 +1,14 @@
 # Changelog
 This document reflects the project's changes made after each release cycle
 
+## [20220623]
+
+Technical release.
+
+### Changed
+
+- Update endpoint-redirect name to be consistent with JetBrains-based IDEs [#124](https://github.com/che-incubator/jetbrains-editor-images/pull/124)
+
 ## [20220622]
 
 ### News
