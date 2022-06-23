@@ -42,21 +42,21 @@ components:
           path: '/?backgroundColor=434343&wss'
           secure: false
           protocol: http
-        - name: code-redirect-1
+        - name: intellij-redirect-1
           targetPort: 13131
           exposure: public
           protocol: http
           attributes:
             discoverable: false
             urlRewriteSupported: true
-        - name: code-redirect-2
+        - name: intellij-redirect-2
           targetPort: 13132
           exposure: public
           protocol: http
           attributes:
             discoverable: false
             urlRewriteSupported: true
-        - name: code-redirect-3
+        - name: intellij-redirect-3
           targetPort: 13133
           exposure: public
           protocol: http
