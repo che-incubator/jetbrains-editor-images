@@ -205,13 +205,6 @@ Options:
 More information is available in [Developer Guide](doc/Developer-Guide.md).
 
 
-
-## Upstream
-
-The code in the current repository is mainly based on the upstream [projector-docker](https://github.com/JetBrains/projector-docker) with the modifications, that allows to run JetBrains products inside Eclipse Che infractructure.
-
-
-
 ## Contributing
 
 The guide which provides necessary information how to build different JetBrains IDEs, you can find here: [Developer-Guide.md](doc/Developer-Guide.md).
