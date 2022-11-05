@@ -205,6 +205,19 @@ Options:
 More information is available in [Developer Guide](doc/Developer-Guide.md).
 
 
+## Builds
+This repo contains several [actions](https://github.com/che-incubator/jetbrains-editor-images/actions), including:
+
+- [![PR](https://github.com/che-incubator/jetbrains-editor-images/actions/workflows/pr.yml/badge.svg)](https://github.com/che-incubator/jetbrains-editor-images/actions/workflows/pr.yml)
+- [![Publish Next](https://github.com/che-incubator/jetbrains-editor-images/actions/workflows/next-build.yml/badge.svg)](https://github.com/che-incubator/jetbrains-editor-images/actions/workflows/next-build.yml)
+- [![Rebase Projector Sources](https://github.com/che-incubator/jetbrains-editor-images/actions/workflows/rebase-projector-sources.yml/badge.svg)](https://github.com/che-incubator/jetbrains-editor-images/actions/workflows/rebase-projector-sources.yml)
+- [![Upload Release Artifacts](https://github.com/che-incubator/jetbrains-editor-images/actions/workflows/release.yml/badge.svg)](https://github.com/che-incubator/jetbrains-editor-images/actions/workflows/release.yml)
+
+Downstream builds can be found at the link below, which is internal to Red Hat. Stable builds can be found by replacing the 3.x with a specific version like 3.2.
+
+- [idea_3.x](https://main-jenkins-csb-crwqe.apps.ocp-c1.prod.psi.redhat.com/job/DS_CI/job/idea_3.x/)
+
+
 ## Contributing
 
 The guide which provides necessary information how to build different JetBrains IDEs, you can find here: [Developer-Guide.md](doc/Developer-Guide.md).
