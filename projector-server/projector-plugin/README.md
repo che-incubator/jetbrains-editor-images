@@ -7,8 +7,13 @@ Projector doesn't support that.
 
 ## Downloading from Plugins Marketplace
 
-The plugin is published here: <https://plugins.jetbrains.com/plugin/16015-projector>. So you can find it in IDE and install it (manual IDE
-restart is needed after installation).
+The plugin is published here:
+
+<a href="https://plugins.jetbrains.com/plugin/16015-projector">
+  <img src="images/button.png" alt="get from marketplace" width="300">
+</a>
+
+You can also find it in your IDE (the plugin is named as "Projector") and install it.
 
 ## Usage
 
@@ -18,7 +23,7 @@ New widget `Projector` will appear in the toolbar.
 To attract user's attention to something, the plugin can display a notification. A notification can be easily closed by pressing the "Got It" button.
 Message example:
 
-![](hello.png)
+![](images/hello.png)
 
 The following notifications are used (please note that we do our best to avoid showing any of them often):
   - **Greeting message** - displayed for each new plugin installation (but no more than once a day) 
@@ -38,8 +43,7 @@ This command creates a zip file in the `projector-plugin/build/distributions` di
 
 ## Downloading zip file from releases
 
-Alternatively, you can download the zip file from [releases](https://github.com/JetBrains/projector-server/releases/). Please search for the
-latest release starting with `agent-...` and find the plugin in Assets there.
+Beside downloading the plugin from the Marketplace as described above, you can download the zip file from [releases](https://github.com/JetBrains/projector-server/releases/). Please search for the latest release starting with `agent-...` and find the plugin in Assets there.
 
 ## Installing zip file
 
