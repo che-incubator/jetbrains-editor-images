@@ -1,6 +1,19 @@
 # Changelog
 This document reflects the project's changes made after each release cycle
 
+## [20221111]
+
+### News
+
+- Updated `machine-exec` image, the `next` version of the `devspaces/machineexec-rhel8` image is used ([#126](https://github.com/che-incubator/jetbrains-editor-images/pull/126))
+- Updated version of the Gradle IntelliJ Plugin to 1.3.1 ([#138](https://github.com/che-incubator/jetbrains-editor-images/pull/138))
+- Updated base ubi-minimal image to 8.6-994 ([#135](https://github.com/che-incubator/jetbrains-editor-images/pull/135))
+- Updated Projector Server sources to [c1cbeb2](https://github.com/JetBrains/projector-server/commit/c1cbeb258143c10a964557e7412c2911222036a9) ([#139](https://github.com/che-incubator/jetbrains-editor-images/pull/139))
+- Updated Projector Client sources to [b420b1a](https://github.com/JetBrains/projector-client/commit/b420b1ad01727948e46b94ef0cd6fbeb977ef37f) ([#139](https://github.com/che-incubator/jetbrains-editor-images/pull/139))
+
+### Changed
+-  `execute` permission is added for the `machine-exec` directly in the Dockerfile ([#137](https://github.com/che-incubator/jetbrains-editor-images/pull/137))
+  
 ## [20220623]
 
 Technical release.
