@@ -16,6 +16,9 @@ if ! whoami &> /dev/null; then
   fi
 fi
 
+# provide necessary environment variables
+echo "export JAVA_HOME=/usr/lib/jvm/java-11" >> "${HOME}"/.bashrc
+
 # PROJECTOR_ASSEMBLY_DIR env variable provided by Docker environment
 cd "$PROJECTOR_ASSEMBLY_DIR"/ide/bin || exit
 
