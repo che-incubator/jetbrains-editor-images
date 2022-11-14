@@ -26,9 +26,6 @@
 
 bash "$PROJECTOR_ASSEMBLY_DIR"/default-configuration-provider.sh
 
-# provide necessary environment variables
-echo "export JAVA_HOME=/usr/lib/jvm/java-11" >> "${HOME}"/.bashrc
-
 # offline activation key registration
 # depending on the product code id taken from $PROJECTOR_ASSEMBLY_DIR/ide/product-info.json looks for:
 #   /tmp/idea.key
