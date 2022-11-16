@@ -6,7 +6,8 @@
 # SPDX-License-Identifier: EPL-2.0
 #
 
-FROM registry.access.redhat.com/ubi8/ubi:8.5-214 as plugin-builder
+# https://registry.access.redhat.com/ubi8/ubi
+FROM registry.access.redhat.com/ubi8/ubi:8.7-929 as plugin-builder
 
 RUN yum install java-11-openjdk-devel unzip -y --nodocs
 RUN mkdir /plugin && mkdir /plugin-assembly
@@ -22,6 +23,7 @@ RUN ./gradlew build
 
 RUN find build/distributions -type f -name "che-plugin-*.zip" -exec mv {} "/plugin-assembly/asset-che-plugin-assembly.zip" \;
 
-FROM registry.access.redhat.com/ubi8/ubi-micro:8.5-744
+# https://registry.access.redhat.com/ubi8/ubi-micro
+FROM registry.access.redhat.com/ubi8/ubi-micro:8.7-1
 WORKDIR /plugin
 COPY --from=plugin-builder /plugin-assembly/asset-che-plugin-assembly.zip asset-che-plugin-assembly.zip
