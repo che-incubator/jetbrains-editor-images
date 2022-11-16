@@ -24,6 +24,6 @@ RUN ./gradlew build
 RUN find build/distributions -type f -name "che-plugin-*.zip" -exec mv {} "/plugin-assembly/asset-che-plugin-assembly.zip" \;
 
 # https://registry.access.redhat.com/ubi8/ubi-micro
-FROM registry.access.redhat.com/ubi8/ubi-micro:8.5-744
+FROM registry.access.redhat.com/ubi8/ubi-micro:8.7-1
 WORKDIR /plugin
 COPY --from=plugin-builder /plugin-assembly/asset-che-plugin-assembly.zip asset-che-plugin-assembly.zip
