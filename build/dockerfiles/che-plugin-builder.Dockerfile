@@ -7,7 +7,7 @@
 #
 
 # https://registry.access.redhat.com/ubi8/ubi
-FROM registry.access.redhat.com/ubi8/ubi:8.5-214 as plugin-builder
+FROM registry.access.redhat.com/ubi8/ubi:8.7-929 as plugin-builder
 
 RUN yum install java-11-openjdk-devel unzip -y --nodocs
 RUN mkdir /plugin && mkdir /plugin-assembly
