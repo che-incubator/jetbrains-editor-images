@@ -7,7 +7,7 @@
 #
 
 # https://registry.access.redhat.com/ubi8/ubi
-FROM registry.access.redhat.com/ubi8/ubi:8.5-214 as projector-builder
+FROM registry.access.redhat.com/ubi8/ubi:8.7-929 as projector-builder
 
 RUN yum install java-11-openjdk unzip -y --nodocs
 RUN mkdir /projector && mkdir /projector-assembly
