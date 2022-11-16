@@ -6,7 +6,8 @@
 # SPDX-License-Identifier: EPL-2.0
 #
 
-FROM registry.access.redhat.com/ubi8/ubi:8.5-214
+# https://registry.access.redhat.com/ubi8/ubi
+FROM registry.access.redhat.com/ubi8/ubi:8.7-929
 
 RUN yum install java-11-openjdk-devel unzip -y --nodocs
 COPY . /devfile-plugin-compilation

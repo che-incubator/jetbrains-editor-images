@@ -5,6 +5,8 @@
 #
 # SPDX-License-Identifier: EPL-2.0
 #
+
+# https://registry.access.redhat.com/ubi8/ubi
 FROM registry.access.redhat.com/ubi8/ubi:8.5-214 as projector-builder
 
 RUN yum install java-11-openjdk unzip -y --nodocs
@@ -23,6 +25,7 @@ RUN ./gradlew :projector-server:distZip
 
 RUN find projector-server/build/distributions -type f -name "projector-server-*.zip" -exec mv {} "/projector-assembly/asset-projector-server-assembly.zip" \;
 
+# https://registry.access.redhat.com/ubi8/ubi-micro
 FROM registry.access.redhat.com/ubi8/ubi-micro:8.5-744
 WORKDIR /projector
 COPY --from=projector-builder /projector-assembly/asset-projector-server-assembly.zip asset-projector-server-assembly.zip

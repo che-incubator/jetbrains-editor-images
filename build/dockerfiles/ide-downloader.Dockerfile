@@ -6,6 +6,7 @@
 # SPDX-License-Identifier: EPL-2.0
 #
 
+# https://registry.access.redhat.com/ubi8-minimal
 FROM registry.access.redhat.com/ubi8-minimal:8.5-230
 
 RUN microdnf install wget -y --nodocs
