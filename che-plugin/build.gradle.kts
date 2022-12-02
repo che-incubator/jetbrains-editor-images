@@ -27,7 +27,7 @@ dependencies {
     implementation(kotlin("stdlib"))
     implementation("org.eclipse.jetty.websocket:websocket-jetty-client:11.0.9")
     implementation("com.google.code.gson:gson:2.9.0")
-    implementation("io.github.che-incubator:che-api:1.0")
+    implementation("io.github.che-incubator:che-api:1.1")
 }
 
 
