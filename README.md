@@ -17,7 +17,7 @@ In order to run JetBrains IDE in Eclipse Che infrastructure, current repository 
 - Che Factory pattern:
 
   ```
-  https://<your-che-host>/dashboard/#https://github.com/che-incubator/jetbrains-editor-images?che-editor=https://raw.githubusercontent.com/che-incubator/jetbrains-editor-images/main/devfiles/next/che-idea/2020.3.4-next.yaml
+  https://<your-che-host>/dashboard/#https://github.com/che-incubator/jetbrains-editor-images?che-editor=https://raw.githubusercontent.com/che-incubator/jetbrains-editor-images/main/devfiles/next/che-idea/2022.1-next.yaml
   ```
 
 ##### PyCharm Community
@@ -25,7 +25,7 @@ In order to run JetBrains IDE in Eclipse Che infrastructure, current repository 
 - Che Factory pattern:
 
   ```
-  https://<your-che-host>/dashboard/#https://github.com/che-incubator/jetbrains-editor-images?che-editor=https://raw.githubusercontent.com/che-incubator/jetbrains-editor-images/main/devfiles/next/che-pycharm/2020.3.5-next.yaml
+  https://<your-che-host>/dashboard/#https://github.com/che-incubator/jetbrains-editor-images?che-editor=https://raw.githubusercontent.com/che-incubator/jetbrains-editor-images/main/devfiles/next/che-pycharm/2022.1-next.yaml
   ```
 
 
