@@ -24,11 +24,11 @@ on:
 jobs:
   prepare_environment:
     name: Prepare Environment
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     outputs:
       matrix: ${{ steps.set-matrix.outputs.matrix }}
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
         with:
           fetch-depth: 1
       - id: set-matrix
@@ -37,19 +37,19 @@ jobs:
   build:
     name: ${{ matrix.productCode }} (${{ matrix.version }}) - Publish Next to Quay.io
     needs: prepare_environment
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     strategy:
       matrix: ${{ fromJson(needs.prepare_environment.outputs.matrix) }}
     steps:
       - name: Clone source code
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
         with:
           fetch-depth: 1
       - name: Compute sha revision
         id: short_sha
         run: echo ::set-output name=hash::$(git rev-parse --short "$GITHUB_SHA")
       - name: Docker login
-        uses: docker/login-action@v1
+        uses: docker/login-action@v2
         with:
           registry: quay.io
           username: ${{ secrets.QUAY_USERNAME }}
