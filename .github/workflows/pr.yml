@@ -23,11 +23,11 @@ on:
 jobs:
   prepare_environment:
     name: Prepare Environment
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     outputs:
       matrix: ${{ steps.set-matrix.outputs.matrix }}
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
         with:
           fetch-depth: 1
       - id: set-matrix
@@ -36,12 +36,12 @@ jobs:
   build:
     name: ${{ matrix.productCode }} (${{ matrix.version }}) - Projector Docker Build
     needs: prepare_environment
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     strategy:
       matrix: ${{ fromJson(needs.prepare_environment.outputs.matrix) }}
     steps:
       - name: Clone source code
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
         with:
           fetch-depth: 1
       - name: Docker image build
