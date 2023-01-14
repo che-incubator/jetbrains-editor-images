@@ -7,7 +7,7 @@
 #
 
 # https://registry.access.redhat.com/ubi8/ubi
-FROM registry.access.redhat.com/ubi8/ubi:8.7-1037
+FROM registry.access.redhat.com/ubi8/ubi:8.7-1054
 
 RUN yum install java-11-openjdk-devel unzip -y --nodocs
 COPY . /devfile-plugin-compilation
