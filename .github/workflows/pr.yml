@@ -47,7 +47,7 @@ jobs:
       - name: Docker image build
         run: |
           ./projector.sh build \
-              --tag ${{ secrets.QUAY_REPOSITORY }}/${{ matrix.dockerImage }}:${{ matrix.version }} \
+              --tag ${{ matrix.dockerImage }}:${{ matrix.version }} \
               --url ${{ matrix.downloadUrl }} \
               --progress plain \
               --log-level debug
