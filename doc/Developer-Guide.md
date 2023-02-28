@@ -4,7 +4,7 @@ Current document contains tip to help and understand the first steps that needed
 
 ## Prerequisities
 
-In order to build locally container images, make sure, that **Docker version is 18.09** or higher, since the build scripts use [Docker BuildKit](https://docs.docker.com/develop/develop-images/build_enhancements/).
+In order to build the container images locally, make sure, that **Docker version is 18.09** or higher, since the build scripts use [Docker BuildKit](https://docs.docker.com/develop/develop-images/build_enhancements/).
 
 > For macOS users, it is needed to ensure that `gnu-getopt` is installed in the system.
 
