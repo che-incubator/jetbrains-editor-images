@@ -198,7 +198,7 @@ JetBrains provides zip archive with two types of activation code. `<License ID> 
 
 ### Use activation codes when running a JetBrains IDE container using Docker
 
-When you run the container on your local machine, it is possible to provide the activation code for offline usage to register the JetBrains IDE. The container image contains scripts, which perform this operation. You only need to map the activation code, that are located on your host, as volume mounts when running the container with Docker. For example:
+When you run the container on your local machine, it is possible to provide the activation code for offline usage to register the JetBrains IDE. The container image contains scripts, which perform this operation. You only need to map the activation codes, that are located on your host, as volume mounts when running the container with Docker. For example:
 
 ```sh
 $ docker run --env DEV_MODE=true --rm -p 8887:8887 -v <path to text file on your host>:/tmp/<product>.key -it <containerName>
