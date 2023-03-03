@@ -22,7 +22,7 @@
 # limitations under the License.
 #
 
-# To build the cuurent Dockerfile there is the following flow:
+# To build the current Dockerfile there is the following flow:
 #   $ ./projector.sh build [OPTIONS]
 
 # Stage 1. Prepare JetBrains IDE with Projector.
@@ -31,7 +31,7 @@
 #       * asset-projector-server-assembly.zip - Projector Server assembly;
 #       * asset-static-assembly.tar.gz - archived `static/` directory.
 # https://registry.access.redhat.com/ubi8/ubi
-FROM registry.access.redhat.com/ubi8/ubi:8.7-1090 as ubi-builder
+FROM ubi8:8.7-1054.1675788412 as ubi-builder
 COPY --chown=0:0 asset-required-rpms.txt /tmp/asset-required-rpms.txt
 
 RUN mkdir -p /mnt/rootfs
@@ -40,7 +40,6 @@ RUN yum install unzip -y --nodocs && \
         brotli libstdc++ coreutils glibc-minimal-langpack \
         jq shadow-utils wget git nss procps findutils which socat \
         java-11-openjdk-devel \
-        python2 python39 \
         libXext libXrender libXtst libXi \
         $(cat /tmp/asset-required-rpms.txt) \
             --releasever 8 --setopt install_weak_deps=false --nodocs -y && \
@@ -84,7 +83,7 @@ RUN rm /mnt/rootfs/etc/hosts
 
 # Stage 2. Copy from build environment Projector assembly to the runtime. Projector runs in headless mode.
 # https://registry.access.redhat.com/ubi8-minimal
-FROM registry.access.redhat.com/ubi8-minimal:8.7-1085
+FROM ubi8-minimal:8.7-1049.1675784874
 ENV HOME=/home/projector
 ENV PROJECTOR_ASSEMBLY_DIR /projector
 ENV PROJECTOR_CONFIG_DIR $HOME/.jetbrains
@@ -92,3 +91,5 @@ COPY --from=ubi-builder /mnt/rootfs/ /
 USER 1001
 EXPOSE 8887
 ENTRYPOINT $PROJECTOR_ASSEMBLY_DIR/entrypoint.sh
+
+# append Brew metadata here

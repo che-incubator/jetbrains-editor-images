@@ -305,7 +305,7 @@ EOM
     docker build \
     --progress="$PROGRESS" \
     -t "$CONTAINER_TAG" \
-    -f Dockerfile .
+    -f build/dockerfiles/Dockerfile .
   # shellcheck disable=SC2181
   if [[ $? -eq 0 ]]; then
     log:info "Container '$CONTAINER_TAG' successfully built"
