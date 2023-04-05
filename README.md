@@ -8,6 +8,9 @@ Projector is a server-side libraries set, that allows to run Swing applications 
 
 
 
+
+
+
 ## Run JetBrains IDE in Eclipse Che
 
 In order to run JetBrains IDE in Eclipse Che infrastructure, current repository contains workspace configuration, which provides the ability to do that. To run the workspace you can use Factory Link:
