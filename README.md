@@ -2,19 +2,19 @@
 
 ![editor](https://raw.githubusercontent.com/che-incubator/jetbrains-editor-images/media/images/editor.png)
 
-Contains utilites and scripts, which allows to run JetBrains products in Eclipse Che infrastructure using [Projector](https://github.com/JetBrains/projector-server).
+Contains utilites and scripts, which allows to run JetBrains products in Eclipse Che® infrastructure using [Projector](https://github.com/JetBrains/projector-server).
 
 Projector is a server-side libraries set, that allows to run Swing applications remotely.
 
 
 
-## Run JetBrains IDE in Eclipse Che
+## Run JetBrains IDE in Eclipse Che®
 
-In order to run JetBrains IDE in Eclipse Che infrastructure, current repository contains workspace configuration, which provides the ability to do that. To run the workspace you can use Factory Link:
+In order to run JetBrains IDE in Eclipse Che® infrastructure, current repository contains workspace configuration, which provides the ability to do that. To run the workspace you can use Factory Link:
 
 ##### IntelliJ IDEA Community
 
-- Che Factory pattern:
+- Eclipse Che® Factory pattern:
 
   ```
   https://<your-che-host>/dashboard/#https://github.com/che-incubator/jetbrains-editor-images?che-editor=https://raw.githubusercontent.com/che-incubator/jetbrains-editor-images/main/devfiles/next/che-idea/2022.1-next.yaml
@@ -22,7 +22,7 @@ In order to run JetBrains IDE in Eclipse Che infrastructure, current repository 
 
 ##### PyCharm Community
 
-- Che Factory pattern:
+- Eclipse Che® Factory pattern:
 
   ```
   https://<your-che-host>/dashboard/#https://github.com/che-incubator/jetbrains-editor-images?che-editor=https://raw.githubusercontent.com/che-incubator/jetbrains-editor-images/main/devfiles/next/che-pycharm/2022.1-next.yaml
@@ -78,7 +78,7 @@ More information is available in [Developer Guide](doc/Developer-Guide.md).
 
 ### `projector.sh`
 
-The main entrypoint to build and run of IntelliJ-based IDEs to run in Eclipse Che environment.
+The main entrypoint to build and run of IntelliJ-based IDEs to run in Eclipse Che® environment.
 
 Calling the
 
@@ -221,3 +221,7 @@ Downstream builds can be found at the link below, which is internal to Red Hat. 
 ## Contributing
 
 The guide which provides necessary information how to build different JetBrains IDEs, you can find here: [Developer-Guide.md](doc/Developer-Guide.md).
+
+## Trademark
+
+"Che" is a trademark of the Eclipse Foundation.
