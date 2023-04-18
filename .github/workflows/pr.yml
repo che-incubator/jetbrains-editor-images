@@ -32,7 +32,7 @@ jobs:
           fetch-depth: 1
       - id: set-matrix
         run: |
-          echo "::set-output name=matrix::{\"include\":[$( .github/build-container-matrix.sh -m latest )]}"
+          echo "matrix={\"include\":[$( .github/build-container-matrix.sh -m latest )]}" >> $GITHUB_OUTPUT
   build:
     name: ${{ matrix.productCode }} (${{ matrix.version }}) - Projector Docker Build
     needs: prepare_environment
