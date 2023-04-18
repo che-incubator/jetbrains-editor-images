@@ -33,7 +33,7 @@ jobs:
           fetch-depth: 1
       - id: set-matrix
         run: |
-          echo "::set-output name=matrix::{\"include\":[$( .github/build-container-matrix.sh -m all )]}"
+          echo "matrix={\"include\":[$( .github/build-container-matrix.sh -m all )]}" >> $GITHUB_OUTPUT
   build:
     name: ${{ matrix.productCode }} (${{ matrix.version }}) - Publish Next to Quay.io
     needs: prepare_environment
@@ -47,7 +47,7 @@ jobs:
           fetch-depth: 1
       - name: Compute sha revision
         id: short_sha
-        run: echo ::set-output name=hash::$(git rev-parse --short "$GITHUB_SHA")
+        run: echo "hash=$(git rev-parse --short $GITHUB_SHA)" >> $GITHUB_OUTPUT
       - name: Docker login
         uses: docker/login-action@v2
         with:

@@ -44,7 +44,7 @@ jobs:
           fetch-depth: 1
       - id: set-matrix
         run: |
-          echo "::set-output name=matrix::{\"include\":[$( .github/build-container-matrix.sh -m all )]}"
+          echo "matrix={\"include\":[$( .github/build-container-matrix.sh -m all )]}" >> $GITHUB_OUTPUT
   build:
     name: ${{ matrix.productCode }} (${{ matrix.version }}) - Release Asset
     needs: [prepare_environment, create_release]
@@ -58,7 +58,7 @@ jobs:
           fetch-depth: 1
       - name: Tag name
         id: tag_name
-        run: echo ::set-output name=sourceTag::${GITHUB_REF#refs/tags/}
+        run: echo "sourceTag=${GITHUB_REF#refs/tags/}" >> $GITHUB_OUTPUT
       - name: Docker login
         uses: docker/login-action@v2
         with:
