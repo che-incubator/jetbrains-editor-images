@@ -84,7 +84,7 @@ RUN rm /mnt/rootfs/etc/hosts
 
 # Stage 2. Copy from build environment Projector assembly to the runtime. Projector runs in headless mode.
 # https://registry.access.redhat.com/ubi8-minimal
-FROM registry.access.redhat.com/ubi8-minimal:8.8-860
+FROM registry.access.redhat.com/ubi8-minimal:8.8-1014
 ENV HOME=/home/projector
 ENV PROJECTOR_ASSEMBLY_DIR /projector
 ENV PROJECTOR_CONFIG_DIR $HOME/.jetbrains
