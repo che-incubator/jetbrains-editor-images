@@ -1,0 +1,40 @@
+schemaVersion: 2.2.0
+metadata:
+  name: jetbrains-editor-images
+components:
+  - name: devtools
+    container:
+      image: quay.io/devfile/universal-developer-image:latest
+      cpuLimit: '4'
+      memoryLimit: 12Gi
+      env:
+        - name: DOCKER
+          value: podman
+        - name: KUBEDOCK_ENABLED
+          value: 'true'
+commands:
+  - id: generic-build
+    exec:
+      commandLine: ./projector.sh build
+      component: devtools
+      label: Interactive build of supported JetBrains IDEs
+  - id: goland-build
+    exec:
+      commandLine: ./projector.sh build --url https://download.jetbrains.com/go/goland-2021.3.3.tar.gz --tag quay.io/che-incubator/che-goland:2021.3
+      component: devtools
+      label: Build of JetBrains GoLand container image
+  - id: raider-build
+    exec:
+      commandLine: ./projector.sh build --url https://download.jetbrains.com/rider/JetBrains.Rider-2021.3.3.tar.gz --tag quay.io/che-incubator/che-rider:2021.3
+      component: devtools
+      label: Build of JetBrains Raider container image
+  - id: intellij-ultimate-build
+    exec:
+      commandLine: ./projector.sh build --url https://download.jetbrains.com/idea/ideaIU-2021.3.2.tar.gz --tag quay.io/che-incubator/che-ideaiu:2021.3
+      component: devtools
+      label: Build of JetBrains IntelliJ Ultimate container image
+  - id: intellij-run
+    exec:
+      commandLine: podman run -p 8887:8887 -d quay.io/che-incubator/che-idea:next
+      component: devtools
+      label: Run of JetBrains IntelliJ
