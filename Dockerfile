@@ -62,7 +62,7 @@ RUN unzip asset-projector-server-assembly.zip && rm asset-projector-server-assem
     find . -maxdepth 1 -type d -name projector-server-* -exec mv {} ide/projector-server \;
 
 COPY --chown=0:0 asset-static-assembly.tar.gz .
-RUN tar -xf asset-static-assembly.tar.gz && rm asset-static-assembly.tar.gz && \
+RUN tar --no-same-owner -xf asset-static-assembly.tar.gz && rm asset-static-assembly.tar.gz && \
     chown -R 0:0 static && \
     mv static/* . && rm -rf static && \
     chmod +x *.sh && \

@@ -48,6 +48,8 @@ MACHINE_EXEC_ASSET_DEST="$base_dir"/asset-machine-exec
 
 DOC_URL=https://github.com/che-incubator/jetbrains-editor-images/tree/main/doc
 
+DOCKER=${DOCKER:-docker}
+
 # Logging configuration
 # https://en.wikipedia.org/wiki/Syslog#Severity_level
 _RD='\033[0;31m' # Red
@@ -220,7 +222,7 @@ EOM
   log:debug "$PRE_BUILD_SUMMARY"
   log:info "Build '$PROJECTOR_SERVER_IMAGE'"
 
-  docker build --progress="$PROGRESS" -f build/dockerfiles/projector-server-builder.Dockerfile -t "$PROJECTOR_SERVER_IMAGE" .
+  "${DOCKER}" build --progress="$PROGRESS" -f build/dockerfiles/projector-server-builder.Dockerfile -t "$PROJECTOR_SERVER_IMAGE" .
   # shellcheck disable=SC2181
   if [[ $? -eq 0 ]]; then
     log:info "Container '$PROJECTOR_SERVER_IMAGE' successfully built"
@@ -248,7 +250,7 @@ EOM
   log:debug "$PRE_BUILD_SUMMARY"
   log:info "Build '$PLUGIN_BUILDER_IMAGE'"
 
-  docker build --progress="$PROGRESS" -f build/dockerfiles/che-plugin-builder.Dockerfile -t "$PLUGIN_BUILDER_IMAGE" .
+  "${DOCKER}" build --progress="$PROGRESS" -f build/dockerfiles/che-plugin-builder.Dockerfile -t "$PLUGIN_BUILDER_IMAGE" .
   # shellcheck disable=SC2181
   if [[ $? -eq 0 ]]; then
     log:info "Container '$PLUGIN_BUILDER_IMAGE' successfully built"
@@ -276,7 +278,7 @@ EOM
     log:debug "$PRE_BUILD_SUMMARY"
     log:info "Build '$MACHINE_EXEC_IMAGE'"
 
-    docker build --progress="$PROGRESS" -f build/dockerfiles/machine-exec-provider.Dockerfile  -t "$MACHINE_EXEC_IMAGE" .
+    "${DOCKER}" build --progress="$PROGRESS" -f build/dockerfiles/machine-exec-provider.Dockerfile  -t "$MACHINE_EXEC_IMAGE" .
     # shellcheck disable=SC2181
     if [[ $? -eq 0 ]]; then
       log:info "Container '$MACHINE_EXEC_IMAGE' successfully built"
@@ -302,7 +304,7 @@ EOM
   log:info "Build '$CONTAINER_TAG'"
 
   DOCKER_BUILDKIT=1 \
-    docker build \
+    "${DOCKER}" build \
     --progress="$PROGRESS" \
     -t "$CONTAINER_TAG" \
     -f Dockerfile .
@@ -328,7 +330,7 @@ runContainerImage() {
   done <<<"$mountVolumes"
 
   log:info "Run container '$containerToStart'"
-  docker run --rm -p 8887:8887 "${mountOptions[@]}" -it "$containerToStart" 2>&1 | awk '{print "       "$0}'
+  "${DOCKER}" run --rm -p 8887:8887 "${mountOptions[@]}" -it "$containerToStart" 2>&1 | awk '{print "       "$0}'
 }
 
 saveImageOnBuild() {
@@ -338,7 +340,7 @@ saveImageOnBuild() {
     fi
     local imageOutputName && imageOutputName=$(basename "$URL")
     log:info "Saving '$CONTAINER_TAG' to '$SAVE_ON_BUILD_DIRECTORY/$imageOutputName'"
-    docker save "$CONTAINER_TAG" -o "$SAVE_ON_BUILD_DIRECTORY"/"$imageOutputName"
+    "${DOCKER}" save "$CONTAINER_TAG" -o "$SAVE_ON_BUILD_DIRECTORY"/"$imageOutputName"
     log:info "Image '$CONTAINER_TAG' saved to '$SAVE_ON_BUILD_DIRECTORY/$imageOutputName'"
   fi
 }
@@ -378,7 +380,7 @@ EOM
   log:debug "$PRE_BUILD_SUMMARY"
   log:info "Build '$IDE_DOWNLOADER_IMAGE'"
 
-  docker build --progress="$PROGRESS" -f build/dockerfiles/ide-downloader.Dockerfile --build-arg "URL=$URL" -t "$IDE_DOWNLOADER_IMAGE" .
+  "${DOCKER}" build --progress="$PROGRESS" -f build/dockerfiles/ide-downloader.Dockerfile --build-arg "URL=$URL" -t "$IDE_DOWNLOADER_IMAGE" .
   # shellcheck disable=SC2181
   if [[ $? -eq 0 ]]; then
     log:info "Container '$IDE_DOWNLOADER_IMAGE' successfully built"
@@ -459,8 +461,8 @@ extractFromContainer() {
   tmpContainer="$(echo "$1" | tr "/:" "--")-$(date +%s)"
 
   log:info "Using temporary container '$tmpContainer'"
-  docker create --name="$tmpContainer" "$1" sh >/dev/null 2>&1
-  docker export "$tmpContainer" > "/tmp/$tmpContainer.tar"
+  "${DOCKER}" create --name="$tmpContainer" "$1" sh >/dev/null 2>&1
+  "${DOCKER}" export "$tmpContainer" > "/tmp/$tmpContainer.tar"
 
   tmpDir="/tmp/$tmpContainer"
   log:info "Created temporary directory '$tmpDir'"
@@ -474,7 +476,7 @@ extractFromContainer() {
   mv "$tmpDir/$2" "$3"
 
   log:info "Clean up the temporary container and directory"
-  docker rm -f "$tmpContainer" >/dev/null 2>&1
+  "${DOCKER}" rm -f "$tmpContainer" >/dev/null 2>&1
   rm -rf "/tmp/$tmpContainer.tar"
   rm -rf "$tmpDir" || true
 }
