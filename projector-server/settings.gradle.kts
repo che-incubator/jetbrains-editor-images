@@ -47,6 +47,7 @@ val localProperties = Properties().apply {
 }
 
 if (localProperties["useLocalProjectorClient"] == "true") {
+  println(">>> useLocalProjectorClient is set to TRUE")
   includeBuild("../projector-client") {
     dependencySubstitution {
       substitute(module("$projectorClientGroup:projector-common")).using(project(":projector-common"))
