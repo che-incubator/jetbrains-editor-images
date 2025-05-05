@@ -37,24 +37,13 @@ rootProject.name = "projector-server"
 
 val projectorClientGroup: String by settings
 
-val localProperties = Properties().apply {
-  try {
-    load(File(rootDir, "local.properties").inputStream())
-  }
-  catch (t: Throwable) {
-    println("Can't read local.properties: $t, assuming empty")
-  }
-}
-
-if (localProperties["useLocalProjectorClient"] == "true") {
-  println(">>> useLocalProjectorClient is set to TRUE")
-  includeBuild("../projector-client") {
-    dependencySubstitution {
-      substitute(module("$projectorClientGroup:projector-common")).using(project(":projector-common"))
-      substitute(module("$projectorClientGroup:projector-server-core")).using(project(":projector-server-core"))
-      substitute(module("$projectorClientGroup:projector-util-loading")).using(project(":projector-util-loading"))
-      substitute(module("$projectorClientGroup:projector-util-logging")).using(project(":projector-util-logging"))
-    }
+println(">>> Include projector-client...")
+includeBuild("../projector-client") {
+  dependencySubstitution {
+    substitute(module("$projectorClientGroup:projector-common")).using(project(":projector-common"))
+    substitute(module("$projectorClientGroup:projector-server-core")).using(project(":projector-server-core"))
+    substitute(module("$projectorClientGroup:projector-util-loading")).using(project(":projector-util-loading"))
+    substitute(module("$projectorClientGroup:projector-util-logging")).using(project(":projector-util-logging"))
   }
 }
 
