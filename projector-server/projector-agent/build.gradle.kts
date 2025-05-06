@@ -68,7 +68,7 @@ tasks.withType<Jar> {
   exclude("META-INF/versions/9/module-info.class")
   duplicatesStrategy = DuplicatesStrategy.WARN
 
-  from(inline(configurations.runtimeClasspath)) // todo: remove
+  // from(inline(configurations.runtimeClasspath)) // todo: remove
 }
 
 val localProperties = Properties()
