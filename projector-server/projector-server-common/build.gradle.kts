@@ -79,7 +79,12 @@ fun downloadFontsInZip(
   else {
     println("Some $name fonts are missing, downloading... If some fonts exist, they will be overwritten.")
 
+    println("> Downloading $zipUrl")
+    val fileName = URL(zipUrl).path.substringAfterLast("/")
+    println("> file name: $fileName")
+
     project.file(fontsPath).mkdirs()
+    println("> fonts path: $fontsPath")
 
     val tempFile = File.createTempFile("${name}-fonts", "zip")
     URL(zipUrl).openStream().copyTo(tempFile.outputStream())
