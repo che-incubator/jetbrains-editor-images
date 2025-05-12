@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019-2022, JetBrains s.r.o. and/or its affiliates. All rights reserved.
+ * Copyright (c) 2019-2023, JetBrains s.r.o. and/or its affiliates. All rights reserved.
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
  *
  * This code is free software; you can redistribute it and/or modify it
@@ -900,8 +900,9 @@ class ProjectorServer private constructor(
 
       generalInitializer.run()
 
-      IjInjectorAgentInitializer.init(isAgent, IdeState.isIdeAttached)
-      if (!IdeState.isIdeAttached) {
+      if (IdeState.isIdeAttached) {
+        IjInjectorAgentInitializer.init(isAgent, IdeState.isIdeAttached)
+      } else {
         logger.info { "Skipping IDE injections" }
       }
 

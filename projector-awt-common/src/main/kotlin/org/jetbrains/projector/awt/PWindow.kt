@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019-2022, JetBrains s.r.o. and/or its affiliates. All rights reserved.
+ * Copyright (c) 2019-2023, JetBrains s.r.o. and/or its affiliates. All rights reserved.
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
  *
  * This code is free software; you can redistribute it and/or modify it
@@ -124,7 +124,6 @@ class PWindow private constructor(val target: Component, private val isAgent: Bo
   }
 
   fun transferNativeFocus() {
-    toFront()
     if (!isAgent) {
       if (target is Window)
         Toolkit.getDefaultToolkit().systemEventQueue.postEvent(WindowEvent(target, WindowEvent.WINDOW_GAINED_FOCUS))
@@ -140,6 +139,7 @@ class PWindow private constructor(val target: Component, private val isAgent: Bo
 
     if (!hasMoved && !hasResized) return
 
+    toFront()
     transferNativeFocus()
 
     if (PGraphicsEnvironment.clientDoesWindowManagement) {
